@@ -9287,6 +9287,12 @@ namespace CSH030Ex
                 AxisCalibration(Axis.TX, 160, false, true, true);
                 AxisCalibration(Axis.TZ, 180, false, true, true);
             }
+            AxisCalibration(Axis.Z, 1400, true, false, false);
+            AxisCalibration(Axis.Y, 1500, true, false, false);
+            AxisCalibration(Axis.X, 1500, true, false, false);
+            AxisCalibration(Axis.TY, 180, true, false, false);
+            AxisCalibration(Axis.TX, 160, true, false, false);
+            AxisCalibration(Axis.TZ, 180, true, false, false);
 
             AddVsnLog("Finsh Calibration");
         }
@@ -10158,7 +10164,7 @@ namespace CSH030Ex
             mEstimatedEastViewYscale = (mYCalAvgY1Y2pp + mZCalAvgY1Y2pp) / (mYCalY3pp + mZCalY3pp);
 
             //string isPass = Math.Abs(eastSideViewAngle) <= 0.1 ? "Pass" : "Fail";
-            string isPass = Math.Abs(eastSideViewAngle) <= 0.2 ? "Pass" : "Fail";
+            string isPass = Math.Abs(eastSideViewAngle) <= 0.15 ? "Pass" : "Fail";
             lstr = $"E-S View YP : {eastSideViewAngle:E5} ({isPass})\r\n";
             lstr += "E-S View YP Scale\t" + mEstimatedEastViewYscale.ToString("E5") + "\r\n";
 
@@ -10228,6 +10234,7 @@ namespace CSH030Ex
             string DoNotTouchPathName = m__G.m_RootDirectory + "\\DoNotTouch\\";
 
             string lstr = "";
+            int debug = 0;
 
             switch (axis)
             {
@@ -10746,7 +10753,7 @@ namespace CSH030Ex
                         {
                             m__G.oCam[0].mFAL.mFZM.mcLP1stPoly(sZZ, effLength, ref ZtoZab[1], ref ZtoZab[2]);
                             m__G.oCam[0].mFAL.mFZM.mcLP1stPoly(sZtoX, effLength, ref ZtoXab[1], ref ZtoXab[2]);
-                            m__G.oCam[0].mFAL.mFZM.mcLP1stPoly(sZtoY, effLength, ref ZtoYab[1], ref ZtoXab[2]);
+                            m__G.oCam[0].mFAL.mFZM.mcLP1stPoly(sZtoY, effLength, ref ZtoYab[1], ref ZtoYab[2]);
                             m__G.oCam[0].mFAL.mFZM.mcLP1stPoly(sZtoTX, effLength, ref ZtoTXab[1], ref ZtoTXab[2]);
                             m__G.oCam[0].mFAL.mFZM.mcLP1stPoly(sZtoTY, effLength, ref ZtoTYab[1], ref ZtoTYab[2]);
                             m__G.oCam[0].mFAL.mFZM.mcLP1stPoly(sZtoTZ, effLength, ref ZtoTZab[1], ref ZtoTZab[2]);
@@ -10873,6 +10880,9 @@ namespace CSH030Ex
                         // ScaleNTheta 업데이트
                         if (isRemote)
                         {
+                            if (IsRecal)
+                                debug = 0;
+
                             string scaleNthetaFile = DoNotTouchPathName + "ScaleNTheta" + camID0 + ".txt";
                             StreamReader sr = new StreamReader(scaleNthetaFile);
                             string allstr = sr.ReadToEnd();
@@ -11129,9 +11139,9 @@ namespace CSH030Ex
                                     TYtoTXab[i] = m__G.oCam[0].mFAL.mFZM.mTYtoTXst[i] + TYtoTXab[i];
                                     TYtoTZab[i] = m__G.oCam[0].mFAL.mFZM.mTYtoTZst[i] + TYtoTZab[i];
 
-                                    TYtoXab[i] = m__G.oCam[0].mFAL.mFZM.mTXtoXst[i] + TYtoXab[i];
-                                    TYtoYab[i] = m__G.oCam[0].mFAL.mFZM.mTXtoYst[i] + TYtoYab[i];
-                                    TYtoZab[i] = m__G.oCam[0].mFAL.mFZM.mTXtoZst[i] + TYtoZab[i];
+                                    TYtoXab[i] = m__G.oCam[0].mFAL.mFZM.mTYtoXst[i] + TYtoXab[i];
+                                    TYtoYab[i] = m__G.oCam[0].mFAL.mFZM.mTYtoYst[i] + TYtoYab[i];
+                                    TYtoZab[i] = m__G.oCam[0].mFAL.mFZM.mTYtoZst[i] + TYtoZab[i];
                                 }
                                 else
                                 {
@@ -14735,7 +14745,34 @@ namespace CSH030Ex
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
-            AutoCalibration();
+            if (motorizedMeasurementRun)
+            {
+                motorizedMeasurementAbort = true;
+                btnEastScale.Enabled = false;
+                return;
+            }
+
+            motorizedMeasurementRun = true;
+            btnEastScale.Text = "Stop";
+            try
+            {
+                await Task.Run(() =>
+                {
+                    AutoCalibration();
+                });
+
+            }
+            catch (Exception ex)
+            {
+                AddVsnLog($"Catch Failure: {ex.Message}");
+            }
+            finally
+            {
+                motorizedMeasurementRun = false;
+                motorizedMeasurementAbort = false;
+                btnEastScale.Enabled = true;
+                btnEastScale.Text = "East Scale";
+            }
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
