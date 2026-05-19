@@ -1565,7 +1565,7 @@ namespace CSH030Ex
             PortList[port].Write(data, 0, data.Length);
             PortList[port].BaseStream.Flush();
             PortList[port].DiscardInBuffer();
-            Thread.Sleep(35);   //  시간 최적화 필요
+            Thread.Sleep(36);   //  시간 최적화 필요
 
             try
             {

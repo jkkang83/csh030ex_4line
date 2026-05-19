@@ -9287,12 +9287,13 @@ namespace CSH030Ex
                 AxisCalibration(Axis.TX, 160, false, true, true);
                 AxisCalibration(Axis.TZ, 180, false, true, true);
             }
-            AxisCalibration(Axis.Z, 1400, true, false, false);
-            AxisCalibration(Axis.Y, 1500, true, false, false);
-            AxisCalibration(Axis.X, 1500, true, false, false);
-            AxisCalibration(Axis.TY, 180, true, false, false);
-            AxisCalibration(Axis.TX, 160, true, false, false);
-            AxisCalibration(Axis.TZ, 180, true, false, false);
+            //AddVsnLog("Start Verification");
+            //AxisCalibration(Axis.Z, 1000, true, false, false);
+            //AxisCalibration(Axis.Y, 1500, true, false, false);
+            //AxisCalibration(Axis.X, 1500, true, false, false);
+            //AxisCalibration(Axis.TY, 170, true, false, false);
+            //AxisCalibration(Axis.TX, 150, true, false, false);
+            //AxisCalibration(Axis.TZ, 180, true, false, false);
 
             AddVsnLog("Finsh Calibration");
         }
@@ -9562,7 +9563,7 @@ namespace CSH030Ex
                     {
                         double step = 12;
                         if (isSingle)
-                            step = 6;
+                            step = 10;
 
                         stabilizedDataList.Add(ScanAxis(axis, onewayStrokeUm, step, true, true, isRemote));
                         break;
@@ -14663,8 +14664,17 @@ namespace CSH030Ex
             }
 
 
-            AutoCalibration(true);
+            try
+            {
+                await Task.Run(() =>
+                {
+                    AutoCalibration();
+                });
 
+            }
+            finally
+            { }
+          
             Thread.Sleep(500);
 
             motorizedMeasurementRun = false;
