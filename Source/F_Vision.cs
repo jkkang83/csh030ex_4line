@@ -9268,24 +9268,24 @@ namespace CSH030Ex
                 AxisCalibration(Axis.TZ, 180, false, true, false); //200
                 AddVsnLog("Finish  baseline measurement");
                 AddVsnLog("Start 1st Fine Cal.");
-                AxisCalibration(Axis.Z, 1400, false, false, true);
-                AxisCalibration(Axis.Y, 1500, false, false, true);
-                AxisCalibration(Axis.X, 1500, false, false, true);
-                AxisCalibration(Axis.TY, 180, false, false, true);
-                AxisCalibration(Axis.TX, 160, false, false, true);
-                AxisCalibration(Axis.TZ, 180, false, false, true);
+                AxisCalibration(Axis.Z, 1400, false, true, true);
+                AxisCalibration(Axis.Y, 1500, false, true, true);
+                AxisCalibration(Axis.X, 1500, false, true, true);
+                AxisCalibration(Axis.TY, 180, false, true, true);
+                AxisCalibration(Axis.TX, 160, false, true, true);
+                AxisCalibration(Axis.TZ, 180, false, true, true);
 
             }
             else
             {
                 AddVsnLog("Repeat Fine Cal.");
                 FindCSHorg(true);   // Probe 리셋
-                AxisCalibration(Axis.Z, 1400, false, false, true);
-                AxisCalibration(Axis.Y, 1500, false, false, true);
-                AxisCalibration(Axis.X, 1500, false, false, true);
-                AxisCalibration(Axis.TY, 180, false, false, true);
-                AxisCalibration(Axis.TX, 160, false, false, true);
-                AxisCalibration(Axis.TZ, 180, false, false, true);
+                AxisCalibration(Axis.Z, 1400, false, true, true);
+                AxisCalibration(Axis.Y, 1500, false, true, true);
+                AxisCalibration(Axis.X, 1500, false, true, true);
+                AxisCalibration(Axis.TY, 180, false, true, true);
+                AxisCalibration(Axis.TX, 160, false, true, true);
+                AxisCalibration(Axis.TZ, 180, false, true, true);
             }
 
             AddVsnLog("Finsh Calibration");
@@ -14353,6 +14353,7 @@ namespace CSH030Ex
         {
             if (motorizedMeasurementRun)
             {
+                AddVsnLog($"Motorized Measurement is running. Can not start RunScanTest()");
                 motorizedMeasurementAbort = true;
                 btnScan.Enabled = false;
                 return;
@@ -14656,6 +14657,7 @@ namespace CSH030Ex
 
             Thread.Sleep(500);
 
+            motorizedMeasurementRun = false;
             RunScanTest();
 
             motorizedMeasurementRun = false;
