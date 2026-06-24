@@ -1,0 +1,2 @@
+LED Power Left	3.50
+LED Power Right	3.50
