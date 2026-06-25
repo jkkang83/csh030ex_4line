@@ -7497,6 +7497,8 @@ namespace FAutoLearn
             TX = signTX * TX;
             TY = signTY * TY;
 
+            if (mOffsetTX != 0 && mOffsetTY != 0)
+                TX += 0.96 * TY * psi; //  P45 를 위한 보정
 
             //TX = TX - 3437.747 * TY * TY / 96;// - (3.14e-8) * dZ*dZ;   //  180/pi
 
@@ -8298,21 +8300,22 @@ namespace FAutoLearn
             {
                 prismTXTYTZ[2] = (-ty + tz) / 1.414213562 - mPrismZeroTZ;
                 prismTXTYTZ[0] = (ty + tz) / 1.414213562 - mPrismZeroTX;
+                prismTXTYTZ[1] = tx;
 
-                if (!bAcrmin)
-                    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] / mMinToRad) * (prismTXTYTZ[0] / mMinToRad) / 10000 - (prismTXTYTZ[2] / mMinToRad) * (prismTXTYTZ[2] / mMinToRad) / 10000) - mPrismZeroTY / mMinToRad;
-                else
-                    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] * prismTXTYTZ[0]) / 10000 - (prismTXTYTZ[2] * prismTXTYTZ[2]) / 10000) - mPrismZeroTY;
+                //if (!bAcrmin)
+                //    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] / mMinToRad) * (prismTXTYTZ[0] / mMinToRad) / 10000 - (prismTXTYTZ[2] / mMinToRad) * (prismTXTYTZ[2] / mMinToRad) / 10000) - mPrismZeroTY / mMinToRad;
+                //else
+                //    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] * prismTXTYTZ[0]) / 10000 - (prismTXTYTZ[2] * prismTXTYTZ[2]) / 10000) - mPrismZeroTY;
             }
             else
             {
                 prismTXTYTZ[2] = (-ty + tz) / 1.414213562;
                 prismTXTYTZ[0] = (ty + tz) / 1.414213562;
-
-                if (!bAcrmin)
-                    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] / mMinToRad) * (prismTXTYTZ[0] / mMinToRad) / 10000 - (prismTXTYTZ[2] / mMinToRad) * (prismTXTYTZ[2] / mMinToRad) / 10000);
-                else
-                    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] * prismTXTYTZ[0]) / 10000 - (prismTXTYTZ[2] * prismTXTYTZ[2]) / 10000);
+                prismTXTYTZ[1] = tx;
+                //if (!bAcrmin)
+                //    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] / mMinToRad) * (prismTXTYTZ[0] / mMinToRad) / 10000 - (prismTXTYTZ[2] / mMinToRad) * (prismTXTYTZ[2] / mMinToRad) / 10000);
+                //else
+                //    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] * prismTXTYTZ[0]) / 10000 - (prismTXTYTZ[2] * prismTXTYTZ[2]) / 10000);
             }
 
             return prismTXTYTZ;

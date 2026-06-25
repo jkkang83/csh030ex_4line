@@ -8475,7 +8475,7 @@ namespace CSH030Ex
                     lPrismTXTYTZ = m__G.oCam[0].mFAL.mFZM.ConvertTXTYTZofCSHtoPrism(tx, ty, tz, true);
                     m__G.oCam[0].mFAL.mFZM.SetPrismZeroTXTZ(lPrismTXTYTZ[0], lPrismTXTYTZ[1], lPrismTXTYTZ[2]);
 
-                    strtmp += "\tPCS\t" + lPrismTXTYTZ[0].ToString("F5") + "\t" + lPrismTXTYTZ[1].ToString("F5") + "\t" + lPrismTXTYTZ[2].ToString("F5");
+                    strtmp += "\tP45\t" + lPrismTXTYTZ[0].ToString("F5") + "\t" + lPrismTXTYTZ[1].ToString("F5") + "\t" + lPrismTXTYTZ[2].ToString("F5");
                 }
             }
             m__G.oCam[0].SaveGrabbedImage(0, fileName);
@@ -11847,14 +11847,18 @@ namespace CSH030Ex
                 if (axis < Axis.TX)
                 {
                     if (step > 100)   //  Calibration
-                        Thread.Sleep(800);
+                        Thread.Sleep(700);
                     else   //  Sweep Test
-                        Thread.Sleep(1400);
+                        Thread.Sleep(1300);
                 }
                 else
                 {
-                    Thread.Sleep(400);
+                    Thread.Sleep(300);
                 };
+
+                m__G.fGraph.mDriverIC.SetLEDpower(1, (int)((mLEDcurrent[0]) * 500));
+                m__G.fGraph.mDriverIC.SetLEDpower(2, (int)((mLEDcurrent[1]) * 500));
+                Thread.Sleep(100);
 
 
                 for (int cnt = 0; cnt < cntRepeat; cnt++)
@@ -11867,6 +11871,9 @@ namespace CSH030Ex
                     piPos.Add(MotorCurPosHexapod());
                 }
                 manualLED = false;
+
+                m__G.fGraph.mDriverIC.SetLEDpower(1, 0);
+                m__G.fGraph.mDriverIC.SetLEDpower(2, 0);
 
                 // 이미지 저장               
                 if (isSaveImg)
@@ -13651,7 +13658,7 @@ namespace CSH030Ex
                                  (stabilizedData[j][2] - stabilizedData[j][18]).ToString("F5") + "," +
                                  (stabilizedData[j][3] - stabilizedData[j][19]).ToString("F5") + "," +
                                  (stabilizedData[j][4] - stabilizedData[j][20]).ToString("F5") + "," +
-                                 (stabilizedData[j][5] - stabilizedData[j][21]).ToString("F5");
+                                 (stabilizedData[j][5] - stabilizedData[j][21]).ToString("F5") + ",";
 
                         if (m__G.m_bPrismCS && stabilizedDataList.Count == 1)
                         {
@@ -16607,11 +16614,11 @@ namespace CSH030Ex
 
                     if (LoadPivotXYZ() == false)
                     {
-                        MessageBox.Show("Fail to Load Pivot XYZ");
+                        AddVsnLog("Fail to Load Pivot XYZ");
                     }
                     if (LoadOQCcondition() == false)
                     {
-                        MessageBox.Show("Fail to Load OQC Condition");
+                        AddVsnLog("Fail to Load OQC Condition");
                     }
 
                     await Task.Run(() =>
@@ -17421,9 +17428,9 @@ namespace CSH030Ex
 
                 await Task.Run(() =>
                 {
-                    Prism45SeparationTest();
-                    m__G.oCam[0].mFAL.mFZM.SetTXTYOffset(0, 0, 0, 0, 0, 0); // Prism45SeparationTest사용할때는 SetTXTYOffset써야함.
-                    //Prism45Test();
+                    //Prism45SeparationTest();
+                    //m__G.oCam[0].mFAL.mFZM.SetTXTYOffset(0, 0, 0, 0, 0, 0); // Prism45SeparationTest사용할때는 SetTXTYOffset써야함.
+                    Prism45Test();
                 }, token);
             }
             catch (Exception ex)
@@ -17665,40 +17672,60 @@ namespace CSH030Ex
 
         public void Prism45Test()
         {
+            //  Hexapod 만 움직이는 Prism 구동 측정 시험
+
             if (motorizedMeasurementAbort) return;
             AddVsnLog("Start to find CSHorg");
-            FindCSHorg();
+            bool resetProbe = chkProbeReset.Checked;
+            FindCSHorg(resetProbe);
+
+            SingleFindMark();   //  측정 시험 시 Probe TZ1, TZ2 값을 각각 읽어들여야하고, Hexapod를 순수 Z 방향으로 이동시켰을 때 발생하는 probe 기울기를 보정해야한다.
+
+            //////for (Axis pivotAxis = Axis.TX; pivotAxis <= Axis.TZ; pivotAxis++)
+            //////{
+            //////    if (motorizedMeasurementAbort) return;
+            //////    AddVsnLog($"Start to find {pivotAxis} pivot.");
+            //////    FindPivot(pivotAxis);
+            //////}
+            //////SavePivots();
+
+            //////if (motorizedMeasurementAbort) return;
+            //////AddVsnLog("Start to find CSHorg");
+            //////FindCSHorg(true);
+
+            //////if (motorizedMeasurementAbort) return;
+            //////AddVsnLog("Start to find Fidorg");
+            //////FindFidorg();
+
+            //////SaveOQCCondition();
+
+
 
             for (Axis pivotAxis = Axis.TX; pivotAxis <= Axis.TZ; pivotAxis++)
             {
                 if (motorizedMeasurementAbort) return;
-                AddVsnLog($"Start to find {pivotAxis} pivot.");
-                FindPivot(pivotAxis);
-            }
-            SavePivots();
+                //AddVsnLog($"Start to find PrismCS {pivotAxis} Rotation");
 
-            if (motorizedMeasurementAbort) return;
-            AddVsnLog("Start to find CSHorg");
-            FindCSHorg(true);
+                //   아래함수의 기능이 뭔지 확인해봐야함. 
+                //FindPrismCSRotation(pivotAxis, 6565); //  의미없음
 
-            if (motorizedMeasurementAbort) return;
-            AddVsnLog("Start to find Fidorg");
-            FindFidorg();
 
-            SaveOQCCondition();
-
-            for (Axis pivotAxis = Axis.TX; pivotAxis <= Axis.TZ; pivotAxis++)
-            {
-                if (motorizedMeasurementAbort) return;
-                AddVsnLog($"Start to find PrismCS {pivotAxis} Rotation");
-                FindPrismCSRotation(pivotAxis, 6565);
                 AddVsnLog($"Start to find PrismCS {pivotAxis} Pivot");
+
+                //   아래함수의 기능이 뭔지 확인해봐야함. 회전중심좌표를 찾는것 같음
                 FindPrismCSPivot(pivotAxis, 6565);
             }
+            //FindCSHorg(resetProbe);
 
             MotorMoveAbs6D(mCSHorg.X, mCSHorg.Y, mCSHorg.Z, 0, 0, 0);
             GrabInitalMark();
             AddVsnLog("Start to Measure");
+
+            int lNumRepeatInSweep = 1;
+            mNumRepeatInSweep = 1;
+
+            if (tbRepeatMeasure.Text.Length > 0)
+                lNumRepeatInSweep = int.Parse(tbRepeatMeasure.Text);
 
             // 측정
             for (int i = 3; i < 6; i++)
@@ -17707,7 +17734,7 @@ namespace CSH030Ex
                 Axis axis = (Axis)i;
                 Axis prismAxis = Axis.TX;
 
-                if (axis == Axis.TZ) return;
+                //if (axis == Axis.TZ) return;
 
                 switch (axis)
                 {
@@ -17724,70 +17751,86 @@ namespace CSH030Ex
                 }
                 mDataFile100 = $"PrismDrv_{prismAxis}_{DateTime.Now:yyMMdd_HHmmss}";
 
+                AddVsnLog("SetPivot " + i.ToString() + "\t" + PrismCSPivots[i - 3].X.ToString("F4") + "\t" + PrismCSPivots[i - 3].Y.ToString("F4") + "\t" + PrismCSPivots[i - 3].Z.ToString("F4"));
+
                 MotorSetPivot(PrismCSPivots[i - 3].X, PrismCSPivots[i - 3].Y, PrismCSPivots[i - 3].Z);
-                MotorSetHCS(PrismCSRotations[i - 3].X, PrismCSRotations[i - 3].Y, PrismCSRotations[i - 3].Z);
+                //  MotorSetHCS() 는 좌표계설정, 좌표계 설정이 Pivot 설정보다 앞서야 함 P45 에서는 좌표계 설정은 1회만 하면 됨.
+                //MotorSetHCS(PrismCSRotations[i - 3].X, PrismCSRotations[i - 3].Y, PrismCSRotations[i - 3].Z);
 
-                for (int repeatN = 0; repeatN < 1; repeatN++)   // 100회
+                double onewayStroke = 3.0 * 60; //  +/- 180min
+                //double step = 0.01 * 60;    // 0.6min step 
+                double step = 10;    // 10min step 
+
+                mGageFullData.Clear();
+                mCalibrationFullData.Clear();
+                mPrismTXTYTZ.Clear();
+                mStdevTXTYTZ.Clear();
+
+                if (motorizedMeasurementAbort) return;
+                double orgPos = MotorCurPosAxis(axis);
+                Thread.Sleep(300);
+                mAutoCalibrationIndex = 0;
+
+
+                SingleFindMark();   //  측정 시험 시 Probe TZ1, TZ2 값을 각각 읽어들여야하고, Hexapod를 순수 Z 방향으로 이동시켰을 때 발생하는 probe 기울기를 보정해야한다.
+
+
+                MotorSetHCS(45 * 60, 0, 0); // 그냥 이것이 P45 좌표계임.
+
+                // 회전
+                double[] targetPositions = new double[] { -(onewayStroke) / 3, -(onewayStroke) * 2 / 3, -onewayStroke - 15, -onewayStroke - 10, -onewayStroke - 5 };
+                if (motorizedMeasurementAbort) return;
+
+                // 누적된 데이터 Clear
+                mGageFullData.Clear();
+                mCalibrationFullData.Clear();
+                mPrismTXTYTZ.Clear();
+                mStdevTXTYTZ.Clear();
+
+                // 측정 시작
+                double movingStroke = -onewayStroke;
+                double pos = orgPos - onewayStroke;
+
+                mNumRepeatInSweep = lNumRepeatInSweep;
+                MotorSetHCS(45 * 60, 0, 0); // 그냥 이것이 P45 좌표계임.
+
+
+                m__G.m_bPrismCS = true;
+
+                GrabInitalMark();
+                MotorMoveAbsAxis(axis, pos - 10);
+                Thread.Sleep(300);
+                while (movingStroke <= onewayStroke)
                 {
-                    double onewayStroke = 3.0 * 60;
-                    double step = 0.01 * 60;    // 0.01
-
-                    mGageFullData.Clear();
-                    mCalibrationFullData.Clear();
-                    mPrismTXTYTZ.Clear();
-                    mStdevTXTYTZ.Clear();
-
                     if (motorizedMeasurementAbort) return;
-                    double orgPos = MotorCurPosAxis(axis);
-                    Thread.Sleep(300);
-                    mAutoCalibrationIndex = 0;
+                    MotorMoveAbsAxis(axis, pos);
+                    Thread.Sleep(400);
                     SingleFindMark();
 
-                    // 회전
-                    double[] targetPositions = new double[] { -(onewayStroke) / 3, -(onewayStroke) * 2 / 3, -onewayStroke - 15, -onewayStroke - 10, -onewayStroke - 5 };
-                    foreach (double targetPos in targetPositions)
-                    {
-                        if (motorizedMeasurementAbort) return;
-                        MotorMoveAbsAxis(axis, targetPos);
-                        Thread.Sleep(300);
-                        SingleFindMark();
-                    }
-
-                    // 누적된 데이터 Clear
-                    mGageFullData.Clear();
-                    mCalibrationFullData.Clear();
-                    mPrismTXTYTZ.Clear();
-                    mStdevTXTYTZ.Clear();
-
-                    // 측정 시작
-                    double movingStroke = -onewayStroke;
-                    double pos = orgPos - onewayStroke;
-
-                    while (movingStroke <= onewayStroke)
-                    {
-                        if (motorizedMeasurementAbort) return;
-                        MotorMoveAbsAxis(axis, pos);
-                        Thread.Sleep(300);
-                        SingleFindMark();
-
-                        pos += step;
-                        movingStroke += step;
-                    }
-                    MotorMoveAbsAxis(axis, orgPos); // 헥사포드 복귀
-
-                    // Data
-                    var stabilizedDataList = new List<List<double[]>> { mCalibrationFullData.ToList() };
-                    AppendMeasuredData(stabilizedDataList, mDataFile100, "Prism45");
+                    pos += step;
+                    movingStroke += step;
                 }
+                MotorMoveAbsAxis(axis, orgPos); // 헥사포드 복귀
 
-                // 한 축 측정완료시 rawData 메일 전송
-                //string attachFilePath = $"{m__G.m_RootDirectory}\\DoNotTouch\\Admin\\StabilizedData_{camID0}_{mDataFile100}.csv";
-                //CWilliamEmailer.SendMailToWilliam($"Prism45 {prismAxis}축 구동측정", "Mail Test", attachFilePath);
+                // Data
+                var stabilizedDataList = new List<List<double[]>> { mCalibrationFullData.ToList() };
+                SaveMeasuredData(stabilizedDataList, $"{prismAxis}_Prsm", "Scan");
+
+                m__G.m_bPrismCS = false;
+
+
+
+                //AppendMeasuredData(stabilizedDataList, mDataFile100, "Prism45");
             }
 
+            // 한 축 측정완료시 rawData 메일 전송
+            //string attachFilePath = $"{m__G.m_RootDirectory}\\DoNotTouch\\Admin\\StabilizedData_{camID0}_{mDataFile100}.csv";
+            //CWilliamEmailer.SendMailToWilliam($"Prism45 {prismAxis}축 구동측정", "Mail Test", attachFilePath);
+
+            //  
+            MotorSetHCS(0, 0, 0); // 좌표계 원상복귀
             MotorSetPivot(0, 0, 0);
         }
-
         private List<List<double[]>> LoadPsweepXYZPoints()
         {
             string filePath = @"C:\CSHTest\DoNotTouch\Admin\psweep_points.csv";
@@ -18727,7 +18770,14 @@ namespace CSH030Ex
 
         public void FindPrismCSPivot(Axis axis, double zOffsetPivot)
         {
-            FindCSHorg();
+            MotorSetHCS(0, 0, 0); // 그냥 이것이 P45 좌표계임.
+            Thread.Sleep(200);
+
+            //FindCSHorg();
+
+            MotorSetHCS(45 * 60, 0, 0); // 그냥 이것이 P45 좌표계임.
+
+            Thread.Sleep(200);
 
             double offsetPivot = zOffsetPivot;
             List<double> targetList = new List<double>();
@@ -18737,7 +18787,7 @@ namespace CSH030Ex
             while (temp <= stroke)
             {
                 targetList.Add(temp);
-                temp += 0.5;
+                temp += 1.0;
             }
             int m = targetList.Count;
             int n = 3;
@@ -18746,7 +18796,7 @@ namespace CSH030Ex
 
             // 행렬 A
             double[,] A = new double[m, n];
-            Point3d pivot = new Point3d(mHexapodPivots[(int)(axis - 3)].X, mHexapodPivots[(int)(axis - 3)].Y, mHexapodPivots[(int)(axis - 3)].Z + offsetPivot);
+            Point3d pivot = new Point3d(mHexapodPivots[(int)(axis - 3)].X * 1000, mHexapodPivots[(int)(axis - 3)].Y * 1000, mHexapodPivots[(int)(axis - 3)].Z * 1000 + offsetPivot);
 
             // 디버깅                       
             List<Point3d> fullPivot = new List<Point3d>();
@@ -18756,9 +18806,14 @@ namespace CSH030Ex
             List<double> fullErrors = new List<double>();
             List<double> fullRadius = new List<double>();
 
-            bool isVert = false;
+
+            //MotorSetHCS(PrismCSRotations[(int)(axis - 3)].X, PrismCSRotations[(int)(axis - 3)].Y, PrismCSRotations[(int)(axis - 3)].Z);
+
             int itrCnt = 0;
-            while (itrCnt++ < 10)
+            double oldError = 0;
+            double convergeSpeed = 1;
+
+            while (itrCnt++ < 7)
             {
                 if (motorizedMeasurementAbort) return;
                 mCalibrationFullData.Clear();
@@ -18768,15 +18823,18 @@ namespace CSH030Ex
                 PrismCSPivots[(int)(axis - 3)] = new Point3d(pivot.X, pivot.Y, pivot.Z);
                 // 디버깅
                 fullPivot.Add(pivot);
-                //
-                MotorSetHCS(PrismCSRotations[(int)(axis - 3)].X, PrismCSRotations[(int)(axis - 3)].Y, PrismCSRotations[(int)(axis - 3)].Z);
+                //   이것은 좌표계를 바꾸는 함수임
 
                 double orgPos = MotorCurPosAxis(axis);
 
+                MotorSetHCS(45 * 60, 0, 0); // 그냥 이것이 P45 좌표계임.
+
+                MotorMoveAbsAxis(axis, orgPos - 190);
+                Thread.Sleep(300);
                 foreach (var target in targetList)
                 {
                     MotorMoveAbsAxis(axis, orgPos + target * 60);
-                    Thread.Sleep(500);
+                    Thread.Sleep(400);
                     SingleFindMark();
                 }
                 MotorMoveAbsAxis(axis, orgPos);
@@ -18799,10 +18857,10 @@ namespace CSH030Ex
                 fullApoints.Add(Apoints);
 
                 normalm = new double[3];
-                double[] directCircle = m__G.mFAL.mFZM.PseudoCircle(ApointsM, ref normalm);
+                double[] centerOfRotation = m__G.mFAL.mFZM.PseudoCircle(ApointsM, ref normalm);
 
                 fullNormalm.Add(new Point3d(normalm[0], normalm[1], normalm[2]));
-                fullCircle.Add(new Point3d(directCircle[0], directCircle[1], directCircle[2]));
+                fullCircle.Add(new Point3d(centerOfRotation[0], centerOfRotation[1], centerOfRotation[2]));
 
                 // center
                 Point3d center0;
@@ -18822,36 +18880,76 @@ namespace CSH030Ex
                         throw new ArgumentOutOfRangeException(nameof(axis), axis, "지원하지 않는 axis입니다.");
                 }
 
-                double h = center0.X - directCircle[0];
-                double k = center0.Y - directCircle[1];
-                double l = center0.Z - directCircle[2];
-                double r = directCircle[3];
+                //  측정된 회전중심은 directCircle, 원래 목표해던 회전중심은 center0
+                double[] corP45 = new double[3];
+                corP45[0] = centerOfRotation[0];//centerOfRotation[0];
+                corP45[1] = centerOfRotation[1];//  centerOfRotation[1] * Math.Sqrt(0.5) - centerOfRotation[2] * Math.Sqrt(0.5);
+                corP45[2] = centerOfRotation[2];//- centerOfRotation[1] * Math.Sqrt(0.5) + centerOfRotation[2] * Math.Sqrt(0.5);
+
+                double h = center0.X - corP45[0];
+                double k = center0.Y - corP45[1];
+                double l = center0.Z - corP45[2];
+                double r = centerOfRotation[3];
+
                 fullRadius.Add(r);
 
-                double errPos = Math.Sqrt(h * h + k * k + l * l);
+                double errPos = 0;
+                switch (axis)
+                {
+                    case Axis.TX:
+                        errPos = Math.Sqrt(k * k + l * l);
+                        break;
+
+                    case Axis.TY:
+                        errPos = Math.Sqrt(k * k + h * h + l * l);  //  회전 방향 벡터 확인 후 직선과 점간 거리로 변경
+                        break;
+                    case Axis.TZ:
+                        errPos = Math.Sqrt(h * h + k * k + l * l);  //  회전 방향 벡터 확인 후 직선과 점간 거리로 변경
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(axis), axis, "지원하지 않는 axis입니다.");
+                }
+                AddVsnLog("#" + itrCnt.ToString() + " " + centerOfRotation[0].ToString("F4") + " " + centerOfRotation[1].ToString("F4") + " " + centerOfRotation[2].ToString("F4") + " " + "Err = " + errPos.ToString("F4"));
+
                 fullErrors.Add(errPos);
 
-                if (!isVert)
+
+                if (itrCnt > 2)
+                    convergeSpeed = 0.7;
+                if (itrCnt > 4)
+                    convergeSpeed = 0.5;
+
+                switch (axis)
                 {
-                    if (errPos <= 30 || itrCnt == 10)
-                    {
-                        isVert = true;
-                        itrCnt = 6;
-                    }
-                    else
-                    {
-                        pivot = new Point3d(pivot.X + h * 0.4, pivot.Y + k * 0.4, pivot.Z + l * 0.4);
-                    }
+                    case Axis.TX:
+                        //  좌표계가 다르므로 
+                        pivot = new Point3d(pivot.X, pivot.Y + k * convergeSpeed, pivot.Z + l * convergeSpeed);
+                        break;
+
+                    case Axis.TY:
+                        pivot = new Point3d(pivot.X + h * convergeSpeed, pivot.Y + k * convergeSpeed, pivot.Z + l * convergeSpeed);
+                        break;
+
+                    case Axis.TZ:
+                        pivot = new Point3d(pivot.X + h * convergeSpeed, pivot.Y + k * convergeSpeed, pivot.Z + l * convergeSpeed);
+                        break;
+
+                    default:
+                        break;
                 }
+
+                if (errPos < 10)
+                    break;
+                oldError = errPos;
             }
 
             MotorSetPivot(0, 0, 0);
 
-            string strStabilizedFile = $"C:\\CSHTest\\DoNotTouch\\Admin\\circle.csv";
+            string strStabilizedFile = $"D:\\PrismTest\\Pivot\\circle{DateTime.Now:MMdd_HHmmss}.csv";
             //StreamWriter wr = new StreamWriter(strStabilizedFile);
             //wr.Close();
 
-            string slstr = $"Pivot, X, Y, Z, Circle, X, Y, Z,Normalm,,,,,Radius(um),,,Error(um) \r\n";
+            string slstr = $"Pivot, X, Y, Z, Center of Rotation, X, Y, Z,Rotation Axis,,,,,Radius(um),,,Error(um) \r\n";
             for (int i = 0; i < fullPivot.Count; i++)
             {
                 slstr += $"{i},{fullPivot[i].X:F7},{fullPivot[i].Y:F7},{fullPivot[i].Z:F7}," +
@@ -18866,7 +18964,14 @@ namespace CSH030Ex
                     slstr += $"{j},{fullApoints[i][j].X:F7},{fullApoints[i][j].Y:F7},{fullApoints[i][j].Z:F7}\r\n";
                 }
             }
-            File.AppendAllText(strStabilizedFile, slstr);
+            try
+            {
+                File.AppendAllText(strStabilizedFile, slstr);
+            }
+            catch
+            {
+                AddVsnLog("Fail to save FindPivotP45 result");
+            }
         }
 
         bool lgTest = false;

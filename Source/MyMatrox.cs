@@ -2142,29 +2142,6 @@ namespace S2System.Vision
         //    return true;
         //}
 
-        public void LoadBMPtoBuf0(string filename)
-        {
-            MIL_ID resMilID = MIL.M_NULL;
-
-            resMilID = MIL.MbufImport(filename, MIL.M_BMP, MIL.M_RESTORE, milSystem, ref milCommonImageGrab[0]);
-
-            //MIL.MimResize(milCommonImageGrab[0], milCommonImageResize[0], mModelScale, mModelScale, MIL.M_DEFAULT);
-
-            //            MIL.MbufImport(filename, MIL.M_BMP, MIL.M_LOAD, MIL.M_NULL, ref milCommonImageGrab[0]);
-            //MIL.MbufCopy(resMilID, milImageDisp);
-            //MIL.MbufGet2d(milCommonImageGrab[0], 0, 0, nSizeX, nSizeY, p_Value[0]);
-
-            MIL.MbufCopy(milCommonImageGrab[0], milImageDisp);
-        }
-        public void LoadBMPtoBufN(string filename, int N)
-        {
-            MIL_ID resMilID = MIL.M_NULL;
-            resMilID = MIL.MbufImport(filename, MIL.M_BMP, MIL.M_RESTORE, milSystem, ref milCommonImageGrab[N]);
-
-            //MIL.MimResize(milCommonImageGrab[N], milCommonImageResize[N], mModelScale, mModelScale, MIL.M_DEFAULT);
-            MIL.MbufCopy(resMilID, milImageDisp);
-        }
-
         public void PrepareFineCOG()
         {
             mFAL.Prepare6DMotion( nSizeX, nSizeY );
