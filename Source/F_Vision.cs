@@ -344,6 +344,8 @@ namespace CSH030Ex
                 tbInfo.Location = new System.Drawing.Point(724, 736);
                 tbInfo.Size = new System.Drawing.Size(1192, 185);
                 tbInfo.Font = new Font("Malgun Gothic", 8, FontStyle.Bold);
+                //pictureBox2.Size = new System.Drawing.Size(780, 460);
+                //pictureBox2.Location = new System.Drawing.Point(1133, 275);
             }
             else
             {
@@ -352,12 +354,15 @@ namespace CSH030Ex
                 tbInfo.Location = new System.Drawing.Point(5, 736);
                 tbInfo.Size = new System.Drawing.Size(1920, 300);
                 tbInfo.Font = new Font("Malgun Gothic", 16, FontStyle.Bold);
+                //pictureBox2.Size = new System.Drawing.Size(1330, 460);
+                //pictureBox2.Location = new System.Drawing.Point(1133 - 550, 275);
             }
             PanelAdmin0.Visible = isOn;
             PanelAdmin1.Visible = isOn;
             PanelAdmin2.Visible = isOn;
             grpAdjust.Visible = isOn;
             groupBox4.Visible = isOn;
+            btnChangeCrop.Visible = isOn;
         }
         public int GetTriggerGrabbedFrame()
         {
