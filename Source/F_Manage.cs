@@ -3121,21 +3121,8 @@ namespace CSH030Ex
                 mychart[3] = chart4;        //  Btm
             }
 
-            //Color Linen = Color.FromName("Linen");
-            //Color LavenderBlush = Color.FromName("LightCyan");
             Color LightGray = Color.FromName("LightGray");
             Color DarkGray = Color.FromName("DarkGray");
-
-            //Color DarkOrange = Color.FromName("DarkOrange");
-            //Color crimson = Color.FromName("crimson");
-            //Color Red = Color.FromName("red");
-            //Color firebrick = Color.FromName("firebrick");
-            //Color tomato = Color.FromName("tomato");
-
-            //Color DodgerBlue = Color.FromName("DodgerBlue");
-            //Color Blue = Color.FromName("blue");
-            //Color navy = Color.FromName("navy");
-            //Color mediumblue = Color.FromName("mediumblue");
 
             int i = 0;
             for (i = 0; i < 4; i++)
@@ -3865,34 +3852,6 @@ namespace CSH030Ex
                 m_FlagChart[chartID] = false;
                 return;
             }
-            //  mTime = new double[10000];
-            //  mXstroke = new double[10000];     //  Code Output Time
-            //  mYstroke = new double[10000];     //  Code Output Time
-            //  mZstroke = new double[10000];     //  Code Output Time
-            //  mTXstroke = new double[10000];     //  Code Output Time
-            //  mTYstroke = new double[10000];     //  Code Output Time
-            //  mTZstroke = new double[10000];     //  Code Output Time
-
-            //  mtN1 = new Point[10000];     //  1 -> 0.1um
-            //  mtN2 = new Point[10000];     //  1 -> 0.1um
-            //  mtW1 = new Point[10000];     //  1 -> 0.1um
-            //  mtW2 = new Point[10000];     //  1 -> 0.1um
-            //  mtS1 = new Point[10000];     //  1 -> 0.1um
-            //  mtS2 = new Point[10000];     //  1 -> 0.1um
-            //  mtE1 = new Point[10000];     //  1 -> 0.1um
-            //  mtE2 = new Point[10000];     //  1 -> 0.1um
-
-            //  msN1 = new Point[10000];     //  1 -> 0.1um
-            //  msN2 = new Point[10000];     //  1 -> 0.1um
-            //  msS1 = new Point[10000];     //  1 -> 0.1um
-            //  msS2 = new Point[10000];     //  1 -> 0.1um
-
-            //double scaleTop = 1;
-            //double scaleSide = 1;
-            //double rotTop = 0;
-            //double rotSide = 0;
-
-            //m__G.oCam[0].GetScaleNOpticalR(ref scaleTop, ref scaleSide, ref rotTop, ref rotSide);
 
             double umscale = 5.5 / Global.LensMag;// * ((scaleTop + scaleSide) / 2);       //  Pixel to um
             double minscale = 180 / Math.PI * 60;                           //  rad to min

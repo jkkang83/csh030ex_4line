@@ -7161,9 +7161,9 @@ namespace FAutoLearn
         double mMinToRad = Math.PI / (60 * 180);
         bool mbGrabInitial = false;
         double mYgapBetweenMarkNSandMarkE = 3.0;
-        public double mTXsinCoef = -3.83972E-05;                            //  ID 기본값 -4E-05
-        public double mTYsinCoef = 4.9e-05;// ID 247488522 : 2e-05           // ID 기본값 : 5E-05
-        public double mTZsinCoef = -0.1e-5; //-3.55596E-05;                   //  ID 247488522 : -3e-5
+        public double mTXsinCoef = -2.0E-05;                            //  ID 기본값 -4E-05
+        public double mTYsinCoef = 4.0e-05;// ID 247488522 : 2e-05           // ID 기본값 : 5E-05
+        public double mTZsinCoef = 1.0e-5; //-3.55596E-05;                   //  ID 247488522 : -3e-5
         public void SetYgapBetweenMarkNSandMarkE(double bymm)
         {
             //  um to pixles
@@ -7403,6 +7403,10 @@ namespace FAutoLearn
             TX = TX / mMinToRad;  //  Convert Radian to min
             TY = TY / mMinToRad;  //  Convert Radian to min
 
+
+            TX += mTXsinCoef * Math.Sin(TX * 67.5); //radian    //  TX += 0.132 * Math.Sin(TX / 160 * Math.PI);// arcmin
+
+
             psi = (mScaleTZ[0] * psi * psi + mScaleTZ[1] * psi + mScaleTZ[2]) * mMinToRad;
             TX = (mScaleTX[0] * TX * TX + mScaleTX[1] * TX + mScaleTX[2]) * mMinToRad; // Convert min to radian
             TY = (mScaleTY[0] * TY * TY + mScaleTY[1] * TY + mScaleTY[2]) * mMinToRad;
@@ -7410,7 +7414,7 @@ namespace FAutoLearn
             dZ = dZ * mPixelToUm * dZ * mScaleZ[0] + dZ * mScaleZ[1] + mScaleZ[2] / mPixelToUm;
 
             T.X -= dZ * dZ * mZtoXst[0] * mPixelToUm + dZ * mZtoXst[1];// + mZtoXst[2] / mPixelToUm;
-            sxtr += (T.X * mPixelToUm).ToString("F3") + "," + (T.Y * mPixelToUm).ToString("F3") + "," + (dZ * mPixelToUm).ToString("F3") + "\r\n";
+            //sxtr += (T.X * mPixelToUm).ToString("F3") + "," + (T.Y * mPixelToUm).ToString("F3") + "," + (dZ * mPixelToUm).ToString("F3") + "\r\n";
             T.Y -= dZ * dZ * mZtoYst[0] * mPixelToUm + dZ * mZtoYst[1];// + mZtoYst[2] / mPixelToUm;
             dZ -= T.Y * T.Y * mYtoZst[0] * mPixelToUm + T.Y * mYtoZst[1]// + mYtoZst[2] / mPixelToUm
                 + T.X * T.X * mXtoZst[0] * mPixelToUm + T.X * mXtoZst[1];// + mXtoZst[2] / mPixelToUm;
@@ -7419,7 +7423,8 @@ namespace FAutoLearn
             T.Y -= T.X * T.X * mXtoYst[0] * mPixelToUm + T.X * mXtoYst[1];// + mXtoYst[2] / mPixelToUm;
 
 
-            // sstr = (T.X * mPixelToUm).ToString() + "," + (TX / mMinToRad).ToString() + ",";
+            TY += mTYsinCoef * Math.Sin(TY * 90.0); //radian    //  TY += 0.191 * Math.Sin( TY / 120 * Math.PI );// arcmin
+
 
             TX -= mXtoTXst[0] * T.X * T.X / 10.228 + mXtoTXst[1] * T.X / 187.5135 + mYtoTXst[0] * T.Y * T.Y / 10.228 + mYtoTXst[1] * T.Y / 187.5135 + mZtoTXst[0] * dZ * dZ / 10.228 + mZtoTXst[1] * dZ / 187.5135;
             TY -= mXtoTYst[0] * T.X * T.X / 10.228 + mXtoTYst[1] * T.X / 187.5135 + mYtoTYst[0] * T.Y * T.Y / 10.228 + mYtoTYst[1] * T.Y / 187.5135 + mZtoTYst[0] * dZ * dZ / 10.228 + mZtoTYst[1] * dZ / 187.5135;
@@ -7447,8 +7452,6 @@ namespace FAutoLearn
             TY -= (signTY > 0 ? mOffsetTY : -mOffsetTY);
             psi -= mOffsetTZ;
 
-            TX += mTXsinCoef * Math.Sin(TX * 67.5); //radian    //  TX += 0.132 * Math.Sin(TX / 160 * Math.PI);// arcmin
-            TY += mTYsinCoef * Math.Sin(TY * 90.0); //radian    //  TY += 0.191 * Math.Sin( TY / 120 * Math.PI );// arcmin
             psi += mTZsinCoef * Math.Sin(psi * 72); //radian    //  TX += 0.132 * Math.Sin(TX / 160 * Math.PI);// arcmin
 
             //TY -= 1.05812E-07 * TY * TY * TY * 3437.746771  * 3437.746771  - 2.02529E-06 * TY * TY * 3437.746771 - 0.00236603 * TY;
@@ -7557,7 +7560,7 @@ namespace FAutoLearn
                               double[] sTZ2Z,
                               double[] sTX2X, double[] sTX2Y, double[] sTX2Z,
                               double[] sTY2X, double[] sTY2Y, double[] sTY2Z,
-                              double[] sTZ2X, double[] sTZ2Y, double txSinCoef = -4E-05, double tySinCoef = 4.9e-05, double tzSinCoef = -0.1e-5
+                              double[] sTZ2X, double[] sTZ2Y, double txSinCoef = -2E-05, double tySinCoef = 4.0e-05, double tzSinCoef = 1.0e-5
                               )
 
         {
@@ -9038,6 +9041,186 @@ namespace FAutoLearn
                 C = -centerProj
             };
         }
+        //  y = a * sin(m * x) + c
+        public class SineFitResult
+        {
+            public double Amplitude { get; set; }   // a
+            public double M { get; set; }           // m
+            public double Offset { get; set; }      // c
+            public double Error { get; set; }       // Sum of squared error
+
+            public double Period
+            {
+                get
+                {
+                    if (Math.Abs(M) < 1e-12)
+                        return double.NaN;
+
+                    return 2.0 * Math.PI / M;
+                }
+            }
+        }
+
+        //double minPeriod = 2.0 * Math.PI / 0.8;
+        //double maxPeriod = 2.0 * Math.PI / 1.6;
+
+        //SineFitResult result = FitToSine(points);
+        public static SineFitResult FitToSine(Point2d[] points, int gridCount = 120)
+        {
+            double minM = 2.0 * Math.PI / 0.8;  //  Min Period
+            double maxM = 2.0 * Math.PI / 1.6;  //  Max Period
+            if (points == null)
+                throw new ArgumentNullException(nameof(points));
+
+            if (points.Length < 3)
+                throw new ArgumentException("데이터는 최소 3개 이상 필요합니다.");
+
+            if (gridCount < 10)
+                gridCount = 10;
+
+            // 1차: grid search로 대략적인 m 찾기
+            double bestM = minM;
+            double bestError = double.MaxValue;
+
+            for (int i = 0; i < gridCount; i++)
+            {
+                double m = minM + (maxM - minM) * i / (gridCount - 1);
+
+                var ac = SolveAmplitudeAndOffset(points, m);
+
+                if (ac.Error < bestError)
+                {
+                    bestError = ac.Error;
+                    bestM = m;
+                }
+            }
+
+            // 2차: bestM 주변에서 Golden Section Search로 정밀 탐색
+            double step = (maxM - minM) / (gridCount - 1);
+
+            double left = bestM - step * 5.0;
+            double right = bestM + step * 5.0;
+
+            if (left < minM) left = minM;
+            if (right > maxM) right = maxM;
+
+            double refinedM = GoldenSectionSearch(points, left, right, 100);
+
+            var finalAc = SolveAmplitudeAndOffset(points, refinedM);
+
+            return new SineFitResult
+            {
+                Amplitude = finalAc.A,
+                M = refinedM,
+                Offset = finalAc.C,
+                Error = finalAc.Error
+            };
+        }
+        private static (double A, double C, double Error) SolveAmplitudeAndOffset(Point2d[] points, double m)
+        {
+            int n = points.Length;
+
+            double sumS = 0.0;
+            double sumY = 0.0;
+            double sumSS = 0.0;
+            double sumSY = 0.0;
+
+            for (int i = 0; i < n; i++)
+            {
+                double x = points[i].X;
+                double y = points[i].Y;
+
+                double s = Math.Sin(m * x);
+
+                sumS += s;
+                sumY += y;
+                sumSS += s * s;
+                sumSY += s * y;
+            }
+
+            /*
+                Least Squares
+
+                y = a * s + c
+                s = sin(m*x)
+
+                [ sumSS   sumS ] [ a ] = [ sumSY ]
+                [ sumS      n  ] [ c ]   [ sumY  ]
+            */
+
+            double det = sumSS * n - sumS * sumS;
+
+            if (Math.Abs(det) < 1e-15)
+            {
+                return (0.0, 0.0, double.MaxValue);
+            }
+
+            double a = (sumSY * n - sumY * sumS) / det;
+            double c = (sumSS * sumY - sumS * sumSY) / det;
+
+            double error = CalculateError(points, m, a, c);
+
+            return (a, c, error);
+        }
+
+        private static double CalculateError(Point2d[] points, double m, double a, double c)
+        {
+            double error = 0.0;
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                double x = points[i].X;
+                double y = points[i].Y;
+
+                double yFit = a * Math.Sin(m * x) + c;
+                double diff = y - yFit;
+
+                error += diff * diff;
+            }
+
+            return error;
+        }
+
+        /// <summary>
+        /// m 하나만 남은 상태에서 error가 최소가 되는 m을 찾는다.
+        /// </summary>
+        private static double GoldenSectionSearch(Point2d[] points, double left, double right, int iterations)
+        {
+            double gr = (Math.Sqrt(5.0) - 1.0) / 2.0;
+
+            double x1 = right - gr * (right - left);
+            double x2 = left + gr * (right - left);
+
+            double f1 = SolveAmplitudeAndOffset(points, x1).Error;
+            double f2 = SolveAmplitudeAndOffset(points, x2).Error;
+
+            for (int i = 0; i < iterations; i++)
+            {
+                if (f1 > f2)
+                {
+                    left = x1;
+
+                    x1 = x2;
+                    f1 = f2;
+
+                    x2 = left + gr * (right - left);
+                    f2 = SolveAmplitudeAndOffset(points, x2).Error;
+                }
+                else
+                {
+                    right = x2;
+
+                    x2 = x1;
+                    f2 = f1;
+
+                    x1 = right - gr * (right - left);
+                    f1 = SolveAmplitudeAndOffset(points, x1).Error;
+                }
+            }
+
+            return (left + right) * 0.5;
+        }
+
     }
     static class VectorExt
     {

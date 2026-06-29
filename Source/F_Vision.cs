@@ -6681,9 +6681,9 @@ namespace CSH030Ex
         public double[] ms_TZtoXst = new double[3];
         public double[] ms_TZtoYst = new double[3];
 
-        public double[] ms_txSin = new double[1] { -4E-05 };
-        public double[] ms_tySin = new double[1] { -5E-05 };
-        public double[] ms_tzSin = new double[1] { -0.2E-05 };
+        public double[] ms_txSin = new double[1] { -2.0E-05 };
+        public double[] ms_tySin = new double[1] {  4.0E-05 };
+        public double[] ms_tzSin = new double[1] {  1.0E-05 };
         
         //private void btnCalcScales_Click(object sender, EventArgs e)
         //{
