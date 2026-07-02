@@ -10447,7 +10447,7 @@ namespace FAutoLearn
                     {
                         if (peakCount == 10)
                             break;
-                        if (lastValley + 20 < aVline[i][k] && afterValley)
+                        if ((lastValley + 20 < aVline[i][k] && afterValley) || (lastPeak + 50) < aVline[i][k] )
                         {
                             if (peakCount == 1)
                             {
@@ -10472,16 +10472,19 @@ namespace FAutoLearn
                     {
                         //if (aVline[i][k] < lastPeak - 20 && aVline[i][k + 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
                         //    afterValley = true;
-                        if (aVline[i][k] < lastPeak - 12 && aVline[i][k + 1] >= aVline[i][k] && aVline[i][k - 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
-                            if (aVline[i][k] < minPeak) //  Valley 는 minPeak 보다 어두워야 한다.
-                            {
-                                lastValley = aVline[i][k];
-                                afterValley = true;
-                                if (k - lastValleyIndex > 6 && peakCount > 4)   //   Valley와 Valley 간 간격이 너무 넓으면 이전 Peak 는 잘못된 Peak임
-                                    peakCount--;
+                        if (aVline[i][k]<100)
+                        {
+                            if (aVline[i][k] < lastPeak - 12 && aVline[i][k + 1] >= aVline[i][k] && aVline[i][k - 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
+                                if (aVline[i][k] < minPeak) //  Valley 는 minPeak 보다 어두워야 한다.
+                                {
+                                    lastValley = aVline[i][k];
+                                    if (k - lastValleyIndex > 6 && peakCount > 4 && !afterValley)   //   Valley와 Valley 간 간격이 너무 넓으면 이전 Peak 는 잘못된 Peak임
+                                        peakCount--;
 
-                                lastValleyIndex = k;
-                            }
+                                    afterValley = true;
+                                    lastValleyIndex = k;
+                                }
+                        }
                     }
                     else
                     {
@@ -10500,11 +10503,33 @@ namespace FAutoLearn
                         if (peakIndex[3] - peakIndex[0] < 16)
                         {
                             //                          //  Pos of Left Ref, Pos of Top Line, Pos of Bottom Line
-                            if ((peakEach[0] > peakEach[1]/2 && peakCount>4) || peakCount==4)
+                            if ((peakEach[0] > peakEach[1]/2 && peakCount>4 && peakEach[0] < 1.5*peakEach[1]) || peakCount==4)
                             {
-                                resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
-                                foundMark = true;
-                                break;
+                                if (peakCount>4)
+                                {
+                                    int gap01 = peakIndex[1] - peakIndex[0];
+                                    int gap12 = peakIndex[2] - peakIndex[1];
+                                    int gap23 = peakIndex[3] - peakIndex[2];
+                                    int gap45 = peakIndex[4] - peakIndex[3];
+                                    if (gap01 > gap12+1 && gap01 > gap23+1)
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                        foundMark = true;
+                                        break;
+                                    }else
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                        foundMark = true;
+                                        break;
+
+                                    }
+                                }
+                                else
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
                             }
                             else if (peakCount > 4)
                             {
@@ -10586,6 +10611,12 @@ namespace FAutoLearn
             {
                 for (int xi = 0; xi < HbufLength; xi++)
                 {
+                    if (xi + searchHline[si] < resVline[si][0] - 24)
+                    {
+                        resHline[si][xi] = 6 * 255;
+                        continue;
+                    }
+
                     resHline[si][xi] += q_ValueImg[xi + searchHline[si] + resVline[si][1] * quaterWidth] + q_ValueImg[xi + searchHline[si] + resVline[si][2] * quaterWidth];
                     resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] + 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] + 1) * quaterWidth];
                     resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] - 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] - 1) * quaterWidth];
@@ -10699,6 +10730,7 @@ namespace FAutoLearn
                 int k = 3;
                 int peakCount = 0;
                 int[] peakIndex = new int[10];
+                int[] peakEach = new int[10];
                 bool afterValley = true;
                 int lastPeak = 0;
                 int minPeak = 9999;
@@ -10718,7 +10750,7 @@ namespace FAutoLearn
                     {
                         if (peakCount == 10)
                             break;
-                        if (lastValley + valleyThreshold < aVline[i][k] && afterValley)
+                        if ((lastValley + valleyThreshold < aVline[i][k] && afterValley) || (lastPeak + 50) < aVline[i][k])
                         {
                             if (peakCount == 1)
                             {
@@ -10731,6 +10763,7 @@ namespace FAutoLearn
                                 }
                             }
                             peakIndex[peakCount] = k;
+                            peakEach[peakCount] = lastPeak;
                             lastPeak = aVline[i][k];
                             peakCount++;
                             afterValley = false;
@@ -10746,13 +10779,12 @@ namespace FAutoLearn
                             if (aVline[i][k] < minPeak/*lastPeak - 15*/) //  Valley 는 minPeak 보다 어두워야 한다.
                             {
                                 lastValley = aVline[i][k];
-                                afterValley = true;
-                                if (k - lastValleyIndex > 6 && peakCount > 4)   //   Valley와 Valley 간 간격이 너무 넓으면 이전 Peak 는 잘못된 Peak임
+                                if (k - lastValleyIndex > 6 && peakCount > 4 && !afterValley)   //   Valley와 Valley 간 간격이 너무 넓으면 이전 Peak 는 잘못된 Peak임
                                 {
                                     if (peakIndex[peakCount] > lastValleyIndex)
                                         peakCount--;
                                 }
-
+                                afterValley = true;
                                 lastValleyIndex = k;
                             }
                     }
@@ -10773,17 +10805,58 @@ namespace FAutoLearn
                         if (peakIndex[3] - peakIndex[0] < 16)
                         {
                             //                          //  Pos of Left Ref, Pos of Top Line, Pos of Bottom Line
-                            resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
-                            foundMark = true;
-                            break;
-                        }
-                        else if (peakCount > 4)
-                        {
-                            if (peakIndex[1] - peakIndex[4] < 16)
+                            if ((peakEach[0] > peakEach[1] / 2 && peakCount > 4 && peakEach[0] < 1.5 * peakEach[1]) || peakCount == 4)
                             {
-                                resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
-                                foundMark = true;
-                                break;
+                                if (peakCount > 4)
+                                {
+                                    int gap01 = peakIndex[1] - peakIndex[0];
+                                    int gap12 = peakIndex[2] - peakIndex[1];
+                                    int gap23 = peakIndex[3] - peakIndex[2];
+                                    int gap45 = peakIndex[4] - peakIndex[3];
+                                    if (gap01 > gap12 + 1 && gap01 > gap23 + 1)
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                        foundMark = true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                        foundMark = true;
+                                        break;
+
+                                    }
+                                }
+                                else
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
+                            }
+                            else if (peakCount > 4)
+                            {
+                                if (peakIndex[4] - peakIndex[1] < 16)
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
+                                else if (peakCount == 5)
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
+                                else if (peakCount == 6)
+                                {
+                                    if (peakIndex[5] - peakIndex[2] < 16)
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[2] + j0, peakIndex[5] + j0 };
+                                        foundMark = true;
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
@@ -10842,6 +10915,12 @@ namespace FAutoLearn
             {
                 for (int xi = 0; xi < HbufLength; xi++)
                 {
+                    if (xi + searchHline[si] < resVline[si][0] - 24)
+                    {
+                        resHline[si][xi] = 6 * 255;
+                        continue;
+                    }
+
                     resHline[si][xi] += q_ValueImg[xi + searchHline[si] + resVline[si][1] * quaterWidth] + q_ValueImg[xi + searchHline[si] + resVline[si][2] * quaterWidth];
                     resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] + 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] + 1) * quaterWidth];
                     resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] - 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] - 1) * quaterWidth];

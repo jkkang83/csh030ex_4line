@@ -56,6 +56,7 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Web.UI.WebControls;
 using System.Windows.Markup;
 using System.Diagnostics.Eventing.Reader;
+using Dln.Gpio;
 
 namespace CSH030Ex
 {
@@ -363,6 +364,8 @@ namespace CSH030Ex
             grpAdjust.Visible = isOn;
             groupBox4.Visible = isOn;
             btnChangeCrop.Visible = isOn;
+            Can_Reopen.Visible = isOn;
+            cbLiveWithMarks.Visible = isOn;
         }
         public int GetTriggerGrabbedFrame()
         {
@@ -1023,16 +1026,20 @@ namespace CSH030Ex
             //m__G.oCam[0].DrawDC_Circle(Brushes.Red, 200);    // DrawCircle khkim_170920
             m__G.oCam[0].DrawAllRectangles();
 
+            if(BtnAdminMode.Text == "Operate Mode")
+            {
+                tbInfo.Font = new Font("Malgun Gothic", 16, FontStyle.Bold);
+            }
+            else
+            {
+                tbInfo.Font = new Font("Malgun Gothic", 8, FontStyle.Regular);
+            }
             if (cbLiveWithMarks.Checked && bLiveFindMark == false)
             {
-                // 250326 폰트 설정 cbLiveWithMarks_CheckedChanged()에서 이동
-                tbInfo.Font = new Font("Calibri", 14, FontStyle.Bold);
                 Task.Run(() => LiveFindMark());
             }
             else
             {
-                tbInfo.Font = new Font("Calibri", 8, FontStyle.Regular);
-
                 if (m__G.mCamCount > 1)
                 {
                     m__G.oCam[1].ClearDisp();
@@ -3756,7 +3763,14 @@ namespace CSH030Ex
                     {
                         DrawMarkDetected();
                         //pictureBox2.Image = BitmapConverter.ToBitmap(m__G.oCam[0].mFAL.mSourceImg[0]);
-                        tbInfo.Font = new Font("Calibri", 8, FontStyle.Regular);
+                        if (BtnAdminMode.Text == "Operate Mode")
+                        {
+                            tbInfo.Font = new Font("Malgun Gothic", 16, FontStyle.Bold);
+                        }
+                        else
+                        {
+                            tbInfo.Font = new Font("Malgun Gothic", 8, FontStyle.Regular);
+                        }
                         ltextBox[0].Text += strtmp[0] + "\r\n";
                         ltextBox[0].SelectionStart = ltextBox[0].Text.Length;
                         ltextBox[0].ScrollToCaret();
@@ -3766,7 +3780,14 @@ namespace CSH030Ex
                 {
                     DrawMarkDetected();
                     //pictureBox2.Image = BitmapConverter.ToBitmap(m__G.oCam[0].mFAL.mSourceImg[0]);
-                    tbInfo.Font = new Font("Calibri", 8, FontStyle.Regular);
+                    if (BtnAdminMode.Text == "Operate Mode")
+                    {
+                        tbInfo.Font = new Font("Malgun Gothic", 16, FontStyle.Bold);
+                    }
+                    else
+                    {
+                        tbInfo.Font = new Font("Malgun Gothic", 8, FontStyle.Regular);
+                    }
                     ltextBox[0].Text += strtmp[0] + "\r\n";
                     ltextBox[0].SelectionStart = ltextBox[0].Text.Length;
                     ltextBox[0].ScrollToCaret();
@@ -3787,7 +3808,8 @@ namespace CSH030Ex
                 //    ltextBox[1].ScrollToCaret();
                 //}
             }
-            File.AppendAllLines("D:\\PIE Repeatability\\TimeStability.txt", new[] { strtmp[0] });
+
+            //File.AppendAllLines("D:\\PIE Repeatability\\TimeStability.txt", new[] { strtmp[0] });
 
             m__G.oCam[0].mFAL.RecoverFromBackupFMI();
             m__G.mDoingStatus = "IDLE";
@@ -6684,7 +6706,11 @@ namespace CSH030Ex
         public double[] ms_txSin = new double[1] { -2.0E-05 };
         public double[] ms_tySin = new double[1] {  4.0E-05 };
         public double[] ms_tzSin = new double[1] {  1.0E-05 };
-        
+
+        public double[] ms_txCos = new double[1] { 0 };
+        public double[] ms_tyCos = new double[1] { 0 };
+        public double[] ms_tzCos = new double[1] { 0 };
+
         //private void btnCalcScales_Click(object sender, EventArgs e)
         //{
         //    double rX_NtoS = 0;
@@ -7266,7 +7292,7 @@ namespace CSH030Ex
                 else
                 {
                     //  When there are Y1Y2Y3LUT in ScaleNTheta
-                    dScales = new double[44][]
+                    dScales = new double[47][]
                     {
                         new double[3] ,ms_scaleX, ms_scaleY, ms_scaleZ, ms_scaleTX, ms_scaleTY, ms_scaleTZ, new double[3],
                         ms_XtoYst, ms_XtoZst, ms_XtoTXst, ms_XtoTYst, ms_XtoTZst,
@@ -7279,7 +7305,7 @@ namespace CSH030Ex
                         ms_TZtoZst,
                         ms_TXtoXst, ms_TXtoYst, ms_TXtoZst,
                         ms_TYtoXst, ms_TYtoYst, ms_TYtoZst,
-                        ms_TZtoXst, ms_TZtoYst, ms_txSin, ms_tySin, ms_tzSin
+                        ms_TZtoXst, ms_TZtoYst, ms_txSin, ms_tySin, ms_tzSin, ms_txCos, ms_tyCos, ms_tzCos
                     };
                     for (int i = 0; i < eachLine.Length; i++)
                     {
@@ -7322,7 +7348,7 @@ namespace CSH030Ex
                         }
                         else
                         {
-                            dScales[i][0] = double.Parse(strdata[0]);
+                            dScales[i][0] = double.Parse(strdata[0]);   //  ms_txSin ~ ms_tzCos
                         }
                     }
                 }
@@ -7338,7 +7364,7 @@ namespace CSH030Ex
                                                  ms_TZtoZst,
                                                 ms_TXtoXst, ms_TXtoYst, ms_TXtoZst,
                                                 ms_TYtoXst, ms_TYtoYst, ms_TYtoZst,
-                                                ms_TZtoXst, ms_TZtoYst, ms_txSin[0], ms_tySin[0], ms_tzSin[0]
+                                                ms_TZtoXst, ms_TZtoYst, ms_txSin[0], ms_tySin[0], ms_tzSin[0], ms_txCos[0], ms_tyCos[0], ms_tzCos[0]
                                                  );
                 AddVsnLog("Loaded scales");
 
@@ -7560,7 +7586,14 @@ namespace CSH030Ex
             {
                 // 250326 Live with Mark 타이밍 수정
                 // bLiveFindMark = false;
-                tbInfo.Font = new Font("Calibri", 8, FontStyle.Regular);
+                if (BtnAdminMode.Text == "Operate Mode")
+                {
+                    tbInfo.Font = new Font("Malgun Gothic", 16, FontStyle.Bold);
+                }
+                else
+                {
+                    tbInfo.Font = new Font("Malgun Gothic", 8, FontStyle.Regular);
+                }
                 m__G.mDoingStatus = "IDLE";
                 m__G.mIDLEcount = 0;
             }

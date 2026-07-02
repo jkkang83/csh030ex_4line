@@ -213,7 +213,7 @@
             this.label10 = new System.Windows.Forms.Label();
             this.MotionStageBtn = new System.Windows.Forms.Button();
             this.cbBench = new System.Windows.Forms.CheckBox();
-            this.button6 = new System.Windows.Forms.Button();
+            this.Can_Reopen = new System.Windows.Forms.Button();
             this.BtnAdminMode = new System.Windows.Forms.Button();
             this.PanelAdmin1 = new System.Windows.Forms.Panel();
             this.PanelAdmin2 = new System.Windows.Forms.Panel();
@@ -2608,7 +2608,7 @@
             this.PanelAdmin0.Controls.Add(this.label10);
             this.PanelAdmin0.Controls.Add(this.MotionStageBtn);
             this.PanelAdmin0.Controls.Add(this.cbBench);
-            this.PanelAdmin0.Controls.Add(this.button6);
+            this.PanelAdmin0.Controls.Add(this.Can_Reopen);
             this.PanelAdmin0.Location = new System.Drawing.Point(2, 71);
             this.PanelAdmin0.Name = "PanelAdmin0";
             this.PanelAdmin0.Size = new System.Drawing.Size(475, 181);
@@ -2756,20 +2756,20 @@
             this.cbBench.UseVisualStyleBackColor = true;
             this.cbBench.CheckedChanged += new System.EventHandler(this.cbBench_CheckedChanged);
             // 
-            // button6
+            // Can_Reopen
             // 
-            this.button6.BackColor = System.Drawing.Color.DeepSkyBlue;
-            this.button6.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button6.BackgroundImage")));
-            this.button6.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.button6.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.button6.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.button6.ForeColor = System.Drawing.Color.White;
-            this.button6.Location = new System.Drawing.Point(322, 71);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(144, 60);
-            this.button6.TabIndex = 438;
-            this.button6.Text = "Cam Re-Open";
-            this.button6.UseVisualStyleBackColor = false;
+            this.Can_Reopen.BackColor = System.Drawing.Color.DeepSkyBlue;
+            this.Can_Reopen.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("Can_Reopen.BackgroundImage")));
+            this.Can_Reopen.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.Can_Reopen.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.Can_Reopen.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.Can_Reopen.ForeColor = System.Drawing.Color.White;
+            this.Can_Reopen.Location = new System.Drawing.Point(322, 71);
+            this.Can_Reopen.Name = "Can_Reopen";
+            this.Can_Reopen.Size = new System.Drawing.Size(144, 60);
+            this.Can_Reopen.TabIndex = 438;
+            this.Can_Reopen.Text = "Cam Re-Open";
+            this.Can_Reopen.UseVisualStyleBackColor = false;
             // 
             // BtnAdminMode
             // 
@@ -3130,7 +3130,7 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button MotionStageBtn;
         private System.Windows.Forms.CheckBox cbBench;
-        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Button Can_Reopen;
         private System.Windows.Forms.Button BtnAdminMode;
         private System.Windows.Forms.Panel PanelAdmin1;
         private System.Windows.Forms.Panel PanelAdmin2;

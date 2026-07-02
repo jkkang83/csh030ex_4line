@@ -7199,9 +7199,6 @@ namespace FAutoLearn
             double dStxDueToTZ = 0;
             double dStyDueToTZ = 0;
 
-            //subTX = 0;
-            //subTY = 0;
-
             bool bUseSubMark = true;
             if (subTX == 0 && subTY == 0)
                 bUseSubMark = false;
@@ -7302,9 +7299,6 @@ namespace FAutoLearn
                 //여기까지 초기화
 
 
-                //string[] myStr = new string[1];
-                //myStr[0] = subTY.ToString("F5") + "," + (pSide[0].Y - pSide[2].Y).ToString("F5");
-                //File.AppendAllLines("D:\\PrismTest\\Pivot\\SubTX.csv", myStr);
 
                 T = TnPsifromTopView(mCOItop, mTop0, pTop, mCOIside, mSide0, pSide, ref psi, ref err);   //  이 함수를 SideView, TopView 모두 이용하는 것으로 변경 필요   20230102
                 mPsi0 = psi;
@@ -7317,7 +7311,7 @@ namespace FAutoLearn
                 if (bUseSubMark)
                 {
                     dYns2eTZcomp = pSideCompensateTnPsi[3].Y - (pSideCompensateTnPsi[0].Y + pSideCompensateTnPsi[2].Y) / 2;
-                    dYn2sTZcomp = pSideCompensateTnPsi[0].Y - pSideCompensateTnPsi[2].Y;
+                    dYn2sTZcomp = pSideCompensateTnPsi[2].Y - pSideCompensateTnPsi[0].Y;
                     dStxDueToTZ = dYns2eTZcomp - dYns2eOrg;
                     dStyDueToTZ = dYn2sTZcomp - dYn2sOrg;
                     subTX += dStxDueToTZ;
@@ -7357,7 +7351,7 @@ namespace FAutoLearn
                 if (bUseSubMark)
                 {
                     dYns2eTZcomp = pSideCompensateTnPsi[3].Y - (pSideCompensateTnPsi[0].Y + pSideCompensateTnPsi[2].Y) / 2;
-                    dYn2sTZcomp = pSideCompensateTnPsi[0].Y - pSideCompensateTnPsi[2].Y;
+                    dYn2sTZcomp = pSideCompensateTnPsi[2].Y - pSideCompensateTnPsi[0].Y;
                     dStxDueToTZ = dYns2eTZcomp - dYns2eOrg;
                     dStyDueToTZ = dYn2sTZcomp - dYn2sOrg;
                     subTX += dStxDueToTZ;
@@ -7423,7 +7417,7 @@ namespace FAutoLearn
             TY = TY / mMinToRad;  //  Convert Radian to min
 
 
-            TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);
+            TX += mTXsinCoef * Math.Sin(TX * 68) + mTXcosCoef * Math.Cos(TX * 68); //radian    //  TX += 0.132 * Math.Sin(TX / 160 * Math.PI);// arcmin
 
 
             psi = (mScaleTZ[0] * psi * psi + mScaleTZ[1] * psi + mScaleTZ[2]) * mMinToRad;
@@ -7433,7 +7427,7 @@ namespace FAutoLearn
             dZ = dZ * mPixelToUm * dZ * mScaleZ[0] + dZ * mScaleZ[1] + mScaleZ[2] / mPixelToUm;
 
             T.X -= dZ * dZ * mZtoXst[0] * mPixelToUm + dZ * mZtoXst[1];// + mZtoXst[2] / mPixelToUm;
-            sxtr += (T.X * mPixelToUm).ToString("F3") + "," + (T.Y * mPixelToUm).ToString("F3") + "," + (dZ * mPixelToUm).ToString("F3") + "\r\n";
+            //sxtr += (T.X * mPixelToUm).ToString("F3") + "," + (T.Y * mPixelToUm).ToString("F3") + "," + (dZ * mPixelToUm).ToString("F3") + "\r\n";
             T.Y -= dZ * dZ * mZtoYst[0] * mPixelToUm + dZ * mZtoYst[1];// + mZtoYst[2] / mPixelToUm;
             dZ -= T.Y * T.Y * mYtoZst[0] * mPixelToUm + T.Y * mYtoZst[1]// + mYtoZst[2] / mPixelToUm
                 + T.X * T.X * mXtoZst[0] * mPixelToUm + T.X * mXtoZst[1];// + mXtoZst[2] / mPixelToUm;
@@ -7442,7 +7436,7 @@ namespace FAutoLearn
             T.Y -= T.X * T.X * mXtoYst[0] * mPixelToUm + T.X * mXtoYst[1];// + mXtoYst[2] / mPixelToUm;
 
 
-            TY -= (signTY > 0 ? mOffsetTY : -mOffsetTY);
+            TY += mTYsinCoef * Math.Sin(TY * 76) + mTYcosCoef * Math.Cos(TY * 76.0); //radian    //  TY += 0.191 * Math.Sin( TY / 120 * Math.PI );// arcmin
 
 
             TX -= mXtoTXst[0] * T.X * T.X / 10.228 + mXtoTXst[1] * T.X / 187.5135 + mYtoTXst[0] * T.Y * T.Y / 10.228 + mYtoTXst[1] * T.Y / 187.5135 + mZtoTXst[0] * dZ * dZ / 10.228 + mZtoTXst[1] * dZ / 187.5135;
@@ -7465,19 +7459,16 @@ namespace FAutoLearn
             //  X,Y,Z 는 pixel
 
             //  비선형성분 제거
-            TY -= 8.55e-8 * psi * psi * psi * 11818102.86 + 20.35e-6 * psi * psi * 3437.746771;
-            // + 3.08e-6 * psi * psi * 3437.746771;    // 3.08e-6 당 1180min 에서 0.1min 아래로 내려간다.
-            //TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);
-            //TY -= (signTY > 0 ? mOffsetTY : -mOffsetTY);
-            //psi -= mOffsetTZ;
+            TY -= 8.55e-8 * psi * psi * psi * 11818102.86 + 2.35e-6 * psi * psi * 3437.746771;    //  공통
 
-            TX += mTXsinCoef * Math.Sin(TX * 68) + mTXcosCoef * Math.Cos(TX * 68); //radian    //  TX += 0.132 * Math.Sin(TX / 160 * Math.PI);// arcmin
-            TY += mTYsinCoef * Math.Sin(TY * 76) + mTYcosCoef * Math.Cos(TY * 76); //radian    //  TY += 0.191 * Math.Sin( TY / 120 * Math.PI );// arcmin
+            TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);
+            TY -= (signTY > 0 ? mOffsetTY : -mOffsetTY);
+            psi -= mOffsetTZ;
+
             psi += mTZsinCoef * Math.Sin(psi * 81) + mTZcosCoef * Math.Cos(psi * 81); //radian    //  TX += 0.132 * Math.Sin(TX / 160 * Math.PI);// arcmin
 
             //TY -= 1.05812E-07 * TY * TY * TY * 3437.746771  * 3437.746771  - 2.02529E-06 * TY * TY * 3437.746771 - 0.00236603 * TY;
             //TY -= 1.2505 * TY * TY * TY - -0.006962 * TY * TY - 0.002366 * TY;  //  TY 의 3차 성분 제거
-            psi -= mOffsetTZ;
 
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7523,10 +7514,7 @@ namespace FAutoLearn
             TY = signTY * TY;
 
             if (mOffsetTX != 0 && mOffsetTY != 0)
-                TX += 0.96 * TY * psi; //  P45 를 위한 보정 ,  0.1 일 때 P45 +/-180min 구동 시 P45 TY 양끝단을 0.4um 낮추는 효과있음
-
-            if (mOffsetTX != 0 && mOffsetTY != 0)
-                psi += 0.05 * TY * psi; //  P45 를 위한 보정 ,  0.1 일 때 P45 +/-180min 구동 시 P45 TZ 양끝단을 0.4um 낮추는 효과있음
+                TX += 0.96 * TY * psi; //  P45 를 위한 보정
 
             //TX = TX - 3437.747 * TY * TY / 96;// - (3.14e-8) * dZ*dZ;   //  180/pi
 
@@ -9196,7 +9184,7 @@ namespace FAutoLearn
             double[] error = new double[11];
             double[] slope = new double[11];
             double fullstroke = Math.Abs(points[n - 1].X - points[0].X);
-            double period = 3.2 * Math.PI / fullstroke;
+            double period = 3.0 * Math.PI / fullstroke;
             double offset = 0;
             int[] index = new int[11] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             double minY = 9999;
