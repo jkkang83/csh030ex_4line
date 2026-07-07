@@ -6185,7 +6185,7 @@ namespace CSH030Ex
 
 
             m__G.oCam[0].FineCOG(true, 0, 0, false, true, false, IsFile);    // 마크찾기
-            m__G.fManage.AddViewLog(string.Format("FineCOG 0\r\n"));
+            if(!m__G.m_bHideAllGraph) m__G.fManage.AddViewLog(string.Format("FineCOG 0\r\n"));
             if (count < HowManyThread)
             {
                 mb_FinishCalcVision[0] = false;

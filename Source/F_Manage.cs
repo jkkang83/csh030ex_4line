@@ -1536,7 +1536,7 @@ namespace CSH030Ex
                 }
                 else
                 {
-                    AddViewLog(string.Format("mMatroxMsg : {0}", m__G.oCam[0].mMatroxMsg));
+                    if (!m__G.m_bHideAllGraph) AddViewLog(string.Format("mMatroxMsg : {0}", m__G.oCam[0].mMatroxMsg));
                 }
                 //if (!m__G.m_bHideAllGraph) AddViewLog(string.Format("Trigger grab End\r\n"));
                 //if (!m__G.m_bHideAllGraph) AddViewLog("MatroxMsg " + m__G.oCam[0].mMatroxMsg);
@@ -1740,7 +1740,7 @@ namespace CSH030Ex
                         ///////////////////////////////////////////////////////////////////////
 
                         m__G.oCam[0].SetTriggeredframeCount(m__G.oCam[0].mTargetTriggerCount);
-                        AddViewLog("MakeSaveResult " + m__G.oCam[0].mTargetTriggerCount.ToString() + "\r\n");
+                        if (!m__G.m_bHideAllGraph) AddViewLog("MakeSaveResult " + m__G.oCam[0].mTargetTriggerCount.ToString() + "\r\n");
                         byte[] sDatabuffer = MyOwner.MakeSaveResult();
                         //MyOwner.WriteResultBin(0);
                         int framCnt = m__G.oCam[0].mTargetTriggerCount;
