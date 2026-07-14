@@ -454,12 +454,12 @@ namespace MotorizedStage_SK_PI
         }
         public bool SetCoordinateSystem(double x, double y, double z, double u, double v, double w)
         {
-            x *= 0.001;
-            y *= 0.001;
-            z *= 0.001;
-            u /= 60;
-            v /= 60;
-            w /= 60;
+            x *= 0.001;    //  mm 로 바꾼다
+            y *= 0.001;    //  mm 로 바꾼다
+            z *= 0.001;    //  mm 로 바꾼다
+            u /= 60;    //  deg 로 바꾼다
+            v /= 60;    //  deg 로 바꾼다
+            w /= 60;    //  deg 로 바꾼다
 
             try
             {

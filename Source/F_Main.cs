@@ -1041,6 +1041,8 @@ namespace CSH030Ex
                 cbNoHost.Checked = false;
                 m__G.m_bNoHostPC = false;
             }
+            if (i == rows.Length) return true;
+            IsChecked = rows[i++];
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
                 cbDebugMode.Checked = true;
@@ -1050,6 +1052,18 @@ namespace CSH030Ex
             {
                 cbDebugMode.Checked = false;
                 m__G.m_bDebugMode = false;
+            }
+            if (i == rows.Length) return true;
+            IsChecked = rows[i++];
+            if (IsChecked.Contains("t") || IsChecked.Contains("T"))
+            {
+                cbPseudoOMM.Checked = true;
+                m__G.m_bPseudoOMM = true;
+            }
+            else
+            {
+                cbPseudoOMM.Checked = false;
+                m__G.m_bPseudoOMM = false;
             }
             return true;
         }
@@ -1082,6 +1096,11 @@ namespace CSH030Ex
             sr.WriteLine(cbSaveLostTestSet.Checked.ToString());
             sr.WriteLine(cbNoHost.Checked.ToString());
             sr.WriteLine(cbDebugMode.Checked.ToString());
+            //sr.WriteLine(cbTestStage.Checked.ToString());
+            //sr.WriteLine(cbSaveNGImage.Checked.ToString());
+            //sr.WriteLine(chOISOption.Checked.ToString());
+            //sr.WriteLine(chSaveUserImage.Checked.ToString());
+            sr.WriteLine(cbPseudoOMM.Checked.ToString());
 
             sr.Close();
             if (MachineType == (int)CSH030Ex.MachineType.Master)
@@ -1521,7 +1540,7 @@ namespace CSH030Ex
         [Serializable]
         public class sSaveResultBin
         {
-            public Int64 sTime;             
+            public Int64 sTime;
             public int frameCount;
             public double fps;
             public double ledLeft;
@@ -1533,6 +1552,16 @@ namespace CSH030Ex
             public double[] TX;
             public double[] TY;
             public double[] TZ;
+            public double[] CoX;
+            public double[] CoY;
+            public double[] CoZ;
+
+            public double[] pOmmX;
+            public double[] pOmmY;
+            public double[] pOmmZ;
+            public double[] pOmmTX;
+            public double[] pOmmTY;
+            public double[] pOmmTZ;
         }
         public class sSaveResultPos
         {
@@ -1891,7 +1920,7 @@ namespace CSH030Ex
             return sFilePath;
         }
         public bool DebugStop = false;
-        public byte [] MakeSaveResult(bool isManual = false)
+        public byte[] MakeSaveResult(bool isManual = false)
         {
             string sLotName = m__G.fManage.GetLotName();
             m__G.mNowLotName = sLotName;
@@ -1902,8 +1931,9 @@ namespace CSH030Ex
                 framCnt = m__G.oCam[0].mTargetTriggerCount;
 
             int structCnt = 44;
-
-            byte[] dataBuf = new byte[structCnt + framCnt * 8 * 6];
+            int databufCnt = 9;
+            if (m__G.m_bPseudoOMM) databufCnt = 12;
+            byte[] dataBuf = new byte[structCnt + framCnt * 8 * databufCnt];
 
             double umscale = 5.5 / Global.LensMag;                           //  rad to min
             double minscale = 180 / Math.PI * 60;                           //  rad to min
@@ -1954,14 +1984,29 @@ namespace CSH030Ex
             sResult.TX = new double[framCnt];
             sResult.TY = new double[framCnt];
             sResult.TZ = new double[framCnt];
+            sResult.CoX = new double[framCnt];
+            sResult.CoY = new double[framCnt];
+            sResult.CoZ = new double[framCnt];
 
-            if(!isManual)
+            sResult.pOmmX = new double[framCnt];
+            sResult.pOmmY = new double[framCnt];
+            sResult.pOmmZ = new double[framCnt];
+            //sResult.pOmmTX = new double[framCnt];
+            //sResult.pOmmTY = new double[framCnt];
+            //sResult.pOmmTZ = new double[framCnt];
+
+            for (i = 0; i < framCnt; i++)
+            {
+                sResult.CoX[i] = 0;
+                sResult.CoY[i] = 0;
+                sResult.CoZ[i] = 0;
+            }
+            if (!isManual)
             {
                 if (framCnt > 1000)
                 {
                     for (i = 0; i < 5; i++)
                     {
-
                         sResult.X[0] += m__G.oCam[0].mC_pX[i] * umscale / 5;  //  um
                         sResult.Y[0] += m__G.oCam[0].mC_pY[i] * umscale / 5;  //  um
                         sResult.Z[0] += m__G.oCam[0].mC_pZ[i] * umscale / 5;  //  um
@@ -1970,6 +2015,20 @@ namespace CSH030Ex
                         sResult.TX[0] += m__G.oCam[0].mC_pTX[i] * minscale / 5; //  min
                         sResult.TY[0] += m__G.oCam[0].mC_pTY[i] * minscale / 5; //  min
                         sResult.TZ[0] += m__G.oCam[0].mC_pTZ[i] * minscale / 5; //  min
+
+                        sResult.CoX[0] += m__G.oCam[0].mPrism_pTX[i] * minscale / 5; //  min
+                        sResult.CoY[0] += m__G.oCam[0].mPrism_pTY[i] * minscale / 5; //  min
+                        sResult.CoZ[0] += m__G.oCam[0].mPrism_pTZ[i] * minscale / 5; //  min
+
+                        if (m__G.m_bPseudoOMM)
+                        {
+                            sResult.pOmmX[0] += m__G.oCam[0].mPOMM_X[i] * umscale / 5;  //  um
+                            sResult.pOmmY[0] += m__G.oCam[0].mPOMM_Y[i] * umscale / 5;  //  um
+                            sResult.pOmmZ[0] += m__G.oCam[0].mPOMM_Z[i] * umscale / 5;  //  um
+                            //sResult.pOmmTX[0] += m__G.oCam[0].mPOMM_TX[i] * minscale / 5; //  min
+                            //sResult.pOmmTY[0] += m__G.oCam[0].mPOMM_TY[i] * minscale / 5; //  min
+                            //sResult.pOmmTZ[0] += m__G.oCam[0].mPOMM_TZ[i] * minscale / 5; //  min
+                        }
                     }
 
                     for (i = 1; i < framCnt; i++)
@@ -1982,6 +2041,19 @@ namespace CSH030Ex
                         sResult.TX[i] = m__G.oCam[0].mC_pTX[i] * minscale; //  min
                         sResult.TY[i] = m__G.oCam[0].mC_pTY[i] * minscale; //  min
                         sResult.TZ[i] = m__G.oCam[0].mC_pTZ[i] * minscale; //  min
+
+                        sResult.CoX[i] = m__G.oCam[0].mPrism_pTX[i] * minscale; //  min
+                        sResult.CoY[i] = m__G.oCam[0].mPrism_pTY[i] * minscale; //  min
+                        sResult.CoZ[i] = m__G.oCam[0].mPrism_pTZ[i] * minscale; //  min
+                        if (m__G.m_bPseudoOMM)
+                        {
+                            sResult.pOmmX[i] += m__G.oCam[0].mPOMM_X[i] * umscale;  //  um
+                            sResult.pOmmY[i] += m__G.oCam[0].mPOMM_Y[i] * umscale;  //  um
+                            sResult.pOmmZ[i] += m__G.oCam[0].mPOMM_Z[i] * umscale;  //  um
+                            //sResult.pOmmTX[i] += m__G.oCam[0].mPOMM_TX[i] * minscale ; //  min
+                            //sResult.pOmmTY[i] += m__G.oCam[0].mPOMM_TY[i] * minscale ; //  min
+                            //sResult.pOmmTZ[i] += m__G.oCam[0].mPOMM_TZ[i] * minscale ; //  min
+                        }
                     }
                 }
                 else
@@ -1996,6 +2068,19 @@ namespace CSH030Ex
                         sResult.TX[i] = m__G.oCam[0].mC_pTX[i] * minscale; //  min
                         sResult.TY[i] = m__G.oCam[0].mC_pTY[i] * minscale; //  min
                         sResult.TZ[i] = m__G.oCam[0].mC_pTZ[i] * minscale; //  min
+
+                        sResult.CoX[i] = m__G.oCam[0].mPrism_pTX[i] * minscale; //  min
+                        sResult.CoY[i] = m__G.oCam[0].mPrism_pTY[i] * minscale; //  min
+                        sResult.CoZ[i] = m__G.oCam[0].mPrism_pTZ[i] * minscale; //  min
+                        if (m__G.m_bPseudoOMM)
+                        {
+                            sResult.pOmmX[i] += m__G.oCam[0].mPOMM_X[i] * umscale;  //  um
+                            sResult.pOmmY[i] += m__G.oCam[0].mPOMM_Y[i] * umscale;  //  um
+                            sResult.pOmmZ[i] += m__G.oCam[0].mPOMM_Z[i] * umscale;  //  um
+                            //sResult.pOmmTX[i] += m__G.oCam[0].mPOMM_TX[i] * minscale; //  min
+                            //sResult.pOmmTY[i] += m__G.oCam[0].mPOMM_TY[i] * minscale; //  min
+                            //sResult.pOmmTZ[i] += m__G.oCam[0].mPOMM_TZ[i] * minscale; //  min
+                        }
                     }
                 }
             }
@@ -2009,10 +2094,25 @@ namespace CSH030Ex
                     sResult.TX[i] = m__G.oCam[0].mC_pTX[i];
                     sResult.TY[i] = m__G.oCam[0].mC_pTY[i];
                     sResult.TZ[i] = m__G.oCam[0].mC_pTZ[i];
+
+                    sResult.CoX[i] = m__G.oCam[0].mPrism_pTX[i]; //  min
+                    sResult.CoY[i] = m__G.oCam[0].mPrism_pTY[i]; //  min
+                    sResult.CoZ[i] = m__G.oCam[0].mPrism_pTZ[i]; //  min
+                    if (m__G.m_bPseudoOMM)
+                    {
+                        sResult.pOmmX[i] += m__G.oCam[0].mPOMM_X[i] * umscale;  //  um
+                        sResult.pOmmY[i] += m__G.oCam[0].mPOMM_Y[i] * umscale;  //  um
+                        sResult.pOmmZ[i] += m__G.oCam[0].mPOMM_Z[i] * umscale;  //  um
+                        //sResult.pOmmTX[i] += m__G.oCam[0].mPOMM_TX[i] * minscale; //  min
+                        //sResult.pOmmTY[i] += m__G.oCam[0].mPOMM_TY[i] * minscale; //  min
+                        //sResult.pOmmTZ[i] += m__G.oCam[0].mPOMM_TZ[i] * minscale; //  min
+                    }
                 }
             }
+
+
             DateTime dt = DateTime.Now;
-            string sLotDir = "C:\\CSHTest\\Data\\" + dt.Year + "\\" + dt.Month + "\\" + dt.Day + "\\" + "A_RData\\"; 
+            string sLotDir = "C:\\CSHTest\\Data\\" + dt.Year + "\\" + dt.Month + "\\" + dt.Day + "\\" + "A_RData\\";
             if (!Directory.Exists(sLotDir))
                 Directory.CreateDirectory(sLotDir);
 
@@ -2039,41 +2139,156 @@ namespace CSH030Ex
                 Array.Copy(data, 0, dataBuf, curCount, data.Length);
                 curCount += data.Length;
             }
-            for (i = 0; i < framCnt; i++)
+            if (m__G.m_bOISOption)
             {
-                if (sResult.TX[i] == 0) sResult.TX[i] = 99999;
-                data = BitConverter.GetBytes(sResult.TX[i]);
-                Array.Copy(data, 0, dataBuf, curCount, data.Length);
-                curCount += data.Length;
+                //COMP_TX,COMP_TY,COMP_TZ 추후에 RawData 값 추가 현재 0 채워서 전송
+                for (i = 0; i < framCnt; i++)
+                {
+                    data = BitConverter.GetBytes(sResult.CoX[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
+                for (i = 0; i < framCnt; i++)
+                {
+                    data = BitConverter.GetBytes(sResult.CoY[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
+                for (i = 0; i < framCnt; i++)
+                {
+                    data = BitConverter.GetBytes(sResult.CoZ[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
+                for (i = 0; i < framCnt; i++)
+                {
+                    if (sResult.TX[i] == 0) sResult.TX[i] = 99999;
+                    data = BitConverter.GetBytes(sResult.TX[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
+                for (i = 0; i < framCnt; i++)
+                {
+                    if (sResult.TY[i] == 0) sResult.TY[i] = 99999;
+                    data = BitConverter.GetBytes(sResult.TY[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
+                for (i = 0; i < framCnt; i++)
+                {
+                    if (sResult.TZ[i] == 0) sResult.TZ[i] = 99999;
+                    data = BitConverter.GetBytes(sResult.TZ[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
             }
-            for (i = 0; i < framCnt; i++)
+            else
             {
-                if (sResult.TY[i] == 0) sResult.TY[i] = 99999;
-                data = BitConverter.GetBytes(sResult.TY[i]);
-                Array.Copy(data, 0, dataBuf, curCount, data.Length);
-                curCount += data.Length;
+                for (i = 0; i < framCnt; i++)
+                {
+                    if (sResult.TX[i] == 0) sResult.TX[i] = 99999;
+                    data = BitConverter.GetBytes(sResult.TX[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
+                for (i = 0; i < framCnt; i++)
+                {
+                    if (sResult.TY[i] == 0) sResult.TY[i] = 99999;
+                    data = BitConverter.GetBytes(sResult.TY[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
+                for (i = 0; i < framCnt; i++)
+                {
+                    if (sResult.TZ[i] == 0) sResult.TZ[i] = 99999;
+                    data = BitConverter.GetBytes(sResult.TZ[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
+                //COMP_TX,COMP_TY,COMP_TZ 추후에 RawData 값 추가 현재 0 채워서 전송
+                for (i = 0; i < framCnt; i++)
+                {
+                    data = BitConverter.GetBytes(sResult.CoX[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
+                for (i = 0; i < framCnt; i++)
+                {
+                    data = BitConverter.GetBytes(sResult.CoY[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
+                for (i = 0; i < framCnt; i++)
+                {
+                    data = BitConverter.GetBytes(sResult.CoZ[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
             }
-            for (i = 0; i < framCnt; i++)
+            if (m__G.m_bPseudoOMM)
             {
-                if (sResult.TZ[i] == 0) sResult.TZ[i] = 99999;
-                data = BitConverter.GetBytes(sResult.TZ[i]);
-                Array.Copy(data, 0, dataBuf, curCount, data.Length);
-                curCount += data.Length;
+                for (i = 0; i < framCnt; i++)
+                {
+                    //if (sResult.pOmmX[i] == 0) sResult.pOmmX[i] = 99999;
+                    data = BitConverter.GetBytes(sResult.pOmmX[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
+                for (i = 0; i < framCnt; i++)
+                {
+                    //if (sResult.pOmmY[i] == 0) sResult.pOmmY[i] = 99999;
+                    data = BitConverter.GetBytes(sResult.pOmmY[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
+                for (i = 0; i < framCnt; i++)
+                {
+                    //if (sResult.pOmmZ[i] == 0) sResult.pOmmZ[i] = 99999;
+                    data = BitConverter.GetBytes(-sResult.pOmmZ[i]);
+                    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                    curCount += data.Length;
+                }
             }
-            StreamWriter wr = null; 
+            //for (i = 0; i < framCnt; i++)
+            //{
+            //    if (sResult.pOmmTX[i] == 0) sResult.pOmmTX[i] = 99999;
+            //    data = BitConverter.GetBytes(sResult.pOmmTX[i]);
+            //    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+            //    curCount += data.Length;
+            //}
+            //for (i = 0; i < framCnt; i++)
+            //{
+            //    if (sResult.pOmmTY[i] == 0) sResult.pOmmTY[i] = 99999;
+            //    data = BitConverter.GetBytes(sResult.pOmmTY[i]);
+            //    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+            //    curCount += data.Length;
+            //}
+            //for (i = 0; i < framCnt; i++)
+            //{
+            //    if (sResult.pOmmTZ[i] == 0) sResult.pOmmTZ[i] = 99999;
+            //    data = BitConverter.GetBytes(sResult.pOmmTZ[i]);
+            //    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+            //    curCount += data.Length;
+            //}
+            ////////////////////////////////////////////////////////////////
+            StreamWriter wr = null;
             if (m__G.m_bSaveRawData)
             {
                 wr = new StreamWriter(sLotDir);
-                wr.WriteLine("X,Y,Z,TX,TY,TZ");
+                wr.WriteLine("X,Y,Z,TX,TY,TZ,COMP_TX,COMP_TY,COMP_TZ,Pseudo_X,Pseudo_Y,Pseudo_Z");
                 for (i = 0; i < framCnt; i++)
                 {
-                    wr.WriteLine(string.Format("{0:0.00},{1:0.00},{2:0.00},{3:0.00},{4:0.00},{5:0.00}", sResult.X[i], sResult.Y[i], sResult.Z[i], sResult.TX[i], sResult.TY[i], sResult.TZ[i]));
+                    wr.WriteLine(string.Format("{0:0.00},{1:0.00},{2:0.00},{3:0.00},{4:0.00},{5:0.00},{6:0.00},{7:0.00},{8:0.00},{9:0.00},{10:0.00},{11:0.00}",
+                        sResult.X[i], sResult.Y[i], sResult.Z[i],
+                        sResult.TX[i], sResult.TY[i], sResult.TZ[i], sResult.CoX[i], sResult.CoY[i], sResult.CoZ[i],
+                        sResult.pOmmX[i], sResult.pOmmY[i], sResult.pOmmZ[i]));
                 }
                 wr.Close();
             }
 
             return dataBuf;
         }
+
         public byte[] MakeSaveResultAnosis(bool isManual = false)
         {
             string sLotName = m__G.fManage.GetLotName();
@@ -5928,7 +6143,7 @@ namespace CSH030Ex
             }
         }
 
-        private void cbSuperFastMode_CheckedChanged(object sender, EventArgs e)
+        private void cbPrismCS_CheckedChanged(object sender, EventArgs e)
         {
             if (cbPrismCoordinateSystem.Checked)
                 m__G.m_bPrismCS = true;
@@ -6014,6 +6229,17 @@ namespace CSH030Ex
             {
 
             }
+        }
+
+        private void cbPseudoOMM_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox ch = (sender as CheckBox);
+            if (ch.Checked)
+                m__G.m_bPseudoOMM = true;
+            else
+                m__G.m_bPseudoOMM = false;
+
+            m__G.oCam[0].bPseudoOMM = m__G.m_bPseudoOMM;
         }
     }
 }

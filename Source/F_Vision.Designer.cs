@@ -78,6 +78,9 @@
             this.cbCompatibility = new System.Windows.Forms.CheckBox();
             this.tbBreakIndex = new System.Windows.Forms.TextBox();
             this.grbCalibration = new System.Windows.Forms.GroupBox();
+            this.btnScanTXTYTZ = new System.Windows.Forms.Button();
+            this.tbRepeaMeasure = new System.Windows.Forms.TextBox();
+            this.label39 = new System.Windows.Forms.Label();
             this.cbMicroYcal = new System.Windows.Forms.CheckBox();
             this.btnPivotTest = new System.Windows.Forms.Button();
             this.chkSaveImg = new System.Windows.Forms.CheckBox();
@@ -97,6 +100,7 @@
             this.btnAutoCal = new System.Windows.Forms.Button();
             this.btnEastScale = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.button13 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.tbDistancePosCD = new System.Windows.Forms.TextBox();
             this.chkPixel5 = new System.Windows.Forms.CheckBox();
@@ -223,7 +227,7 @@
             this.btnLEDUP.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnLEDUP.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold);
             this.btnLEDUP.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.btnLEDUP.Location = new System.Drawing.Point(79, 930);
+            this.btnLEDUP.Location = new System.Drawing.Point(79, 935);
             this.btnLEDUP.Name = "btnLEDUP";
             this.btnLEDUP.Size = new System.Drawing.Size(66, 61);
             this.btnLEDUP.TabIndex = 247;
@@ -237,7 +241,7 @@
             this.btnLEDDOWN.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnLEDDOWN.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold);
             this.btnLEDDOWN.ForeColor = System.Drawing.Color.Black;
-            this.btnLEDDOWN.Location = new System.Drawing.Point(2, 930);
+            this.btnLEDDOWN.Location = new System.Drawing.Point(2, 935);
             this.btnLEDDOWN.Name = "btnLEDDOWN";
             this.btnLEDDOWN.Size = new System.Drawing.Size(71, 61);
             this.btnLEDDOWN.TabIndex = 248;
@@ -251,7 +255,7 @@
             this.tbVsnLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tbVsnLog.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tbVsnLog.ForeColor = System.Drawing.Color.LemonChiffon;
-            this.tbVsnLog.Location = new System.Drawing.Point(724, 927);
+            this.tbVsnLog.Location = new System.Drawing.Point(724, 931);
             this.tbVsnLog.Multiline = true;
             this.tbVsnLog.Name = "tbVsnLog";
             this.tbVsnLog.ReadOnly = true;
@@ -265,7 +269,7 @@
             // panelCam0
             // 
             this.panelCam0.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(68)))));
-            this.panelCam0.Location = new System.Drawing.Point(483, 4);
+            this.panelCam0.Location = new System.Drawing.Point(483, 0);
             this.panelCam0.Name = "panelCam0";
             this.panelCam0.Size = new System.Drawing.Size(1433, 272);
             this.panelCam0.TabIndex = 265;
@@ -276,7 +280,7 @@
             this.rbLED1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.rbLED1.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
             this.rbLED1.ForeColor = System.Drawing.Color.Yellow;
-            this.rbLED1.Location = new System.Drawing.Point(4, 873);
+            this.rbLED1.Location = new System.Drawing.Point(4, 878);
             this.rbLED1.Name = "rbLED1";
             this.rbLED1.Size = new System.Drawing.Size(56, 21);
             this.rbLED1.TabIndex = 6;
@@ -291,7 +295,7 @@
             this.rbLED2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.rbLED2.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
             this.rbLED2.ForeColor = System.Drawing.Color.Yellow;
-            this.rbLED2.Location = new System.Drawing.Point(4, 900);
+            this.rbLED2.Location = new System.Drawing.Point(4, 905);
             this.rbLED2.Name = "rbLED2";
             this.rbLED2.Size = new System.Drawing.Size(58, 21);
             this.rbLED2.TabIndex = 5;
@@ -318,7 +322,7 @@
             this.groupBox3.Controls.Add(this.btnFOVDown);
             this.groupBox3.Controls.Add(this.btnFitFOV);
             this.groupBox3.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
-            this.groupBox3.Location = new System.Drawing.Point(316, 280);
+            this.groupBox3.Location = new System.Drawing.Point(316, 276);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(392, 227);
             this.groupBox3.TabIndex = 297;
@@ -682,7 +686,7 @@
             this.tbInfo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tbInfo.Font = new System.Drawing.Font("맑은 고딕", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.tbInfo.ForeColor = System.Drawing.Color.LemonChiffon;
-            this.tbInfo.Location = new System.Drawing.Point(724, 736);
+            this.tbInfo.Location = new System.Drawing.Point(724, 740);
             this.tbInfo.Multiline = true;
             this.tbInfo.Name = "tbInfo";
             this.tbInfo.ReadOnly = true;
@@ -803,7 +807,7 @@
             // tbLedRight
             // 
             this.tbLedRight.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.tbLedRight.Location = new System.Drawing.Point(84, 900);
+            this.tbLedRight.Location = new System.Drawing.Point(84, 905);
             this.tbLedRight.Name = "tbLedRight";
             this.tbLedRight.Size = new System.Drawing.Size(60, 21);
             this.tbLedRight.TabIndex = 430;
@@ -812,7 +816,7 @@
             // tbLedLeft
             // 
             this.tbLedLeft.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.tbLedLeft.Location = new System.Drawing.Point(84, 873);
+            this.tbLedLeft.Location = new System.Drawing.Point(84, 878);
             this.tbLedLeft.Name = "tbLedLeft";
             this.tbLedLeft.Size = new System.Drawing.Size(60, 21);
             this.tbLedLeft.TabIndex = 431;
@@ -850,6 +854,9 @@
             // 
             // grbCalibration
             // 
+            this.grbCalibration.Controls.Add(this.btnScanTXTYTZ);
+            this.grbCalibration.Controls.Add(this.tbRepeaMeasure);
+            this.grbCalibration.Controls.Add(this.label39);
             this.grbCalibration.Controls.Add(this.cbMicroYcal);
             this.grbCalibration.Controls.Add(this.btnPivotTest);
             this.grbCalibration.Controls.Add(this.chkSaveImg);
@@ -870,25 +877,64 @@
             this.grbCalibration.Controls.Add(this.btnEastScale);
             this.grbCalibration.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.grbCalibration.ForeColor = System.Drawing.Color.Black;
-            this.grbCalibration.Location = new System.Drawing.Point(724, 513);
+            this.grbCalibration.Location = new System.Drawing.Point(724, 509);
             this.grbCalibration.Name = "grbCalibration";
-            this.grbCalibration.Size = new System.Drawing.Size(403, 217);
+            this.grbCalibration.Size = new System.Drawing.Size(403, 227);
             this.grbCalibration.TabIndex = 441;
             this.grbCalibration.TabStop = false;
             this.grbCalibration.Text = "Calibration";
             this.grbCalibration.Enter += new System.EventHandler(this.groupBox1_Enter);
+            // 
+            // btnScanTXTYTZ
+            // 
+            this.btnScanTXTYTZ.BackColor = System.Drawing.Color.Indigo;
+            this.btnScanTXTYTZ.BackgroundImage = global::CSH030Ex.Properties.Resources.BtnGN;
+            this.btnScanTXTYTZ.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnScanTXTYTZ.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnScanTXTYTZ.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.btnScanTXTYTZ.ForeColor = System.Drawing.Color.Black;
+            this.btnScanTXTYTZ.Location = new System.Drawing.Point(144, 19);
+            this.btnScanTXTYTZ.Name = "btnScanTXTYTZ";
+            this.btnScanTXTYTZ.Size = new System.Drawing.Size(120, 36);
+            this.btnScanTXTYTZ.TabIndex = 500;
+            this.btnScanTXTYTZ.Text = "Scan TXTYTZ";
+            this.btnScanTXTYTZ.UseVisualStyleBackColor = false;
+            this.btnScanTXTYTZ.Click += new System.EventHandler(this.btnScanTXTYTZ_Click_1);
+            // 
+            // tbRepeaMeasure
+            // 
+            this.tbRepeaMeasure.BackColor = System.Drawing.Color.White;
+            this.tbRepeaMeasure.Location = new System.Drawing.Point(333, 94);
+            this.tbRepeaMeasure.Name = "tbRepeaMeasure";
+            this.tbRepeaMeasure.Size = new System.Drawing.Size(62, 23);
+            this.tbRepeaMeasure.TabIndex = 499;
+            this.tbRepeaMeasure.Text = "1";
+            this.tbRepeaMeasure.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label39
+            // 
+            this.label39.AutoSize = true;
+            this.label39.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
+            this.label39.ForeColor = System.Drawing.Color.GreenYellow;
+            this.label39.Location = new System.Drawing.Point(274, 96);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(56, 19);
+            this.label39.TabIndex = 498;
+            this.label39.Text = "Repeat";
+            this.label39.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // cbMicroYcal
             // 
             this.cbMicroYcal.AutoSize = true;
             this.cbMicroYcal.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbMicroYcal.ForeColor = System.Drawing.Color.White;
-            this.cbMicroYcal.Location = new System.Drawing.Point(283, 192);
+            this.cbMicroYcal.Location = new System.Drawing.Point(283, 198);
             this.cbMicroYcal.Name = "cbMicroYcal";
             this.cbMicroYcal.Size = new System.Drawing.Size(89, 19);
             this.cbMicroYcal.TabIndex = 497;
             this.cbMicroYcal.Text = "micro Y cal";
             this.cbMicroYcal.UseVisualStyleBackColor = true;
+            this.cbMicroYcal.Visible = false;
             // 
             // btnPivotTest
             // 
@@ -898,7 +944,7 @@
             this.btnPivotTest.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnPivotTest.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnPivotTest.ForeColor = System.Drawing.Color.Black;
-            this.btnPivotTest.Location = new System.Drawing.Point(13, 14);
+            this.btnPivotTest.Location = new System.Drawing.Point(13, 19);
             this.btnPivotTest.Name = "btnPivotTest";
             this.btnPivotTest.Size = new System.Drawing.Size(120, 36);
             this.btnPivotTest.TabIndex = 496;
@@ -911,7 +957,7 @@
             this.chkSaveImg.AutoSize = true;
             this.chkSaveImg.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.chkSaveImg.ForeColor = System.Drawing.Color.White;
-            this.chkSaveImg.Location = new System.Drawing.Point(283, 163);
+            this.chkSaveImg.Location = new System.Drawing.Point(283, 169);
             this.chkSaveImg.Name = "chkSaveImg";
             this.chkSaveImg.Size = new System.Drawing.Size(94, 19);
             this.chkSaveImg.TabIndex = 495;
@@ -926,7 +972,7 @@
             this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnTest.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnTest.ForeColor = System.Drawing.Color.Black;
-            this.btnTest.Location = new System.Drawing.Point(144, 176);
+            this.btnTest.Location = new System.Drawing.Point(144, 181);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(120, 36);
             this.btnTest.TabIndex = 494;
@@ -939,7 +985,7 @@
             this.chkProbeReset.AutoSize = true;
             this.chkProbeReset.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.chkProbeReset.ForeColor = System.Drawing.Color.White;
-            this.chkProbeReset.Location = new System.Drawing.Point(283, 133);
+            this.chkProbeReset.Location = new System.Drawing.Point(283, 139);
             this.chkProbeReset.Name = "chkProbeReset";
             this.chkProbeReset.Size = new System.Drawing.Size(97, 19);
             this.chkProbeReset.TabIndex = 493;
@@ -954,7 +1000,7 @@
             this.btn45Test.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btn45Test.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btn45Test.ForeColor = System.Drawing.Color.Black;
-            this.btn45Test.Location = new System.Drawing.Point(144, 135);
+            this.btn45Test.Location = new System.Drawing.Point(144, 140);
             this.btn45Test.Name = "btn45Test";
             this.btn45Test.Size = new System.Drawing.Size(120, 36);
             this.btn45Test.TabIndex = 491;
@@ -965,9 +1011,9 @@
             // tbStep
             // 
             this.tbStep.BackColor = System.Drawing.Color.White;
-            this.tbStep.Location = new System.Drawing.Point(333, 50);
+            this.tbStep.Location = new System.Drawing.Point(333, 48);
             this.tbStep.Name = "tbStep";
-            this.tbStep.Size = new System.Drawing.Size(63, 23);
+            this.tbStep.Size = new System.Drawing.Size(62, 23);
             this.tbStep.TabIndex = 485;
             this.tbStep.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
@@ -976,7 +1022,7 @@
             this.label25.AutoSize = true;
             this.label25.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label25.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label25.Location = new System.Drawing.Point(286, 52);
+            this.label25.Location = new System.Drawing.Point(286, 50);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(39, 19);
             this.label25.TabIndex = 484;
@@ -991,7 +1037,7 @@
             this.btnRangeTest.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnRangeTest.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnRangeTest.ForeColor = System.Drawing.Color.Black;
-            this.btnRangeTest.Location = new System.Drawing.Point(13, 94);
+            this.btnRangeTest.Location = new System.Drawing.Point(13, 99);
             this.btnRangeTest.Name = "btnRangeTest";
             this.btnRangeTest.Size = new System.Drawing.Size(120, 36);
             this.btnRangeTest.TabIndex = 480;
@@ -1007,7 +1053,7 @@
             this.btnFindCSHorg.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnFindCSHorg.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnFindCSHorg.ForeColor = System.Drawing.Color.Black;
-            this.btnFindCSHorg.Location = new System.Drawing.Point(13, 53);
+            this.btnFindCSHorg.Location = new System.Drawing.Point(13, 58);
             this.btnFindCSHorg.Name = "btnFindCSHorg";
             this.btnFindCSHorg.Size = new System.Drawing.Size(120, 36);
             this.btnFindCSHorg.TabIndex = 483;
@@ -1023,7 +1069,7 @@
             this.btnRepeatTest.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnRepeatTest.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnRepeatTest.ForeColor = System.Drawing.Color.Black;
-            this.btnRepeatTest.Location = new System.Drawing.Point(144, 94);
+            this.btnRepeatTest.Location = new System.Drawing.Point(144, 99);
             this.btnRepeatTest.Name = "btnRepeatTest";
             this.btnRepeatTest.Size = new System.Drawing.Size(120, 36);
             this.btnRepeatTest.TabIndex = 479;
@@ -1034,16 +1080,16 @@
             // tbMaxStroke
             // 
             this.tbMaxStroke.BackColor = System.Drawing.Color.White;
-            this.tbMaxStroke.Location = new System.Drawing.Point(333, 82);
+            this.tbMaxStroke.Location = new System.Drawing.Point(333, 71);
             this.tbMaxStroke.Name = "tbMaxStroke";
-            this.tbMaxStroke.Size = new System.Drawing.Size(64, 23);
+            this.tbMaxStroke.Size = new System.Drawing.Size(62, 23);
             this.tbMaxStroke.TabIndex = 478;
             this.tbMaxStroke.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // cboAxis
             // 
             this.cboAxis.FormattingEnabled = true;
-            this.cboAxis.Location = new System.Drawing.Point(332, 20);
+            this.cboAxis.Location = new System.Drawing.Point(332, 25);
             this.cboAxis.Name = "cboAxis";
             this.cboAxis.Size = new System.Drawing.Size(64, 23);
             this.cboAxis.TabIndex = 477;
@@ -1055,7 +1101,7 @@
             this.label18.AutoSize = true;
             this.label18.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label18.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label18.Location = new System.Drawing.Point(288, 22);
+            this.label18.Location = new System.Drawing.Point(288, 27);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(37, 19);
             this.label18.TabIndex = 476;
@@ -1070,7 +1116,7 @@
             this.btnScan.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnScan.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnScan.ForeColor = System.Drawing.Color.Black;
-            this.btnScan.Location = new System.Drawing.Point(144, 53);
+            this.btnScan.Location = new System.Drawing.Point(144, 58);
             this.btnScan.Name = "btnScan";
             this.btnScan.Size = new System.Drawing.Size(120, 36);
             this.btnScan.TabIndex = 475;
@@ -1083,7 +1129,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label1.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label1.Location = new System.Drawing.Point(274, 84);
+            this.label1.Location = new System.Drawing.Point(274, 73);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(53, 19);
             this.label1.TabIndex = 474;
@@ -1098,7 +1144,7 @@
             this.btnAutoCal.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnAutoCal.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnAutoCal.ForeColor = System.Drawing.Color.Black;
-            this.btnAutoCal.Location = new System.Drawing.Point(13, 176);
+            this.btnAutoCal.Location = new System.Drawing.Point(13, 181);
             this.btnAutoCal.Name = "btnAutoCal";
             this.btnAutoCal.Size = new System.Drawing.Size(120, 36);
             this.btnAutoCal.TabIndex = 470;
@@ -1114,7 +1160,7 @@
             this.btnEastScale.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnEastScale.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnEastScale.ForeColor = System.Drawing.Color.Black;
-            this.btnEastScale.Location = new System.Drawing.Point(13, 135);
+            this.btnEastScale.Location = new System.Drawing.Point(13, 140);
             this.btnEastScale.Name = "btnEastScale";
             this.btnEastScale.Size = new System.Drawing.Size(120, 36);
             this.btnEastScale.TabIndex = 469;
@@ -1124,6 +1170,7 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.button13);
             this.groupBox4.Controls.Add(this.button5);
             this.groupBox4.Controls.Add(this.tbDistancePosCD);
             this.groupBox4.Controls.Add(this.chkPixel5);
@@ -1137,12 +1184,28 @@
             this.groupBox4.Controls.Add(this.btnDownPos);
             this.groupBox4.Controls.Add(this.btnUpPos);
             this.groupBox4.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.groupBox4.Location = new System.Drawing.Point(724, 280);
+            this.groupBox4.Location = new System.Drawing.Point(724, 276);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(403, 227);
             this.groupBox4.TabIndex = 450;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Crop Pos";
+            // 
+            // button13
+            // 
+            this.button13.BackColor = System.Drawing.Color.Indigo;
+            this.button13.BackgroundImage = global::CSH030Ex.Properties.Resources.BtnGN;
+            this.button13.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.button13.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.button13.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.button13.ForeColor = System.Drawing.Color.Black;
+            this.button13.Location = new System.Drawing.Point(233, 146);
+            this.button13.Name = "button13";
+            this.button13.Size = new System.Drawing.Size(143, 36);
+            this.button13.TabIndex = 441;
+            this.button13.Text = "Auto Crop";
+            this.button13.UseVisualStyleBackColor = false;
+            this.button13.Click += new System.EventHandler(this.button13_Click);
             // 
             // button5
             // 
@@ -1152,7 +1215,7 @@
             this.button5.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button5.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.button5.ForeColor = System.Drawing.Color.Black;
-            this.button5.Location = new System.Drawing.Point(233, 176);
+            this.button5.Location = new System.Drawing.Point(233, 185);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(143, 36);
             this.button5.TabIndex = 440;
@@ -1166,7 +1229,7 @@
             // 
             // tbDistancePosCD
             // 
-            this.tbDistancePosCD.Location = new System.Drawing.Point(268, 77);
+            this.tbDistancePosCD.Location = new System.Drawing.Point(268, 69);
             this.tbDistancePosCD.Name = "tbDistancePosCD";
             this.tbDistancePosCD.Size = new System.Drawing.Size(68, 25);
             this.tbDistancePosCD.TabIndex = 349;
@@ -1190,7 +1253,7 @@
             // 
             this.btnNarrowPosCD.BackgroundImage = global::CSH030Ex.Properties.Resources.BtnGP;
             this.btnNarrowPosCD.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.btnNarrowPosCD.Location = new System.Drawing.Point(303, 108);
+            this.btnNarrowPosCD.Location = new System.Drawing.Point(303, 100);
             this.btnNarrowPosCD.Name = "btnNarrowPosCD";
             this.btnNarrowPosCD.Size = new System.Drawing.Size(73, 34);
             this.btnNarrowPosCD.TabIndex = 22;
@@ -1206,7 +1269,7 @@
             // 
             this.btnWidenPosCD.BackgroundImage = global::CSH030Ex.Properties.Resources.BtnGN;
             this.btnWidenPosCD.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.btnWidenPosCD.Location = new System.Drawing.Point(233, 108);
+            this.btnWidenPosCD.Location = new System.Drawing.Point(233, 100);
             this.btnWidenPosCD.Name = "btnWidenPosCD";
             this.btnWidenPosCD.Size = new System.Drawing.Size(71, 34);
             this.btnWidenPosCD.TabIndex = 21;
@@ -1408,7 +1471,7 @@
             this.btnChangeCrop.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnChangeCrop.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnChangeCrop.ForeColor = System.Drawing.Color.Black;
-            this.btnChangeCrop.Location = new System.Drawing.Point(770, 283);
+            this.btnChangeCrop.Location = new System.Drawing.Point(770, 279);
             this.btnChangeCrop.Name = "btnChangeCrop";
             this.btnChangeCrop.Size = new System.Drawing.Size(143, 36);
             this.btnChangeCrop.TabIndex = 440;
@@ -1455,9 +1518,9 @@
             // pictureBox2
             // 
             this.pictureBox2.BackColor = System.Drawing.Color.Black;
-            this.pictureBox2.Location = new System.Drawing.Point(1133, 280);
+            this.pictureBox2.Location = new System.Drawing.Point(1133, 276);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(780, 450);
+            this.pictureBox2.Size = new System.Drawing.Size(780, 460);
             this.pictureBox2.TabIndex = 442;
             this.pictureBox2.TabStop = false;
             // 
@@ -1617,7 +1680,7 @@
             this.btnAutoLearn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnAutoLearn.Font = new System.Drawing.Font("Calibri", 14F, System.Drawing.FontStyle.Bold);
             this.btnAutoLearn.ForeColor = System.Drawing.Color.Chartreuse;
-            this.btnAutoLearn.Location = new System.Drawing.Point(157, 4);
+            this.btnAutoLearn.Location = new System.Drawing.Point(157, 0);
             this.btnAutoLearn.Name = "btnAutoLearn";
             this.btnAutoLearn.Size = new System.Drawing.Size(153, 62);
             this.btnAutoLearn.TabIndex = 323;
@@ -1633,7 +1696,7 @@
             this.button8.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button8.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.button8.ForeColor = System.Drawing.Color.White;
-            this.button8.Location = new System.Drawing.Point(227, 860);
+            this.button8.Location = new System.Drawing.Point(227, 865);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(70, 61);
             this.button8.TabIndex = 320;
@@ -1653,7 +1716,7 @@
             this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnBack.Font = new System.Drawing.Font("맑은 고딕", 14F, System.Drawing.FontStyle.Bold);
             this.btnBack.ForeColor = System.Drawing.Color.Chartreuse;
-            this.btnBack.Location = new System.Drawing.Point(2, 4);
+            this.btnBack.Location = new System.Drawing.Point(2, 0);
             this.btnBack.Name = "btnBack";
             this.btnBack.Size = new System.Drawing.Size(142, 61);
             this.btnBack.TabIndex = 6;
@@ -1693,7 +1756,7 @@
             this.btnUptoNthMesure.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnUptoNthMesure.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnUptoNthMesure.ForeColor = System.Drawing.Color.White;
-            this.btnUptoNthMesure.Location = new System.Drawing.Point(155, 930);
+            this.btnUptoNthMesure.Location = new System.Drawing.Point(155, 935);
             this.btnUptoNthMesure.Name = "btnUptoNthMesure";
             this.btnUptoNthMesure.Size = new System.Drawing.Size(143, 61);
             this.btnUptoNthMesure.TabIndex = 299;
@@ -1773,7 +1836,7 @@
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button1.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.button1.ForeColor = System.Drawing.Color.White;
-            this.button1.Location = new System.Drawing.Point(155, 860);
+            this.button1.Location = new System.Drawing.Point(155, 865);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(70, 61);
             this.button1.TabIndex = 291;
@@ -1873,7 +1936,7 @@
             this.MotionStageBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.MotionStageBtn.Font = new System.Drawing.Font("Calibri", 14F, System.Drawing.FontStyle.Bold);
             this.MotionStageBtn.ForeColor = System.Drawing.Color.Chartreuse;
-            this.MotionStageBtn.Location = new System.Drawing.Point(323, 4);
+            this.MotionStageBtn.Location = new System.Drawing.Point(323, 0);
             this.MotionStageBtn.Name = "MotionStageBtn";
             this.MotionStageBtn.Size = new System.Drawing.Size(153, 62);
             this.MotionStageBtn.TabIndex = 461;
@@ -1912,7 +1975,7 @@
             this.grbVolumetric.Controls.Add(this.tbXrange);
             this.grbVolumetric.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.grbVolumetric.ForeColor = System.Drawing.Color.Black;
-            this.grbVolumetric.Location = new System.Drawing.Point(316, 785);
+            this.grbVolumetric.Location = new System.Drawing.Point(316, 789);
             this.grbVolumetric.Name = "grbVolumetric";
             this.grbVolumetric.Size = new System.Drawing.Size(392, 211);
             this.grbVolumetric.TabIndex = 462;
@@ -2683,7 +2746,7 @@
             this.tbUncalibratedInfo.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tbUncalibratedInfo.Font = new System.Drawing.Font("맑은 고딕", 14F, System.Drawing.FontStyle.Bold);
             this.tbUncalibratedInfo.ForeColor = System.Drawing.Color.Red;
-            this.tbUncalibratedInfo.Location = new System.Drawing.Point(1133, 280);
+            this.tbUncalibratedInfo.Location = new System.Drawing.Point(1133, 276);
             this.tbUncalibratedInfo.Multiline = true;
             this.tbUncalibratedInfo.Name = "tbUncalibratedInfo";
             this.tbUncalibratedInfo.ReadOnly = true;
@@ -3034,5 +3097,9 @@
         private System.Windows.Forms.CheckBox cbMicroYcal;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button btnAgingXYZ;
+        private System.Windows.Forms.TextBox tbRepeaMeasure;
+        private System.Windows.Forms.Label label39;
+        private System.Windows.Forms.Button button13;
+        private System.Windows.Forms.Button btnScanTXTYTZ;
     }
 }

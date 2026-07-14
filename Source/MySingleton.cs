@@ -84,6 +84,8 @@ namespace CSH030Ex
         public bool m_ScriptLinearityCal = false;
         public bool m_bSaveLostTestSet = false;
         public bool m_bNoHostPC = false;
+        public bool m_bOISOption = false;
+        public bool m_bPseudoOMM = false;
         public string mCamID0 = "";
         public string mCamID1 = "";
 
@@ -97,7 +99,7 @@ namespace CSH030Ex
         //public const int mMergeImgWidth = 750;
         //public const int mMergeImgHeight = 440;
         public const int mMergeImgWidth = 780;
-        public const int mMergeImgHeight = 450;
+        public const int mMergeImgHeight = 460;
         public GageCounter mGageCounter = null;
 
         public static Global GetInstance()
@@ -1286,7 +1288,7 @@ namespace CSH030Ex
 
             PortList[index].PortName = "COM4"; index++;    //       //   -> center of stage                      "COM15";  Probe X
             PortList[index].PortName = "COM8"; index++;         //X2    -> 40mm off from center of stage       "COM11";  Porb Y
-            PortList[index].PortName = "COM11"; index++;        //Y1    -> center of stage                      "COM7";  Porb TZ1
+            PortList[index].PortName = "COM10"; index++;        //Y1    -> center of stage                      "COM7";  Porb TZ1
             PortList[index].PortName = "COM6"; index++;        //Y2    -> 40mm off from center of stage       "COM10";  Porb TZ2
             PortList[index].PortName = "COM5"; index++;        //TX    -> 55mm off from center of stage        "COM5";  Porb TX
             PortList[index].PortName = "COM7"; index++;        //TY1   -> 55mm off from center of stage        "COM6";  Porb TY1
@@ -1565,7 +1567,7 @@ namespace CSH030Ex
             PortList[port].Write(data, 0, data.Length);
             PortList[port].BaseStream.Flush();
             PortList[port].DiscardInBuffer();
-            Thread.Sleep(36);   //  시간 최적화 필요
+            Thread.Sleep(37);   //  시간 최적화 필요
 
             try
             {

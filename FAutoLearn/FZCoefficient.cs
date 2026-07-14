@@ -1,26 +1,26 @@
-﻿using System;
-using System.Numerics;
+﻿using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Double;
+using OpenCvSharp;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Threading;
-using System.Windows.Forms;
-using System.IO;
-using OpenCvSharp;
-using static alglib;
-using System.Runtime.InteropServices;
-using System.Reflection.Emit;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Double;
-
-using MathNetVector = MathNet.Numerics.LinearAlgebra.Vector<double>;
-using MathNetMatrix = MathNet.Numerics.LinearAlgebra.Matrix<double>;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using static alglib;
 using static FAutoLearn.FZMath;
+using MathNetMatrix = MathNet.Numerics.LinearAlgebra.Matrix<double>;
+using MathNetVector = MathNet.Numerics.LinearAlgebra.Vector<double>;
 
 namespace FAutoLearn
 {
@@ -3622,7 +3622,14 @@ namespace FAutoLearn
                 XTA[2] += wp[i].Y;
             }
             InverseU(ref XXTinv, 3);
-            MatrixCross(ref XXTinv, ref XTA, ref A, 3);
+            double[] resA = new double[3];
+            MatrixCross(ref XXTinv, ref XTA, ref resA, 3);
+            if (!double.IsNaN(resA[0]))
+            {
+                A[0] = resA[0];
+                A[1] = resA[1];
+                A[2] = resA[2];
+            }
 
             if (!minimizedPP)
                 return;
@@ -4152,9 +4159,11 @@ namespace FAutoLearn
                 Epp0 = Epp;
             }
 
-
-            A[0] = _A[0];
-            A[1] = _A[1];
+            if (!double.IsNaN(_A[0]))
+            {
+                A[0] = _A[0];
+                A[1] = _A[1];
+            }
         }
 
         public void mcLMS1stPoly(Point2D[] wp, int length, ref double a, ref double b, int istart = 0, int count = -1)
@@ -4209,8 +4218,11 @@ namespace FAutoLearn
             }
             InverseU(ref XXTinv, 2);
             MatrixCross(ref XXTinv, ref XTA, ref A, 2);
-            a = A[0];
-            b = A[1];
+            if (!double.IsNaN(A[0]))
+            {
+                a = A[0];
+                b = A[1];
+            }
 
 
             double A0org = A[0];
@@ -4465,6 +4477,11 @@ namespace FAutoLearn
             }
             a = _A[0];
             b = _A[1];
+            if (!double.IsNaN(_A[0]))
+            {
+                a = _A[0];
+                b = _A[1];
+            }
         }
 
         public bool mcRefSurfDirVector(double oisxTilt, double oisyTilt, ref double[] DirVector)
@@ -5770,7 +5787,7 @@ namespace FAutoLearn
 
         public int[] mPeakOrder = new int[24];   //                mPeakOrder[i] = new int[24]; // 6 *  [ 0 - 1 - 2 - 3 : L - R - T - B ]
 
-        public double[] ConvergePeakX2(int id, ref int[] Xidiffsrc, int width, int height, double xia, double yia, int xW_, int yH_, ref byte updown, ref int peaktype, int iIndex = 0)
+        public double[] ConvergePeakX2(int id, ref int[] Xidiffsrc, int width, int height, double xia, double yia, double xW_, double yH_, ref int peaktype, int iIndex = 0)
         {
             //  오직 X 방향 Edge 추출에만 활용한다.
             
@@ -5787,8 +5804,8 @@ namespace FAutoLearn
 
             int xi0 = (int)xia;
             int yi0 = (int)yia - 5;
-            int xW = xW_;
-            int yH = yH_ + 10;
+            double xW = xW_;
+            double yH = yH_ + 6;
 
 
             int fxi0 = xi0;
@@ -5861,7 +5878,7 @@ namespace FAutoLearn
                     {
                         xi0_i = (int)(xi0 + i);
                         peakIndex[i] = i;
-                        for (int j = yi0; j < yH; j++)
+                        for (int j = yi0; j < yi0 + yH; j++)
                             roughPeak[i] += (1 - ry) * Xidiffsrc[xi0_i + j * width] + ry * Xidiffsrc[xi0_i + (j + 1) * width];
 
                         //  좌측 찾고 우측 이어서 찾을 것이므로 부호 불필요
@@ -6071,7 +6088,7 @@ namespace FAutoLearn
                     {
                         xi0_i = (int)(xi0 + i);
                         peakIndex[i] = i;
-                        for (int j = yi0; j < yH; j++)
+                        for (int j = yi0; j < yi0 + yH; j++)
                             roughPeak[i] -= ((1 - ry) * Xidiffsrc[xi0_i + j * width] + ry * Xidiffsrc[xi0_i + (j + 1) * width]);
 
                         //  우측 찾기 부호반전함.
@@ -6256,7 +6273,7 @@ namespace FAutoLearn
         }
 
 
-        public double[] ConvergePeakX3(int si, ref int[] Xidiffsrc, int width, int height, double xia, double yia, int xW, int yH, ref byte updown, ref int peaktype, int iIndex = 0)
+        public double[] ConvergePeakX3(int si, ref int[] Xidiffsrc, int width, int height, double xia, double yia, double xW, double yH, ref int peaktype, int iIndex = 0)
         {
             //  원본 영상의 크기 width, height 로서 ROI 범위의 조각영상인 것을 전제로 한다.
             //  xi0 : 경계가 있을 것으로 예상되는 BOX 영역의 좌상단 X 좌표
@@ -6360,6 +6377,14 @@ namespace FAutoLearn
                                 firstPeakFound = true;
                             }
                         }
+                        else
+                        {
+                            if (3 * peak < roughPeakBk[i - 1] && (roughPeakBk[i - 1] >= roughPeakBk[i - 2] && roughPeakBk[i - 1] >= roughPeakBk[i]))
+                            {
+                                pIndex = i - 1;
+                                peak = roughPeakBk[i - 1];
+                            }
+                        }
                     }
 
                     if (pIndex > kLength - 4 && incCnt < 6)
@@ -6443,9 +6468,9 @@ namespace FAutoLearn
 
             try
             {
-                while(edgeFound<8)
+                while (edgeFound < 8)
                 {
-                    if (edgeFound % 2 == 0) 
+                    if (edgeFound % 2 == 0)
                         slopeDir = 1;
                     else
                         slopeDir = -1;
@@ -6546,7 +6571,7 @@ namespace FAutoLearn
                         }
                         err = oldres - res1st;
                         err = err < 0 ? -err : err;
-                        if (err < 0.00015)   //  0.0001 일때 반복성 더 나쁘다.
+                        if (err < 0.00012)   //  0.0001 일때 반복성 더 나쁘다.
                         {
                             //maxSlope[edgeFound] = Math.Abs((1 - rx) * roughPeakBk[irx] + rx * roughPeakBk[irx + 1]);
                             break;
@@ -6591,7 +6616,7 @@ namespace FAutoLearn
                 //MessageBox.Show("ConvergePeakX() 2>>\r\n" + e.ToString());
                 //return simpleRes;
             }
-            resEdge[8] = (maxSlope[0] + maxSlope[1] + maxSlope[2] + maxSlope[3] + maxSlope[4] + maxSlope[5] + maxSlope[6] + maxSlope[7]) / 2000;
+            resEdge[8] = (maxSlope[7] - maxSlope[0]);
             return resEdge;
         }
 
@@ -6878,7 +6903,7 @@ namespace FAutoLearn
                 
                 tx[i] = tpAfter[i].X - RotatedP[i].X;   //  Top View 에서는 단순히 Z 회전만 적용된 좌표를 빼주면 Shift 만 남는다.
                 ty[i] = tpAfter[i].Y - RotatedP[i].Y;   //  Top View 에서는 단순히 Z 회전만 적용된 좌표를 빼주면 Shift 만 남는다.
-                resT.X += tx[i];
+                resT.X += 3*tx[i];
                 resT.Y += ty[i];
             }
             //for (int i = 0; i < spBefore_Length; i++)
@@ -6888,10 +6913,11 @@ namespace FAutoLearn
                     continue;
 
                 tx[i] = spAfter[i].X - RotatedPS[i].X;  //  Z 회전성분을 소거
-                resT.X += tx[i];                    //  Side View 로부터의 X 변동량은 오차가 클 수 있으니 1/2 의 비중을 적용한다.
+                resT.X += 2*tx[i];                    //  Side View 로부터의 X 변동량은 오차가 클 수 있으니 1/2 의 비중을 적용한다.
             }
             //  East Mark 에서 회전성분을 제거한 나머지 부분
-            resT.X = resT.X / (tpBefore_Length + 2);  //  Side View 로부터의 X 변동량은 오차가 클 수 있으니 1/2 의 비중을 적용한다.
+            //resT.X = resT.X / (tpBefore_Length + 2);  //  Side View 로부터의 X 변동량은 오차가 클 수 있으니 1/2 의 비중을 적용한다. -> 현재는 1:1 -> 1:0.65 으로 변경 필요
+            resT.X = resT.X / 10;  //   1:0.667 으로 변경함.
             resT.Y = resT.Y / tpBefore_Length;
 
             return resT;
@@ -7141,13 +7167,19 @@ namespace FAutoLearn
         double mMinToRad = Math.PI / (60 * 180);
         bool mbGrabInitial = false;
         double mYgapBetweenMarkNSandMarkE = 3.0;
+        public double mTXsinCoef = 0.0;//-2.0E-05;//-3.83972E-05;                            //  ID 기본값 -4E-05
+        public double mTYsinCoef = 0.0;//4.0E-05;//4.9e-05;// ID 247488522 : 2e-05           // ID 기본값 : 5E-05
+        public double mTZsinCoef = 0.0;//1.0E-05;// 0.1e-5; //-3.55596E-05;                   //  ID 247488522 : -3e-5
+        public double mTXcosCoef = 0.00E-05;//-3.83972E-05;                            //  ID 기본값 -4E-05
+        public double mTYcosCoef = 0.00E-05;//4.9e-05;// ID 247488522 : 2e-05           // ID 기본값 : 5E-05
+        public double mTZcosCoef = 0.00E-05;// 0.1e-5; //-3.55596E-05;                   //  ID 247488522 : -3e-5
 
         public void SetYgapBetweenMarkNSandMarkE(double bymm)
         {
             //  um to pixles
             mYgapBetweenMarkNSandMarkE = bymm / 0.018333333;  //mm unit to pixel unit
         }
-        public void Extract6DMotion(int i, Point2D[] markT, Point2D[] markS,  ref Point2D T, ref double psi, ref double dZ, ref double TX, ref double TY, bool useCropGap = true)
+        public void Extract6DMotion(int i, Point2D[] markT, Point2D[] markS,  ref Point2D T, ref double psi, ref double dZ, ref double TX, ref double TY, double subTX, double subTY, bool useCropGap = true)
         {
             //  marks 좌표는 기본적으로 오른손좌표계로 변환되어있음을 가정한다.
             Point2D[] pSideCompensateTnPsi = null;
@@ -7156,6 +7188,21 @@ namespace FAutoLearn
             //double[,] wT = null;        //  M6DMwT
             double[] ZTXTY = new double[3];
 
+            double dYns2eOrg = 0;
+            double dYns2eTZcomp = 0;
+            double dYn2sOrg = 0;
+            double dYn2sTZcomp = 0;
+
+            double dStxDueToTZ = 0;
+            double dStyDueToTZ = 0;
+
+            //subTX = 0;
+            //subTY = 0;
+
+            bool bUseSubMark = true;
+            if (subTX == 0 && subTY == 0)
+                bUseSubMark = false;
+
             //  markNorm 은 마크별 좌표값이 Nominal Value 인 배열, Nominal Value 는 Design Infomation 에서 User 가 입력한 값을 Pixel unit 로 변환한 값이어야 한다.
             //   아래 함수는 최초에 한번만 수행해주면 된다.
             //  CalcScaleTopNSide();            // 마스터 샘플로 Scale 보정되어있어야 한다.
@@ -7163,26 +7210,26 @@ namespace FAutoLearn
             //  TopNSideViewRotationAnlge()     // 마스터 샘플로 각 View 의 Rotation Angle 을 추출해놓아야 한다.
             //
 
-            //  markS[][0] : North, North Mark 가 2개 인 경우 평균취해서 1개로 축약한다.
-            //  markS[][1] : West , West  Mark 가 2개 인 경우 평균취해서 1개로 축약한다.
-            //  markS[][2] : South, South Mark 가 2개 인 경우 평균취해서 1개로 축약한다.
-            //  markS[][3] : East , East  Mark 가 2개 인 경우 평균취해서 1개로 축약한다.
-            //  markT[][0] : North, North Mark 가 2개 인 경우 평균취해서 1개로 축약한다.
-            //  markT[][1] : South, South Mark 가 2개 인 경우 평균취해서 1개로 축약한다.
+                //  markS[][0] : North, North Mark 가 2개 인 경우 평균취해서 1개로 축약한다.
+                //  markS[][1] : West , West  Mark 가 2개 인 경우 평균취해서 1개로 축약한다.
+                //  markS[][2] : South, South Mark 가 2개 인 경우 평균취해서 1개로 축약한다.
+                //  markS[][3] : East , East  Mark 가 2개 인 경우 평균취해서 1개로 축약한다.
+                //  markT[][0] : North, North Mark 가 2개 인 경우 평균취해서 1개로 축약한다.
+                //  markT[][1] : South, South Mark 가 2개 인 경우 평균취해서 1개로 축약한다.
 
-            //  다음은 본 함수 호출에 앞서서 1회 호출할 것
-            //ZPhiThetaTransferMatrix(markNorm, out invW, out wT);
-            //GetC12C13fromP12P13(markNorm[0], markNorm[2], markNorm[3], ref mC12, ref mC13);
+                //  다음은 본 함수 호출에 앞서서 1회 호출할 것
+                //ZPhiThetaTransferMatrix(markNorm, out invW, out wT);
+                //GetC12C13fromP12P13(markNorm[0], markNorm[2], markNorm[3], ref mC12, ref mC13);
 
-            //  markT, markS 는 이미 오른손좌표계를 따르고 있어야 하고, 오른손좌표계에 의한 mCenterOfTop 와 mCenterOfSide 가 주어져야 한다.
-            //  광학계의 구조적 각도오차를 보정하고 오른손좌표계, CIS ( Cener Of Image Sensor ) 로 변환 한다.
-            //int debugCnt = 0;
-            //if (i == 2)
-            //    debugCnt = 2;
+                //  markT, markS 는 이미 오른손좌표계를 따르고 있어야 하고, 오른손좌표계에 의한 mCenterOfTop 와 mCenterOfSide 가 주어져야 한다.
+                //  광학계의 구조적 각도오차를 보정하고 오른손좌표계, CIS ( Cener Of Image Sensor ) 로 변환 한다.
+                //int debugCnt = 0;
+                //if (i == 2)
+                //    debugCnt = 2;
 
 
-            //Point2D[] lpTop = CompensateViewRotation(mCenterOfImg, markT, mOpticsAngleTop);
-            //Point2D[] lpSide = CompensateViewRotation(mCenterOfImg, markS, mOpticsAngleSide);
+                //Point2D[] lpTop = CompensateViewRotation(mCenterOfImg, markT, mOpticsAngleTop);
+                //Point2D[] lpSide = CompensateViewRotation(mCenterOfImg, markS, mOpticsAngleSide);
             if (markS[0].X == 0 || markS[2].X == 0 || markT[0].X == 0 || markT[1].X == 0) return;
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7209,6 +7256,8 @@ namespace FAutoLearn
                 pSide[2].Y -= (mCropABgap / 2 - 95);    //  영상에서 잡힌 값에서 mCropABgap / 2 만큼 중심쪽으로 보내줘야 한다.
                 pSide[3].Y += (mCropABgap / 2 - 95);    //  영상에서 잡힌 값에서 mCropABgap / 2 만큼 중심쪽으로 보내줘야 한다.
 
+                if (bUseSubMark)
+                    subTX += 2 * (mCropABgap / 2 - 95);
             }
 
             Point2D[] pTopCopy = new Point2D[2];
@@ -7250,18 +7299,41 @@ namespace FAutoLearn
                 //여기까지 초기화
 
 
+                //string[] myStr = new string[1];
+                //myStr[0] = subTY.ToString("F5") + "," + (pSide[0].Y - pSide[2].Y).ToString("F5");
+                //File.AppendAllLines("D:\\PrismTest\\Pivot\\SubTX.csv", myStr);
 
                 T = TnPsifromTopView(mCOItop, mTop0, pTop, mCOIside, mSide0, pSide, ref psi, ref err);   //  이 함수를 SideView, TopView 모두 이용하는 것으로 변경 필요   20230102
                 mPsi0 = psi;
-                pSideCompensateTnPsi = CompensateTnPsi(mCOItop, mCOIside, pTop, pSide, T, psi);
-                CalcZPhiTheta(pSideCompensateTnPsi, mSide0, M6DM, M6DMwT, ref ZTXTY);
 
-                //  수렴시키기 : TX 또는 TY 가 굉장히 클 때 ( 절대값 30min 이상 ) 의미가 있으나 그 이하에서는 영향 미미
+                dYns2eOrg = pSide[3].Y - (pSide[0].Y + pSide[2].Y)/2;
+                dYn2sOrg = pSide[0].Y - pSide[2].Y ;
+
+                pSideCompensateTnPsi = CompensateTnPsi(mCOItop, mCOIside, pTop, pSide, T, psi);
+
+                if (bUseSubMark)
+                {
+                    dYns2eTZcomp = pSideCompensateTnPsi[3].Y - (pSideCompensateTnPsi[0].Y + pSideCompensateTnPsi[2].Y) / 2;
+                    dYn2sTZcomp = pSideCompensateTnPsi[0].Y - pSideCompensateTnPsi[2].Y;
+                    dStxDueToTZ = dYns2eTZcomp - dYns2eOrg;
+                    dStyDueToTZ = dYn2sTZcomp - dYn2sOrg;
+                    subTX += dStxDueToTZ;
+                    subTY += dStyDueToTZ;
+                }
+
+                CalcZPhiTheta(pSideCompensateTnPsi, mSide0, M6DM, M6DMwT, ref ZTXTY, subTX, subTY);
+
                 CompnesateTopViewWithTXTY(mCOItop, pTopCopy, ZTXTY[1], ZTXTY[2], ref pTop);
+
+                T = TnPsifromTopView(mCOItop, mTop0, pTop, mCOIside, mSide0, pSide, ref psi, ref err);   //  이 함수를 SideView, TopView 모두 이용하는 것으로 변경 필요   20230102
+
+                pSideCompensateTnPsi = CompensateTnPsi(mCOItop, mCOIside, pTop, pSide, T, psi);
+                CalcZPhiTheta(pSideCompensateTnPsi, mSide0, M6DM, M6DMwT, ref ZTXTY, subTX, subTY);
+                CompnesateTopViewWithTXTY(mCOItop, pTopCopy, ZTXTY[1], ZTXTY[2], ref pTop);
+
                 T = TnPsifromTopView(mCOItop, mTop0, pTop, mCOIside, mSide0, pSide, ref psi, ref err);   //  이 함수를 SideView, TopView 모두 이용하는 것으로 변경 필요   20230102
                 pSideCompensateTnPsi = CompensateTnPsi(mCOItop, mCOIside, pTop, pSide, T, psi);
-                CalcZPhiTheta(pSideCompensateTnPsi, mSide0, M6DM, M6DMwT, ref ZTXTY);
-
+                CalcZPhiTheta(pSideCompensateTnPsi, mSide0, M6DM, M6DMwT, ref ZTXTY, subTX, subTY);
 
                 mSideStart = pSide;
                 mTopStart = pTop;
@@ -7269,18 +7341,39 @@ namespace FAutoLearn
             else
             {
                 //  mCOItop, mTop0, mCOIside, mSide0  값이   서로다른  Test 에서 유지되는지 확인할 것.
-                T = TnPsifromTopView(mCOItop, mTop0, pTop, mCOIside, mSide0, pSide, ref psi, ref err);   //  이 함수를 SideView, TopView 모두 이용하는 것으로 변경 필요   20230102
-
                 //  psi 보상은 조기회전상태에서 변화된 양 만큼만 보상해야 한다.
                 //  따라서 psi - mPsi0 가 된다.
-                pSideCompensateTnPsi = CompensateTnPsi(mCOItop, mCOIside, pTop, pSide, T, psi);
-                CalcZPhiTheta(pSideCompensateTnPsi, mSide0, M6DM, M6DMwT, ref ZTXTY);
-
                 //  수렴시키기 : TX 또는 TY 가 굉장히 클 때 ( 절대값 30min 이상 ) 의미가 있으나 그 이하에서는 영향 미미
+                T = TnPsifromTopView(mCOItop, mTop0, pTop, mCOIside, mSide0, pSide, ref psi, ref err);   //  이 함수를 SideView, TopView 모두 이용하는 것으로 변경 필요   20230102
+
+                dYns2eOrg = pSide[3].Y - (pSide[0].Y + pSide[2].Y) / 2;
+                dYn2sOrg = pSide[0].Y - pSide[2].Y;
+
+                pSideCompensateTnPsi = CompensateTnPsi(mCOItop, mCOIside, pTop, pSide, T, psi);
+
+                if (bUseSubMark)
+                {
+                    dYns2eTZcomp = pSideCompensateTnPsi[3].Y - (pSideCompensateTnPsi[0].Y + pSideCompensateTnPsi[2].Y) / 2;
+                    dYn2sTZcomp = pSideCompensateTnPsi[0].Y - pSideCompensateTnPsi[2].Y;
+                    dStxDueToTZ = dYns2eTZcomp - dYns2eOrg;
+                    dStyDueToTZ = dYn2sTZcomp - dYn2sOrg;
+                    subTX += dStxDueToTZ;
+                    subTY += dStyDueToTZ;
+                }
+
+                CalcZPhiTheta(pSideCompensateTnPsi, mSide0, M6DM, M6DMwT, ref ZTXTY, subTX, subTY);
+
                 CompnesateTopViewWithTXTY(mCOItop, pTopCopy, ZTXTY[1], ZTXTY[2], ref pTop);
+
                 T = TnPsifromTopView(mCOItop, mTop0, pTop, mCOIside, mSide0, pSide, ref psi, ref err);   //  이 함수를 SideView, TopView 모두 이용하는 것으로 변경 필요   20230102
                 pSideCompensateTnPsi = CompensateTnPsi(mCOItop, mCOIside, pTop, pSide, T, psi);
-                CalcZPhiTheta(pSideCompensateTnPsi, mSide0, M6DM, M6DMwT, ref ZTXTY);
+                CalcZPhiTheta(pSideCompensateTnPsi, mSide0, M6DM, M6DMwT, ref ZTXTY, subTX, subTY);
+
+                CompnesateTopViewWithTXTY(mCOItop, pTopCopy, ZTXTY[1], ZTXTY[2], ref pTop);
+
+                T = TnPsifromTopView(mCOItop, mTop0, pTop, mCOIside, mSide0, pSide, ref psi, ref err);   //  이 함수를 SideView, TopView 모두 이용하는 것으로 변경 필요   20230102
+                pSideCompensateTnPsi = CompensateTnPsi(mCOItop, mCOIside, pTop, pSide, T, psi);
+                CalcZPhiTheta(pSideCompensateTnPsi, mSide0, M6DM, M6DMwT, ref ZTXTY, subTX, subTY);
             }
 
             T.X = -T.X;
@@ -7290,8 +7383,6 @@ namespace FAutoLearn
             TX = ZTXTY[1];// * vSec40;  //  radian
             TY = -ZTXTY[2];// * vSec40;  //  radian
 
-            //  CSH org 를 FOV 의 중심에 맞도록 offset 조정 241219
-            T.Y -= 6;   //  Pixel
 
             psi = -psi;
 
@@ -7328,6 +7419,10 @@ namespace FAutoLearn
             TX = TX / mMinToRad;  //  Convert Radian to min
             TY = TY / mMinToRad;  //  Convert Radian to min
 
+            
+            TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);
+
+
             psi = (mScaleTZ[0] * psi* psi + mScaleTZ[1] * psi + mScaleTZ[2]) * mMinToRad;
             TX  = (mScaleTX[0] * TX * TX  + mScaleTX[1] * TX  + mScaleTX[2]) * mMinToRad; // Convert min to radian
             TY  = (mScaleTY[0] * TY * TY  + mScaleTY[1] * TY  + mScaleTY[2]) * mMinToRad;
@@ -7344,9 +7439,10 @@ namespace FAutoLearn
             T.Y -= T.X * T.X * mXtoYst[0] * mPixelToUm + T.X * mXtoYst[1];// + mXtoYst[2] / mPixelToUm;
 
 
-            // sstr = (T.X * mPixelToUm).ToString() + "," + (TX / mMinToRad).ToString() + ",";
+            TY -= (signTY > 0 ? mOffsetTY : -mOffsetTY);
 
-            TX  -= mXtoTXst[0] * T.X * T.X / 10.228 + mXtoTXst[1] * T.X / 187.5135 + mYtoTXst[0] * T.Y * T.Y / 10.228 + mYtoTXst[1] * T.Y / 187.5135 + mZtoTXst[0] * dZ * dZ / 10.228 + mZtoTXst[1] * dZ / 187.5135;
+
+            TX -= mXtoTXst[0] * T.X * T.X / 10.228 + mXtoTXst[1] * T.X / 187.5135 + mYtoTXst[0] * T.Y * T.Y / 10.228 + mYtoTXst[1] * T.Y / 187.5135 + mZtoTXst[0] * dZ * dZ / 10.228 + mZtoTXst[1] * dZ / 187.5135;
             TY  -= mXtoTYst[0] * T.X * T.X / 10.228 + mXtoTYst[1] * T.X / 187.5135 + mYtoTYst[0] * T.Y * T.Y / 10.228 + mYtoTYst[1] * T.Y / 187.5135 + mZtoTYst[0] * dZ * dZ / 10.228 + mZtoTYst[1] * dZ / 187.5135;
             psi -= mXtoTZst[0] * T.X * T.X / 10.228 + mXtoTZst[1] * T.X / 187.5135 + mYtoTZst[0] * T.Y * T.Y / 10.228 + mYtoTZst[1] * T.Y / 187.5135 + mZtoTZst[0] * dZ * dZ / 10.228 + mZtoTZst[1] * dZ / 187.5135;
 
@@ -7366,13 +7462,19 @@ namespace FAutoLearn
             //  X,Y,Z 는 pixel
 
             //  비선형성분 제거
-            TY -= 8.55e-8 * psi * psi * psi * 11818102.86 + 2.35e-6 * psi * psi * 3437.746771;    //  공통
+            TY -= 8.55e-8 * psi * psi * psi * 11818102.86 + 20.35e-6 * psi * psi * 3437.746771;    
+                                                       // + 3.08e-6 * psi * psi * 3437.746771;    // 3.08e-6 당 1180min 에서 0.1min 아래로 내려간다.
+            //TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);
+            //TY -= (signTY > 0 ? mOffsetTY : -mOffsetTY);
+            //psi -= mOffsetTZ;
 
-            TY += 5.15596E-05 * Math.Sin(TY * 98.18181804); //radian    //  TY += 0.191 * Math.Sin(TY / 110 * Math.PI);// arcmin
-            TX -= 3.83972E-05 * Math.Sin(TX * 67.50000000); //radian    //  TX += 0.132 * Math.Sin(TX / 160 * Math.PI);// arcmin
+            TX  += mTXsinCoef * Math.Sin(TX * 68)  + mTXcosCoef * Math.Cos(TX * 68) ; //radian    //  TX += 0.132 * Math.Sin(TX / 160 * Math.PI);// arcmin
+            TY  += mTYsinCoef * Math.Sin(TY * 76)  + mTYcosCoef * Math.Cos(TY * 76) ; //radian    //  TY += 0.191 * Math.Sin( TY / 120 * Math.PI );// arcmin
+            psi += mTZsinCoef * Math.Sin(psi * 81) + mTZcosCoef * Math.Cos(psi * 81); //radian    //  TX += 0.132 * Math.Sin(TX / 160 * Math.PI);// arcmin
 
             //TY -= 1.05812E-07 * TY * TY * TY * 3437.746771  * 3437.746771  - 2.02529E-06 * TY * TY * 3437.746771 - 0.00236603 * TY;
             //TY -= 1.2505 * TY * TY * TY - -0.006962 * TY * TY - 0.002366 * TY;  //  TY 의 3차 성분 제거
+            psi -= mOffsetTZ;
 
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7417,9 +7519,11 @@ namespace FAutoLearn
             TX = signTX * TX;
             TY = signTY * TY;
 
-            TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);
-            TY -= (signTY > 0 ? mOffsetTY : -mOffsetTY);
-            psi -= mOffsetTZ;
+            if ( mOffsetTX!= 0 && mOffsetTY != 0 )
+                TX += 0.96 * TY * psi; //  P45 를 위한 보정 ,  0.1 일 때 P45 +/-180min 구동 시 P45 TY 양끝단을 0.4um 낮추는 효과있음
+
+            if (mOffsetTX != 0 && mOffsetTY != 0)
+                psi += 0.05 * TY * psi; //  P45 를 위한 보정 ,  0.1 일 때 P45 +/-180min 구동 시 P45 TZ 양끝단을 0.4um 낮추는 효과있음
 
             //TX = TX - 3437.747 * TY * TY / 96;// - (3.14e-8) * dZ*dZ;   //  180/pi
 
@@ -7432,6 +7536,8 @@ namespace FAutoLearn
                 T.Y = after[1];
                 dZ = after[2];
             }
+            if (Math.Abs(TX) > 0.1)
+                sxtr = "Event";
         }
 
         public void TransferByEulerMatrix(int count, ref double[] xArr, ref double[] yArr, ref double[] zArr)
@@ -7476,7 +7582,7 @@ namespace FAutoLearn
                               double[] sTZ2Z,
                               double[] sTX2X, double[] sTX2Y, double[] sTX2Z,
                               double[] sTY2X, double[] sTY2Y, double[] sTY2Z,
-                              double[] sTZ2X, double[] sTZ2Y
+                              double[] sTZ2X, double[] sTZ2Y, double txSinCoef = -4E-05, double tySinCoef = 4.9e-05, double tzSinCoef = -0.1e-5, double txCosCoef = 0, double tyCosCoef = 0, double tzCosCoef = 0
                               )
 
         {
@@ -7532,34 +7638,17 @@ namespace FAutoLearn
                 mZJtoZ[i] = sZJ2Z[i];
             }
 
-            //mScaleZ   = sZ;
+            //public double mTXsinCoef = -3.83972E-05;                            //  ID 기본값 -4E-05
+            //public double mTYsinCoef = -5e-05;// ID 247488522 : 2e-05           // ID 기본값 : 5E-05
+            //public double mTZsinCoef = -0.1e-5; //-3.55596E-05;                   //  ID 247488522 : -3e-5
 
-            //mScaleTY  = sTY;
-            //mScaleTZ = 1;// sY[1] / sX[1];
+            mTXsinCoef = txSinCoef;
+            mTYsinCoef = tySinCoef;
+            mTZsinCoef = tzSinCoef;
 
-            //mZtoXst = sZ2X;
-            //mZtoYst = sZ2Y;
-
-            //mYtoXst = sY2X;
-            //mYtoZst = new double[3];
-            //if (sY2Z!=null)
-            //{
-            //    mYtoZst[0] = sY2Z[0];
-            //    mYtoZst[1] = sY2Z[1];
-            //    mYtoZst[2] = sY2Z[2];
-            //}
-
-            //mXtoYst = sX2Y;
-            //mXtoZst = new double[3];
-            //if (sX2Z!=null)
-            //{
-            //    mXtoZst[0]  = sX2Z[0];
-            //    mXtoZst[1]  = sX2Z[1];
-            //    mXtoZst[2]  = sX2Z[2];
-            //}
-
-            //mEastviewYPscale = sEY;
-            //mXtoTXst = sX2TX;
+            mTXcosCoef = txCosCoef;
+            mTYcosCoef = tyCosCoef;
+            mTZcosCoef = tzCosCoef;
         }
 
         // offset X, Y, Z 추가 250325
@@ -7682,7 +7771,7 @@ namespace FAutoLearn
         //        trm = null;
         //}
 
-        public void CalcZPhiTheta(Point2D[] pSide, Point2D[] pSide0, double[,] invW, double[,] wT, ref double[] ZTXTY)
+        public void CalcZPhiTheta(Point2D[] pSide, Point2D[] pSide0, double[,] invW, double[,] wT, ref double[] ZTXTY, double subTX, double subTY)
         {
             //  pSide, pSide0 모두  Side View 에서 측정된 Pixel 좌표값이어야 한다. ( 추후 Cos(40) 보정을 수행하고있다)
             //  입력값이 mm 단위면 mm. rad 로 결과 나오고
@@ -7717,10 +7806,20 @@ namespace FAutoLearn
             double[] lZTXTY = new double[3];
             double dYofMarkE = (pSide[3].Y - (pSide[0].Y + pSide[2].Y) / 2) - (pSide0[3].Y - (pSide0[0].Y + pSide0[2].Y) / 2);
             double ZofMarkE = dYofMarkE / vCos40;   //  pixels
+            if (subTX == 0)
+                ;
+            else
+                //ZofMarkE = 0.55 * ZofMarkE + 0.45 * (subTX - (pSide0[3].Y - (pSide0[0].Y + pSide0[2].Y) / 2)) / vCos40;   //  pixels
+                ZofMarkE = 0.60 * ZofMarkE + 0.40 * (subTX - (pSide0[3].Y - (pSide0[0].Y + pSide0[2].Y) / 2)) / vCos40;   //  pixels
+                //ZofMarkE = 0.65 * ZofMarkE + 0.35 * (subTX - (pSide0[3].Y - (pSide0[0].Y + pSide0[2].Y) / 2)) / vCos40;   //  pixels
 
             lZTXTY[0] = -((dYi[0] + dYi[1]) / 2) / vCos40;  //  Z
             lZTXTY[1] = Math.Atan(ZofMarkE / mYgapBetweenMarkNSandMarkE);   //  TX
-            lZTXTY[2] = Math.Atan(((dYi[0] - dYi[1]) / vCos40) / (pSide[0].X - pSide[2].X));    //  TY
+
+            if (subTY==0)
+                lZTXTY[2] = Math.Atan(((pSide[0].Y - pSide[2].Y) / vCos40) / (pSide[0].X - pSide[2].X));    //  TY
+            else
+                lZTXTY[2] = Math.Atan((0.55 * (pSide[0].Y - pSide[2].Y) / vCos40 + 0.45 * subTY / vCos40) / (pSide[0].X - pSide[2].X));    //  TY
 
             Array.Copy(lZTXTY, ZTXTY, 3);
         }
@@ -8208,21 +8307,22 @@ namespace FAutoLearn
             {
                 prismTXTYTZ[2] = (-ty + tz) / 1.414213562 - mPrismZeroTZ; 
                 prismTXTYTZ[0] = (ty + tz) / 1.414213562 - mPrismZeroTX;
+                prismTXTYTZ[1] = tx;
 
-                if (!bAcrmin)
-                    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] / mMinToRad) * (prismTXTYTZ[0] / mMinToRad) / 10000 - (prismTXTYTZ[2] / mMinToRad) * (prismTXTYTZ[2] / mMinToRad) / 10000) - mPrismZeroTY / mMinToRad;
-                else
-                    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] * prismTXTYTZ[0]) / 10000 - (prismTXTYTZ[2] * prismTXTYTZ[2]) / 10000) - mPrismZeroTY;
+                //if (!bAcrmin)
+                //    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] / mMinToRad) * (prismTXTYTZ[0] / mMinToRad) / 10000 - (prismTXTYTZ[2] / mMinToRad) * (prismTXTYTZ[2] / mMinToRad) / 10000) - mPrismZeroTY / mMinToRad;
+                //else
+                //    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] * prismTXTYTZ[0]) / 10000 - (prismTXTYTZ[2] * prismTXTYTZ[2]) / 10000) - mPrismZeroTY;
             }
             else
             {
                 prismTXTYTZ[2] = (-ty + tz) / 1.414213562;
                 prismTXTYTZ[0] = (ty + tz) / 1.414213562;
-
-                if (!bAcrmin)
-                    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] / mMinToRad) * (prismTXTYTZ[0] / mMinToRad) / 10000 - (prismTXTYTZ[2] / mMinToRad) * (prismTXTYTZ[2] / mMinToRad) / 10000);
-                else
-                    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] * prismTXTYTZ[0]) / 10000 - (prismTXTYTZ[2] * prismTXTYTZ[2]) / 10000);
+                prismTXTYTZ[1] = tx;
+                //if (!bAcrmin)
+                //    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] / mMinToRad) * (prismTXTYTZ[0] / mMinToRad) / 10000 - (prismTXTYTZ[2] / mMinToRad) * (prismTXTYTZ[2] / mMinToRad) / 10000);
+                //else
+                //    prismTXTYTZ[1] = tx + 1.4 * ((prismTXTYTZ[0] * prismTXTYTZ[0]) / 10000 - (prismTXTYTZ[2] * prismTXTYTZ[2]) / 10000);
             }
 
             return prismTXTYTZ;
@@ -8692,8 +8792,397 @@ namespace FAutoLearn
             }
             return C;
         }
-    }
+        public struct Line2D
+        {
+            public Point2d Point;     // 직선 위 한 점 (평균점)
+            public Point2d Direction; // 단위 방향 벡터
+        }
 
+        public Line2D FitLinePCA(Point2d[] points)
+        {
+            if (points == null || points.Length < 2)
+                throw new ArgumentException("At least 2 points are required.");
+
+            int n = points.Length;
+
+            // 1. 평균점 (centroid)
+            double meanX = points.Average(p => p.X);
+            double meanY = points.Average(p => p.Y);
+
+            // 2. 공분산 행렬 계산
+            double sxx = 0, syy = 0, sxy = 0;
+
+            foreach (var p in points)
+            {
+                double dx = p.X - meanX;
+                double dy = p.Y - meanY;
+
+                sxx += dx * dx;
+                syy += dy * dy;
+                sxy += dx * dy;
+            }
+
+            sxx /= n;
+            syy /= n;
+            sxy /= n;
+
+            // 3. 공분산 행렬:
+            // [ sxx  sxy ]
+            // [ sxy  syy ]
+
+            // 4. 고유값/고유벡터 계산 (2x2 행렬)
+            double trace = sxx + syy;
+            double det = sxx * syy - sxy * sxy;
+
+            double temp = Math.Sqrt(trace * trace / 4 - det);
+            double lambda1 = trace / 2 + temp; // 최대 고유값
+
+            // 5. 대응하는 고유벡터 구하기
+            double vx, vy;
+
+            if (Math.Abs(sxy) > 1e-12)
+            {
+                vx = lambda1 - syy;
+                vy = sxy;
+            }
+            else
+            {
+                // sxy ≈ 0 인 경우
+                if (sxx >= syy)
+                {
+                    vx = 1;
+                    vy = 0;
+                }
+                else
+                {
+                    vx = 0;
+                    vy = 1;
+                }
+            }
+
+            // 6. 정규화
+            double norm = Math.Sqrt(vx * vx + vy * vy);
+            vx /= norm;
+            vy /= norm;
+
+            return new Line2D
+            {
+                Point = new Point2d(meanX, meanY),
+                Direction = new Point2d(vx, vy)
+            };
+        }
+        public bool TryIntersect(Line2D A, Line2D B, out Point2d intersection)
+        {
+            intersection = new Point2d();
+
+            double x1 = A.Point.X;
+            double y1 = A.Point.Y;
+            double dx1 = A.Direction.X;
+            double dy1 = A.Direction.Y;
+
+            double x2 = B.Point.X;
+            double y2 = B.Point.Y;
+            double dx2 = B.Direction.X;
+            double dy2 = B.Direction.Y;
+
+            // 외적 (determinant)
+            double det = dx1 * dy2 - dy1 * dx2;
+
+            // 평행 또는 거의 평행
+            if (Math.Abs(det) < 1e-12)
+                return false;
+
+            // t 계산
+            double t = ((x2 - x1) * dy2 - (y2 - y1) * dx2) / det;
+
+            intersection = new Point2d(
+                x1 + t * dx1,
+                y1 + t * dy1
+            );
+
+            return true;
+        }
+        public class CenterLineResult
+        {
+            // 최소 폭
+            public double Width;
+
+            // 중심선 : Ax + By + C = 0
+            public double A;
+            public double B;
+            public double C;
+        }
+
+        public static (double slope, double offset, double ppOrg, double ppFinal) FitLineMinWidth(List<Point2d> points)
+        {
+            if (points == null || points.Count < 2)
+                throw new ArgumentException(
+                    "At least two points are required.");
+
+            double ppOrg = 0;
+            double ppFinal = 0;
+            double[] slope = new double[11];
+            double[] error = new double[11];
+            int[] index = new int[11] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+            double minY = 9999;
+            double maxY = -9999;
+            int n = points.Count;
+            double offset = 0;
+            for (int i = 0; i < n; i++)
+            {
+                offset += points[i].Y;
+                if (points[i].Y < minY)
+                    minY = points[i].Y;
+                if (points[i].Y > maxY)
+                    maxY = points[i].Y;
+            }
+            offset /= n;
+            ppOrg = maxY - minY;
+
+            int itr = 10;
+            //  initial equation  : y = (p[n].Y - p[0].Y)/(p[n].X - p[0].X) * ( X - p[0].X) + offset;
+            double a0 = (points[n - 1].Y - points[0].Y) / (points[n - 1].X - points[0].X);
+            double b0 = offset;
+            double err = 0;
+            for (int k = -5; k < 6; k++)
+                slope[k + 5] = a0 + 0.2 * k * (maxY - minY) / (points[n - 1].X - points[0].X);
+
+            double slopeAmp = 0.2 * (maxY - minY) / (points[n - 1].X - points[0].X);
+
+            while (itr > 0)
+            {
+                error = new double[11];
+                index = new int[11] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+                for (int k = -5; k < 6; k++)
+                {
+                    minY = 9999;
+                    maxY = -9999;
+                    for (int i = 0; i < n; i++)
+                    {
+                        err = points[i].Y - slope[k + 5] * points[i].X - offset;
+                        if (err < minY)
+                            minY = err;
+                        if (err > maxY)
+                            maxY = err;
+                    }
+                    error[k + 5] = maxY - minY;
+                }
+                Array.Sort(error, index);
+                ppFinal = error[0];
+                a0 = slope[index[0]];
+                slopeAmp /= 2;
+                for (int k = -5; k < 6; k++)
+                    slope[k + 5] = a0 + k * slopeAmp;
+
+
+                itr--;
+            }
+
+            return (a0, offset, ppOrg, ppFinal);
+        }
+        //  y = a * sin(m * x) + c
+        public class SineFitResult
+        {
+            public double Amplitude { get; set; }   // a
+            public double Period { get; set; }           // m
+            public double Offset { get; set; }      // c
+
+            public double PPorg { get; set; }
+            public double PPres { get; set; }
+
+            public double Slope { get; set; }
+        }
+
+        //double minPeriod = 2.0 * Math.PI / 0.8;
+        //double maxPeriod = 2.0 * Math.PI / 1.6;
+
+        //SineFitResult result = FitToSine(points);
+        public static SineFitResult FitToSine(Point2d[] points)
+        {
+            if (points == null)
+                throw new ArgumentNullException(nameof(points));
+
+            if (points.Length < 3)
+                throw new ArgumentException("데이터는 최소 3개 이상 필요합니다.");
+
+            var finalAc = SolveAmplitudeAndOffset(points);
+
+            return new SineFitResult
+            {
+                Amplitude = finalAc.A,
+                Period = finalAc.P,
+                Offset = finalAc.Offset,
+                PPorg = finalAc.ppOrg,
+                PPres = finalAc.ppFinal,
+                Slope = finalAc.slope,
+            };
+        }
+        private static (double A, double P, double Offset, double ppOrg, double ppFinal, double slope) SolveAmplitudeAndOffset(Point2d[] points)
+        {
+            int n = points.Length;
+            double[] error = new double[11];
+            double[] slope = new double[11];
+            double fullstroke = Math.Abs(points[n - 1].X - points[0].X);
+            double period = 2.2 * Math.PI / fullstroke;
+            double offset = 0;
+            int[] index = new int[11] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            double minY = 9999;
+            double maxY = -9999;
+            for (int i = 0; i < n; i++)
+            {
+                offset += points[i].Y;
+                if (points[i].Y < minY)
+                    minY = points[i].Y;
+                if (points[i].Y > maxY)
+                    maxY = points[i].Y;
+            }
+            double ppOrg = maxY - minY;
+            offset = offset / n;
+            double[] amplitude = new double[11];
+            double dAmplitude = (maxY - minY) / 3;
+            for (int k = -5; k < 6; k++)
+                amplitude[k + 5] = (k + 0.5) * dAmplitude;
+
+
+            int itr = 8;
+            double oldAmplitude = 0;
+            double err = 0;
+            double ppFinal = 0;
+            double slopeFinal = 0;
+
+
+            while (itr > 0)
+            {
+                for (int k = 0; k < 11; k++)
+                {
+                    minY = 9999;
+                    maxY = -9999;
+                    List<Point2d> newPts = new List<Point2d>();
+                    for (int i = 0; i < n; i++)
+                    {
+                        err = points[i].Y - amplitude[k] * Math.Sin(points[i].X * period) - offset;
+                        if (err < minY)
+                            minY = err;
+                        if (err > maxY)
+                            maxY = err;
+                        newPts.Add(new Point2d(points[i].X, err));
+                    }
+                    var lResult = FitLineMinWidth(newPts);
+                    error[k] = lResult.ppFinal;
+                    slope[k] = lResult.slope;
+                }
+                Array.Sort(error, index);
+                dAmplitude /= 2;
+                ppFinal = error[0];
+                slopeFinal = slope[index[0]];
+
+                oldAmplitude = amplitude[index[0]];
+                for (int k = -5; k < 6; k++)
+                    amplitude[k + 5] = (k + 0.5) * dAmplitude + oldAmplitude;
+
+                error = new double[11];
+                index = new int[11] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+                itr--;
+            }
+            oldAmplitude = oldAmplitude / (60 * 180 / Math.PI);
+            return (oldAmplitude, period, offset, ppOrg, ppFinal, slopeFinal);
+        }
+
+        public static SineFitResult FitToCosine(Point2d[] points)
+        {
+            if (points == null)
+                throw new ArgumentNullException(nameof(points));
+
+            if (points.Length < 3)
+                throw new ArgumentException("데이터는 최소 3개 이상 필요합니다.");
+
+            var finalAc = SolveAmplitudeAndOffsetCos(points);
+
+            return new SineFitResult
+            {
+                Amplitude = finalAc.A,
+                Period = finalAc.P,
+                Offset = finalAc.Offset,
+                PPorg = finalAc.ppOrg,
+                PPres = finalAc.ppFinal,
+                Slope = finalAc.slope,
+            };
+        }
+        private static (double A, double P, double Offset, double ppOrg, double ppFinal, double slope) SolveAmplitudeAndOffsetCos(Point2d[] points)
+        {
+            int n = points.Length;
+            double[] error = new double[11];
+            double[] slope = new double[11];
+            double fullstroke = Math.Abs(points[n - 1].X - points[0].X);
+            double period = 3.0 * Math.PI / fullstroke;
+            double offset = 0;
+            int[] index = new int[11] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            double minY = 9999;
+            double maxY = -9999;
+            for (int i = 0; i < n; i++)
+            {
+                offset += points[i].Y;
+                if (points[i].Y < minY)
+                    minY = points[i].Y;
+                if (points[i].Y > maxY)
+                    maxY = points[i].Y;
+            }
+            double ppOrg = maxY - minY;
+            offset = offset / n;
+            double[] amplitude = new double[11];
+            double dAmplitude = (maxY - minY) / 2;
+            for (int k = -5; k < 6; k++)
+                amplitude[k + 5] = (k + 0.5) * dAmplitude;
+
+
+            int itr = 9;
+            double oldAmplitude = 0;
+            double err = 0;
+            double ppFinal = 0;
+            double slopeFinal = 0;
+
+
+            while (itr > 0)
+            {
+                for (int k = 0; k < 11; k++)
+                {
+                    minY = 9999;
+                    maxY = -9999;
+                    List<Point2d> newPts = new List<Point2d>();
+                    for (int i = 0; i < n; i++)
+                    {
+                        err = points[i].Y - amplitude[k] * Math.Cos(points[i].X * period) - offset;
+                        if (err < minY)
+                            minY = err;
+                        if (err > maxY)
+                            maxY = err;
+                        newPts.Add(new Point2d(points[i].X, err));
+                    }
+                    var lResult = FitLineMinWidth(newPts);
+                    error[k] = lResult.ppFinal;
+                    slope[k] = lResult.slope;
+                }
+                Array.Sort(error, index);
+                dAmplitude /= 2;
+                ppFinal = error[0];
+                slopeFinal = slope[index[0]];
+
+                oldAmplitude = amplitude[index[0]];
+                for (int k = -5; k < 6; k++)
+                    amplitude[k + 5] = (k + 0.5) * dAmplitude + oldAmplitude;
+
+                error = new double[11];
+                index = new int[11] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+                itr--;
+            }
+            oldAmplitude = oldAmplitude / (60 * 180 / Math.PI);
+            return (oldAmplitude, period, offset, ppOrg, ppFinal, slopeFinal);
+        }
+    }
     static class VectorExt
     {
         public static MathNetVector ToVector(this MathNetVector v) => v.Clone();

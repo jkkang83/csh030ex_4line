@@ -50,6 +50,7 @@
             this.tb_CurrResult = new System.Windows.Forms.TextBox();
             this.P_Sub = new System.Windows.Forms.Panel();
             this.groupBox1 = new System.Windows.Forms.Panel();
+            this.cbPseudoOMM = new System.Windows.Forms.CheckBox();
             this.cbReverseTY = new System.Windows.Forms.CheckBox();
             this.cbReverseY = new System.Windows.Forms.CheckBox();
             this.cbReverseX = new System.Windows.Forms.CheckBox();
@@ -398,6 +399,7 @@
             // groupBox1
             // 
             this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(96)))), ((int)(((byte)(100)))));
+            this.groupBox1.Controls.Add(this.cbPseudoOMM);
             this.groupBox1.Controls.Add(this.cbReverseTY);
             this.groupBox1.Controls.Add(this.cbReverseY);
             this.groupBox1.Controls.Add(this.cbReverseX);
@@ -437,6 +439,21 @@
             this.groupBox1.Size = new System.Drawing.Size(593, 962);
             this.groupBox1.TabIndex = 200;
             // 
+            // cbPseudoOMM
+            // 
+            this.cbPseudoOMM.AutoSize = true;
+            this.cbPseudoOMM.BackColor = System.Drawing.Color.Transparent;
+            this.cbPseudoOMM.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbPseudoOMM.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbPseudoOMM.ForeColor = System.Drawing.Color.DodgerBlue;
+            this.cbPseudoOMM.Location = new System.Drawing.Point(345, 438);
+            this.cbPseudoOMM.Name = "cbPseudoOMM";
+            this.cbPseudoOMM.Size = new System.Drawing.Size(130, 25);
+            this.cbPseudoOMM.TabIndex = 194;
+            this.cbPseudoOMM.Text = "Pseudo OMM";
+            this.cbPseudoOMM.UseVisualStyleBackColor = false;
+            this.cbPseudoOMM.CheckedChanged += new System.EventHandler(this.cbPseudoOMM_CheckedChanged);
+            // 
             // cbReverseTY
             // 
             this.cbReverseTY.AutoSize = true;
@@ -444,7 +461,7 @@
             this.cbReverseTY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbReverseTY.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbReverseTY.ForeColor = System.Drawing.Color.Black;
-            this.cbReverseTY.Location = new System.Drawing.Point(345, 193);
+            this.cbReverseTY.Location = new System.Drawing.Point(346, 172);
             this.cbReverseTY.Name = "cbReverseTY";
             this.cbReverseTY.Size = new System.Drawing.Size(161, 25);
             this.cbReverseTY.TabIndex = 193;
@@ -459,7 +476,7 @@
             this.cbReverseY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbReverseY.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbReverseY.ForeColor = System.Drawing.Color.Black;
-            this.cbReverseY.Location = new System.Drawing.Point(345, 249);
+            this.cbReverseY.Location = new System.Drawing.Point(346, 228);
             this.cbReverseY.Name = "cbReverseY";
             this.cbReverseY.Size = new System.Drawing.Size(152, 25);
             this.cbReverseY.TabIndex = 192;
@@ -474,7 +491,7 @@
             this.cbReverseX.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbReverseX.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbReverseX.ForeColor = System.Drawing.Color.Black;
-            this.cbReverseX.Location = new System.Drawing.Point(345, 221);
+            this.cbReverseX.Location = new System.Drawing.Point(346, 200);
             this.cbReverseX.Name = "cbReverseX";
             this.cbReverseX.Size = new System.Drawing.Size(152, 25);
             this.cbReverseX.TabIndex = 191;
@@ -486,7 +503,7 @@
             // 
             this.lblDefaultModel.AutoSize = true;
             this.lblDefaultModel.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.lblDefaultModel.Location = new System.Drawing.Point(3, 581);
+            this.lblDefaultModel.Location = new System.Drawing.Point(3, 620);
             this.lblDefaultModel.Name = "lblDefaultModel";
             this.lblDefaultModel.Size = new System.Drawing.Size(126, 17);
             this.lblDefaultModel.TabIndex = 190;
@@ -499,7 +516,7 @@
             this.cbNoHost.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbNoHost.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbNoHost.ForeColor = System.Drawing.Color.Black;
-            this.cbNoHost.Location = new System.Drawing.Point(345, 428);
+            this.cbNoHost.Location = new System.Drawing.Point(346, 407);
             this.cbNoHost.Name = "cbNoHost";
             this.cbNoHost.Size = new System.Drawing.Size(116, 25);
             this.cbNoHost.TabIndex = 189;
@@ -550,7 +567,7 @@
             this.cbAutoLastFrame.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbAutoLastFrame.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbAutoLastFrame.ForeColor = System.Drawing.Color.Black;
-            this.cbAutoLastFrame.Location = new System.Drawing.Point(345, 277);
+            this.cbAutoLastFrame.Location = new System.Drawing.Point(346, 256);
             this.cbAutoLastFrame.Name = "cbAutoLastFrame";
             this.cbAutoLastFrame.Size = new System.Drawing.Size(152, 25);
             this.cbAutoLastFrame.TabIndex = 185;
@@ -565,13 +582,13 @@
             this.cbPrismCoordinateSystem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbPrismCoordinateSystem.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbPrismCoordinateSystem.ForeColor = System.Drawing.Color.Lime;
-            this.cbPrismCoordinateSystem.Location = new System.Drawing.Point(345, 397);
+            this.cbPrismCoordinateSystem.Location = new System.Drawing.Point(346, 376);
             this.cbPrismCoordinateSystem.Name = "cbPrismCoordinateSystem";
             this.cbPrismCoordinateSystem.Size = new System.Drawing.Size(219, 25);
             this.cbPrismCoordinateSystem.TabIndex = 184;
             this.cbPrismCoordinateSystem.Text = "Prism Cooridnate System";
             this.cbPrismCoordinateSystem.UseVisualStyleBackColor = false;
-            this.cbPrismCoordinateSystem.CheckedChanged += new System.EventHandler(this.cbSuperFastMode_CheckedChanged);
+            this.cbPrismCoordinateSystem.CheckedChanged += new System.EventHandler(this.cbPrismCS_CheckedChanged);
             // 
             // cbEulerRotation
             // 
@@ -580,7 +597,7 @@
             this.cbEulerRotation.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbEulerRotation.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold);
             this.cbEulerRotation.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.cbEulerRotation.Location = new System.Drawing.Point(345, 366);
+            this.cbEulerRotation.Location = new System.Drawing.Point(346, 345);
             this.cbEulerRotation.Name = "cbEulerRotation";
             this.cbEulerRotation.Size = new System.Drawing.Size(185, 25);
             this.cbEulerRotation.TabIndex = 183;
@@ -624,7 +641,7 @@
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button1.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold);
             this.button1.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.button1.Location = new System.Drawing.Point(3, 420);
+            this.button1.Location = new System.Drawing.Point(3, 459);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(200, 28);
             this.button1.TabIndex = 180;
@@ -642,7 +659,7 @@
             this.lbxModelFiles.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbxModelFiles.FormattingEnabled = true;
             this.lbxModelFiles.ItemHeight = 15;
-            this.lbxModelFiles.Location = new System.Drawing.Point(3, 454);
+            this.lbxModelFiles.Location = new System.Drawing.Point(3, 493);
             this.lbxModelFiles.Name = "lbxModelFiles";
             this.lbxModelFiles.Size = new System.Drawing.Size(582, 124);
             this.lbxModelFiles.TabIndex = 179;
@@ -858,7 +875,7 @@
             this.cbReverseTX.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbReverseTX.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbReverseTX.ForeColor = System.Drawing.Color.Black;
-            this.cbReverseTX.Location = new System.Drawing.Point(345, 165);
+            this.cbReverseTX.Location = new System.Drawing.Point(346, 144);
             this.cbReverseTX.Name = "cbReverseTX";
             this.cbReverseTX.Size = new System.Drawing.Size(161, 25);
             this.cbReverseTX.TabIndex = 178;
@@ -873,7 +890,7 @@
             this.cbXTiltReverse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbXTiltReverse.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbXTiltReverse.ForeColor = System.Drawing.Color.Black;
-            this.cbXTiltReverse.Location = new System.Drawing.Point(345, 109);
+            this.cbXTiltReverse.Location = new System.Drawing.Point(346, 88);
             this.cbXTiltReverse.Name = "cbXTiltReverse";
             this.cbXTiltReverse.Size = new System.Drawing.Size(134, 25);
             this.cbXTiltReverse.TabIndex = 177;
@@ -962,7 +979,7 @@
             this.cbYTiltReverse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbYTiltReverse.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbYTiltReverse.ForeColor = System.Drawing.Color.Black;
-            this.cbYTiltReverse.Location = new System.Drawing.Point(345, 137);
+            this.cbYTiltReverse.Location = new System.Drawing.Point(346, 116);
             this.cbYTiltReverse.Name = "cbYTiltReverse";
             this.cbYTiltReverse.Size = new System.Drawing.Size(134, 25);
             this.cbYTiltReverse.TabIndex = 160;
@@ -988,7 +1005,7 @@
             this.cbCalibrationModel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbCalibrationModel.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbCalibrationModel.ForeColor = System.Drawing.Color.Black;
-            this.cbCalibrationModel.Location = new System.Drawing.Point(345, 305);
+            this.cbCalibrationModel.Location = new System.Drawing.Point(346, 284);
             this.cbCalibrationModel.Name = "cbCalibrationModel";
             this.cbCalibrationModel.Size = new System.Drawing.Size(162, 25);
             this.cbCalibrationModel.TabIndex = 162;
@@ -1025,7 +1042,7 @@
             this.cbHideAllGraph.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbHideAllGraph.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbHideAllGraph.ForeColor = System.Drawing.Color.Black;
-            this.cbHideAllGraph.Location = new System.Drawing.Point(345, 333);
+            this.cbHideAllGraph.Location = new System.Drawing.Point(346, 312);
             this.cbHideAllGraph.Name = "cbHideAllGraph";
             this.cbHideAllGraph.Size = new System.Drawing.Size(139, 25);
             this.cbHideAllGraph.TabIndex = 163;
@@ -1434,7 +1451,7 @@
             this.Name = "F_Main";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "CSH030Ex Test Bench 25110501";
+            this.Text = "CSH030Ex Test Bench 260713 4Line";
             this.TransparencyKey = System.Drawing.Color.Gray;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.F_Main_FormClosing);
@@ -1547,6 +1564,7 @@
         private System.Windows.Forms.CheckBox cbSaveImage;
         private System.Windows.Forms.TextBox txtSaveImage;
         private System.Windows.Forms.Label lblSaveImage;
+        private System.Windows.Forms.CheckBox cbPseudoOMM;
     }
 }
 

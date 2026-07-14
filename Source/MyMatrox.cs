@@ -69,10 +69,23 @@ namespace S2System.Vision
         public double[] mC_pTX = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
         public double[] mC_pTY = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
         public double[] mC_pTZ = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mC_pNewTX = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
 
         public double[] mPrism_pTX = new double[10000];  //  
         public double[] mPrism_pTY = new double[10000];  //  
         public double[] mPrism_pTZ = new double[10000];  //  
+
+        public double[] mPOMM_X = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_Y = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_Z = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_TX = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_TY = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_TZ = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_sX = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_sY = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_tX = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_tY = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public bool bPseudoOMM = false;
 
         public double[][] mBufMTF = new double[12][];
         public bool bNoHostPC = false;
@@ -940,11 +953,27 @@ namespace S2System.Vision
 
             DrawSetDCfree();
         }
-        public void SetStdMarkPos(System.Drawing.Point[] p, ref System.Drawing.Point[] res, int w=-1, int h=-1)
+        public void SetStdMarkPos(ref System.Drawing.Point[] res, int w=-1, int h=-1)
         {
             //  CropGap 을 적용한다.
-            mFAL.mMarkPosOnPanel = new System.Drawing.Point[p.Length];
-            mFAL.mMarkConvOnPanel = new long[p.Length];
+            //mFAL.mMarkPosOnPanel = new System.Drawing.Point[5];
+            //mFAL.mMarkConvOnPanel = new long[5];
+
+            double NSgap = (4300/18.3333);// default mark gap
+            if (mFAL.mFidMarkSide[0] != null)
+            {
+                NSgap = (mFAL.mFidMarkSide[0].fidInfo.X + mFAL.mFidMarkSide[0].fidInfo.X) * 1000 / 18.3333;
+            }
+            res[0].X = (int)(w / 2.0 + NSgap / 2.0);
+            res[0].Y = 95;
+            res[1].X = (int)(w / 2.0 - NSgap / 2.0);
+            res[1].Y = 95;
+            res[2].X = 390;
+            res[2].Y = 285;
+            res[3].X = 520 + 130;
+            res[3].Y = 190 + (h - 190) / 2;
+            res[4].X = 130;
+            res[4].Y = 190 + (h - 190) / 2;
 
             int cx = nSizeX / 2;
             int cy = nSizeY / 2;
@@ -953,28 +982,28 @@ namespace S2System.Vision
                 cx = w / 2;
                 cy = h / 2;
             }
-            for (int i = 0; i < p.Length; i++)
+            for (int i = 0; i < 5; i++)
             {
-                res[i].X = cx + p[i].X;
-                res[i].Y = cy + p[i].Y;
-                switch (i)
-                {
-                    case 0:
-                    case 1:
-                        res[i].Y -= CropABgap / 2;// - 4; 
-                        break;
-                    case 2:
-                        res[i].Y += CropABgap / 2;// - 26; 
-                        break;
-                    case 3:
-                        res[i].X += (520 - CropCgap) / 2;
-                        //res[i].Y += 26;
-                        break;
-                    case 4:
-                        res[i].X -= (520 - CropCgap) / 2;
-                        //res[i].Y += 26;
-                        break;
-                }
+                //res[i].X = cx + p[i].X;
+                //res[i].Y = cy + p[i].Y;
+                //switch (i)
+                //{
+                //    case 0:
+                //    case 1:
+                //        res[i].Y -= CropABgap / 2;// - 4; 
+                //        break;
+                //    case 2:
+                //        res[i].Y += CropABgap / 2;// - 26; 
+                //        break;
+                //    case 3:
+                //        res[i].X += (520 - CropCgap) / 2;
+                //        //res[i].Y += 26;
+                //        break;
+                //    case 4:
+                //        res[i].X -= (520 - CropCgap) / 2;
+                //        //res[i].Y += 26;
+                //        break;
+                //}
                 mFAL.mMarkPosOnPanel[i].X = res[i].X;
                 mFAL.mMarkPosOnPanel[i].Y = res[i].Y;
             }
@@ -1119,8 +1148,8 @@ namespace S2System.Vision
                     //new Size(250, 250)  // D   
                     new Size(550, 190), // Side
                     new Size(260, 190), // Side East
-                    new Size(260, 260), // Top Left
-                    new Size(260, 260)  // Top Right
+                    new Size(260, 270), // Top Left
+                    new Size(260, 270)  // Top Right
             };
 
             // srcImg ROI 설정
@@ -1135,7 +1164,7 @@ namespace S2System.Vision
                 //srcRoiPos[2] = new Point(center + spliteSize - 40 - roiSize[2].Width, 0);   // C   // top           // C AND D간격 80
                 //srcRoiPos[3] = new Point(center + spliteSize + 40, 0);   // D   // top
                 srcRoiPos[0] = new Point(srcSize.Width / 3, 0); // Side
-                srcRoiPos[1] = new Point(0,srcSize.Height - roiSize[1].Height); // Side East
+                srcRoiPos[1] = new Point(0,srcSize.Height - roiSize[1].Height-10); // Side East
                 srcRoiPos[2] = new Point((srcSize.Width / 3) * 2, 0);   // Top Left
                 srcRoiPos[3] = new Point(srcSize.Width - roiSize[3].Width, 0); // Top Right
                 
@@ -1173,7 +1202,7 @@ namespace S2System.Vision
             MIL.MdigGrabWait(milDigitizer, MIL.M_GRAB_FRAME_END);
             //MIL.MbufExport("D:\\TestImage.bmp", MIL.M_BMP, milCommonImageGrab[index]);
             MIL.MbufCopy(milCommonImageGrab[index], milImageDisp);
-            Mat cropImg = LoadCropMat(index);
+            Mat cropImg = MbufToCropMat(index);
 
             //Cv2.ImWrite("D:\\CVImage.bmp", src);
 
@@ -1247,15 +1276,20 @@ namespace S2System.Vision
                 //return BitmapConverter.ToBitmap(cropImg);
                 return cropImg;
         }
-        public Mat LoadCropMat(int index)
-        {           
-            byte[] buf = new byte[nSizeX * nSizeY];
-            MIL.MbufGet2d(milCommonImageGrab[index], 0, 0, nSizeX, nSizeY, buf);
+        public Mat MbufToCropMat(int index)
+        {
+            mFAL.mSourceImg[0] = new Mat(resultSize, MatType.CV_8UC1, new Scalar(0));
 
-            Mat src = new Mat(nSizeY, nSizeX, MatType.CV_8UC1, buf);
-            Mat cropImg = CropImage(src);
+            CropImage(index, 0);
+            return mFAL.mSourceImg[0];
 
-            return cropImg;
+            //byte[] buf = new byte[nSizeX * nSizeY];
+            //MIL.MbufGet2d(milCommonImageGrab[index], 0, 0, nSizeX, nSizeY, buf);
+
+            //Mat src = new Mat(nSizeY, nSizeX, MatType.CV_8UC1, buf);
+            //Mat cropImg = CropImage(src);
+
+            //return cropImg;
         }
         public void DrawAllRectangles()
         {
@@ -1324,28 +1358,62 @@ namespace S2System.Vision
             //if ( index==0)
             //    MIL.MbufExport("C:\\CSHTest\\Result\\RawData\\Image\\Crop.bmp", MIL.M_BMP, milCommonImageGrab[index]);
 
-            Mat src = new Mat(nSizeY, nSizeX, MatType.CV_8UC1, buf);
+            Mat src = new Mat(nSizeY, nSizeX, MatType.CV_8UC1, buf);    //  buf 로 Mat 생성
+            if (bPseudoOMM)
+            {
+                mFAL.mOMMSImg[nbuf] = new Mat();
+                mFAL.mOMMTImg[nbuf] = new Mat();
+            }
             mFAL.mSourceImg[nbuf].SetTo(new Scalar(0));
+            mFAL.mSourceImg2[nbuf].SetTo(new Scalar(0));
+
             for (int i = 0; i < 4; i++)
             {
+                //  i=0 : Side View
+                //  i=1 : East View
+                //  i=2 : Left ( S Mark ) in Top View
+                //  i=3 : Right ( N mark ) in Top View
                 using (Mat srcRoi = src.SubMat(mSrcCropRect[i]))
                 using (Mat resultRoi = mFAL.mSourceImg[nbuf].SubMat(resultRoiRect[i]))
                 {
                     srcRoi.CopyTo(resultRoi);
+                    if (bPseudoOMM)
+                    {
+                        if (i == 0)
+                            srcRoi.CopyTo(mFAL.mOMMSImg[nbuf]);
+                        else if (i == 3)
+                            srcRoi.CopyTo(mFAL.mOMMTImg[nbuf]);
+                    }
                 }
             }
-        }
-        private void CropImage(int nbuf, byte[] buf)
-        {
-            Mat src = new Mat(nSizeY, nSizeX, MatType.CV_8UC1, buf);
-            for (int i = 0; i < 4; i++)
+            Rect eastUp = mSrcCropRect[0];  //  mSrcCropRect[0] : Crop in Side View (Center)
+            int SideToEastX = mSrcCropRect[0].X + mSrcCropRect[0].Width / 2 - (mSrcCropRect[1].X + mSrcCropRect[1].Width / 2);
+            mFAL.mSideToEastX = SideToEastX;
+            eastUp.X -= SideToEastX;
+            eastUp.Y -= 10;
+            eastUp.Height += 20;
+
+            Rect sideLo = mSrcCropRect[1];
+            sideLo.X += SideToEastX;
+            sideLo.Y -= 8;
+            sideLo.Height += 20;
+            if (sideLo.Bottom > 342)
             {
-                using (Mat srcRoi = src.SubMat(mSrcCropRect[i]))
-                using (Mat resultRoi = mFAL.mSourceImg[nbuf].SubMat(resultRoiRect[i]))
-                {
-                    srcRoi.CopyTo(resultRoi);
-                }
+                int delta = sideLo.Bottom - 342;
+                sideLo.Y -= delta;
             }
+            Rect SourceImg2Up = new Rect(0, 0, 550, 210);
+            Rect SourceImg2Lo = new Rect(145, 210, 260, 210);
+
+            Mat srcRoi2 = src.SubMat(eastUp);
+            Mat resultRoi2 = mFAL.mSourceImg2[nbuf].SubMat(SourceImg2Up);
+            srcRoi2.CopyTo(resultRoi2);
+
+            Mat srcRoi3 = src.SubMat(sideLo);
+            Mat resultRoi3 = mFAL.mSourceImg2[nbuf].SubMat(SourceImg2Lo);
+            srcRoi3.CopyTo(resultRoi3);
+
+            //Cv2.ImShow("A", mFAL.mSourceImg2[nbuf]);// mFAL.mSourceImg2[nbuf]);
         }
 
         // Rect 좌표 이미지 벗어나지않게 
@@ -1534,6 +1602,8 @@ namespace S2System.Vision
                     }
                 }
                 CropABgap = mSrcCropRect[1].Top - mSrcCropRect[0].Bottom;
+                mSrcCropRect[2].Height = 270;
+                mSrcCropRect[3].Height = 270;
                 mFAL.SetCropGaps(CropABgap, CropCgap);
                 return true;
             }
@@ -1555,10 +1625,25 @@ namespace S2System.Vision
 
         public void SaveGrabbedImage(int index, string FullbmpName)
         {
-            Mat img = LoadCropMat(index);
-            img.SaveImage(FullbmpName);
-            
-            
+            MbufToCropMat(index);
+
+            int width = mFAL.mSourceImg[0].Width + mFAL.mSourceImg2[0].Width;
+            int height = mFAL.mSourceImg[0].Height;
+
+            // 검정색 배경으로 생성
+            Mat ImgSum = new Mat(height, width, mFAL.mSourceImg[0].Type(), Scalar.Black);
+
+            // A 복사
+            Rect roiA = new Rect(0, 0, mFAL.mSourceImg[0].Width, mFAL.mSourceImg[0].Height);
+            mFAL.mSourceImg[0].CopyTo(new Mat(ImgSum, roiA));
+
+            // B 복사 (A 오른쪽)
+            Rect roiB = new Rect(mFAL.mSourceImg[0].Width, 0, mFAL.mSourceImg2[0].Width, mFAL.mSourceImg2[0].Height);
+            mFAL.mSourceImg2[0].CopyTo(new Mat(ImgSum, roiB));
+
+            ImgSum.SaveImage(FullbmpName);
+
+            ImgSum.Dispose();
             //byte[] data = null;
             //img.GetArray(out data);
             //StreamWriter wr = new StreamWriter("raw" + index.ToString() + ".csv");
@@ -2023,28 +2108,6 @@ namespace S2System.Vision
         //    return true;
         //}
 
-        public void LoadBMPtoBuf0(string filename)
-        {
-            MIL_ID resMilID = MIL.M_NULL;
-
-            resMilID = MIL.MbufImport(filename, MIL.M_BMP, MIL.M_RESTORE, milSystem, ref milCommonImageGrab[0]);
-
-            //MIL.MimResize(milCommonImageGrab[0], milCommonImageResize[0], mModelScale, mModelScale, MIL.M_DEFAULT);
-
-            //            MIL.MbufImport(filename, MIL.M_BMP, MIL.M_LOAD, MIL.M_NULL, ref milCommonImageGrab[0]);
-            //MIL.MbufCopy(resMilID, milImageDisp);
-            //MIL.MbufGet2d(milCommonImageGrab[0], 0, 0, nSizeX, nSizeY, p_Value[0]);
-
-            MIL.MbufCopy(milCommonImageGrab[0], milImageDisp);
-        }
-        public void LoadBMPtoBufN(string filename, int N)
-        {
-            MIL_ID resMilID = MIL.M_NULL;
-            resMilID = MIL.MbufImport(filename, MIL.M_BMP, MIL.M_RESTORE, milSystem, ref milCommonImageGrab[N]);
-
-            //MIL.MimResize(milCommonImageGrab[N], milCommonImageResize[N], mModelScale, mModelScale, MIL.M_DEFAULT);
-            MIL.MbufCopy(resMilID, milImageDisp);
-        }
 
         public void PrepareFineCOG()
         {
@@ -2351,15 +2414,24 @@ namespace S2System.Vision
         //public bool FineCOG(int index, int iBuf, bool IsShowBox = false, bool need6D = true)
         public FAutoLearn.FAutoLearn.sMarkResult[] mOldSMR = new FAutoLearn.FAutoLearn.sMarkResult[12];
         public OpenCvSharp.Point[][] mDetectedMarkPos = new Point[30][];
+        public OpenCvSharp.Point2d[][] mDetectedOMMPos = new Point2d[30][];
+        public OpenCvSharp.Point2d[] mPseudoPtsOrg = null;
+        public double mNewTX = 0;
         public bool FineCOG(bool IsFirst, int index, int iBuf, bool IsShowBox = false, bool need6D = true, bool needLEDavg = false, bool IsFile = false)
         {
             if (mFAL.mFidMarkSide[0] == null)
                 return false;
 
+            mFAL.mIsFile = IsFile;
             int lModelScale = mFAL.mFidMarkSide[0].MScale;
             FAutoLearn.FAutoLearn.sMarkResult[] sMR = new FAutoLearn.FAutoLearn.sMarkResult[12];
             FAutoLearn.FAutoLearn.sMarkResult[] sMR_T = new FAutoLearn.FAutoLearn.sMarkResult[12];
             FAutoLearn.FAutoLearn.sMarkResult[] sMR_B = new FAutoLearn.FAutoLearn.sMarkResult[12];
+
+            //          new Size(550, 190), // Side
+            //          new Size(260, 190), // Side East
+            //          new Size(260, 260), // Top Left
+            //          new Size(260, 260)  // Top Right
 
             if (IsFirst)
             {
@@ -2367,8 +2439,14 @@ namespace S2System.Vision
                 {
                     scaledImg[i] = new Mat();
                     mFAL.mSourceImg[i] = new Mat(Global.mMergeImgHeight, Global.mMergeImgWidth, MatType.CV_8UC1);
+                    mFAL.mSourceImg2[i] = new Mat(420, 550, MatType.CV_8UC1);
+                    mFAL.mOMMSImg[i] = new Mat(190, 550, MatType.CV_8UC1);
+                    mFAL.mOMMTImg[i] = new Mat(270, 260, MatType.CV_8UC1);
                     mFAL.q_Value[i] = new byte[(Global.mMergeImgWidth / lModelScale) * (Global.mMergeImgHeight / lModelScale)];
+                    mFAL.qOMMS_Value[i] = new byte[550 * 95];
+                    mFAL.qOMMT_Value[i] = new byte[260 * 135];  //  260 x (270/2)
                 }
+                mFAL.m_bPseudoResize = bPseudoOMM;
             }
 
             for (int i = 0; i < 12; i++)
@@ -2383,6 +2461,8 @@ namespace S2System.Vision
             //ResizeGrab(index);
 
             long Nfound = 0;
+            Rect rcSideN = new Rect(115, 0, 550, 190);
+            Rect rcTopN = new Rect(520, 190, 260, 270);
 
 
             if (index == 0)
@@ -2391,11 +2471,23 @@ namespace S2System.Vision
                 if (!IsFile)
                 {
                     CropImage(0, 0);
+                    mFAL.ResizeSourceImg2(0, 0);
                 }
                 else
                 {
                     mFAL.mSourceImg[0] = new Mat(Global.mMergeImgHeight, Global.mMergeImgWidth, MatType.CV_8UC1);
                     mFAL.mSourceImg[0].SetArray(mFAL.mCommonImgFile[index]);
+                    mFAL.mOMMSImg[0] = mFAL.mSourceImg[0].SubMat(rcSideN);
+                    //mFAL.mOMMSImg[0].SaveImage("D:\\OMMS.bmp");
+                    mFAL.mOMMTImg[0] = mFAL.mSourceImg[0].SubMat(rcTopN);
+                    //mFAL.mOMMTImg[0].SaveImage("D:\\OMMT.bmp");
+
+                    if (index < mFAL.mCommonImgFile2.Count )
+                    {
+                        mFAL.mSourceImg2[0].SetArray(mFAL.mCommonImgFile2[index]);
+                        mFAL.ResizeSourceImg2(iBuf, iBuf);
+                        mFAL.mIsFile = false;
+                    }
                 }
 
 
@@ -2404,17 +2496,36 @@ namespace S2System.Vision
                 {
                     mFAL.mSourceImg[0].CopyTo(mFAL.mSourceImg[nbuf]);
                     mFAL.ResizeSourceImg(nbuf, nbuf); //  시간 많이 걸림. 단축할 필요 있음
+                    if (index < mFAL.mCommonImgFile2.Count)
+                    {
+                        mFAL.mSourceImg2[0].CopyTo(mFAL.mSourceImg2[nbuf]);
+                        mFAL.ResizeSourceImg2(nbuf, nbuf); //  시간 많이 걸림. 단축할 필요 있음
+
+                    }
                 }
-                //mFAL.mSourceImg[0].SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\Crop2.bmp");
+                //mFAL.mSourceImg[0].SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\MergeMain.bmp");
+                //mFAL.mSourceImg2[0].SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\MergeSub.bmp");
             }
             else
             {
                 if (!IsFile)
+                {
                     CropImage(index, iBuf);
+                    mFAL.ResizeSourceImg2(iBuf, iBuf);
+                }
                 else
                 {
                     mFAL.mSourceImg[iBuf] = new Mat(Global.mMergeImgHeight, Global.mMergeImgWidth, MatType.CV_8UC1);
                     mFAL.mSourceImg[iBuf].SetArray(mFAL.mCommonImgFile[index]);
+                    mFAL.mOMMSImg[iBuf] = mFAL.mSourceImg[iBuf].SubMat(rcSideN);
+                    mFAL.mOMMTImg[iBuf] = mFAL.mSourceImg[iBuf].SubMat(rcTopN);
+
+                    if (index<mFAL.mCommonImgFile2.Count )
+                    {
+                        mFAL.mSourceImg2[iBuf].SetArray(mFAL.mCommonImgFile2[index]);
+                        mFAL.ResizeSourceImg2(iBuf, iBuf);
+                        mFAL.mIsFile = false;
+                    }
                 }
                 mFAL.ResizeSourceImg(iBuf, iBuf);
             }
@@ -2487,11 +2598,15 @@ namespace S2System.Vision
                 if (pts[j * 2 + 1].X > 0)
                 {
                     ptsSide[j] = new FAutoLearn.FZMath.Point2D((pts[j * 2].X + pts[j * 2 + 1].X) / 2, (pts[j * 2].Y + pts[j * 2 + 1].Y) / 2);
+                    //ptsSide[j].X = (pts[j * 2].X + pts[j * 2 + 1].X) / 2;
+                    //ptsSide[j].Y = (pts[j * 2].Y + pts[j * 2 + 1].Y) / 2;
                 }
                 else
                 {
                     //  0->0, 2->1, 4->2, 6->3
                     ptsSide[j] = new FAutoLearn.FZMath.Point2D(pts[j * 2].X, pts[j * 2].Y);
+                    //ptsSide[j].X = pts[j * 2].X;
+                    //ptsSide[j].Y = pts[j * 2].Y;
                 }
             }
 
@@ -2501,11 +2616,15 @@ namespace S2System.Vision
                 {
 
                     ptsTop[j - 4] = new FAutoLearn.FZMath.Point2D((pts[j * 2].X + pts[j * 2 + 1].X) / 2, (pts[j * 2].Y + pts[j * 2 + 1].Y) / 2);
+                    //ptsTop[j - 4].X = (pts[j * 2].X + pts[j * 2 + 1].X) / 2;
+                    //ptsTop[j - 4].Y = (pts[j * 2].Y + pts[j * 2 + 1].Y) / 2;
                 }
                 else
                 {
                     //  8->0, 10->1
                     ptsTop[j - 4] = new FAutoLearn.FZMath.Point2D(pts[j * 2].X, pts[j * 2].Y);
+                    //ptsTop[j - 4].X = pts[j * 2].X;
+                    //ptsTop[j - 4].Y = pts[j * 2].Y;
                 }
             }
             FAutoLearn.FZMath.Point2D lTranslation = new FAutoLearn.FZMath.Point2D();
@@ -2532,18 +2651,50 @@ namespace S2System.Vision
             double umsale = 5.5 / Global.LensMag;
             double[] lPrismTXTYTZ = new double[3];
 
+            double[] allPts = new double[10];
+            allPts[0] = ptsSide[0].X;
+            allPts[1] = ptsSide[0].Y;
+            allPts[2] = ptsSide[2].X;
+            allPts[3] = ptsSide[2].Y;
+            allPts[6] = ptsTop[0].X;
+            allPts[7] = ptsTop[0].Y;
+            allPts[8] = ptsTop[1].X;
+            allPts[9] = ptsTop[1].Y;
+
             if (Nfound >= 5 && need6D)
             {
-                // ApplyY1Y2Y3LUT() 와 Extract6DMotion() 는 항상 Pair
-                mFAL.ApplyY1Y2Y3LUT(ref ptsSide[0].Y, ref ptsSide[2].Y, ref ptsSide[3].Y);
-
                 mMarkPosRes[0][index] = ptsSide[0];
                 mMarkPosRes[1][index] = ptsSide[2];
                 mMarkPosRes[2][index] = ptsSide[3];
                 mMarkPosRes[3][index] = ptsTop[0];
                 mMarkPosRes[4][index] = ptsTop[1];
+                //double newTX = sMR_B[0].pos.Y - sMR_T[0].pos.Y + sMR_B[1].pos.Y - sMR_T[1].pos.Y + sMR_B[2].pos.Y - sMR_T[2].pos.Y;
+                double newTX = (sMR_T[2].pos.Y - (sMR_T[0].pos.Y + sMR_T[1].pos.Y) / 2);
+                double newTY = (sMR_T[0].pos.Y - sMR_T[1].pos.Y);   //  sMR_T[0] : N(right) Mark on East View, //  sMR_T[1] : S(Left) Mark on East View
+                //string filename = "D:\\Linearity\\Analysis\\NewYs.csv";
+                //string[] aLine = new string[1];
+                //aLine[0] =  ptsSide[0].Y.ToString("F4") + ","+ ptsSide[2].Y.ToString("F4") + "," + ptsSide[3].Y.ToString("F4") + "," +
+                //            sMR_T[0].pos.Y.ToString("F4") + "," + sMR_T[1].pos.Y.ToString("F4") + "," + sMR_T[2].pos.Y.ToString("F4");
+                //File.AppendAllLines(filename, aLine);
 
-                mFAL.mFZM.Extract6DMotion(index, ptsTop, ptsSide, ref lTranslation, ref mC_pTZ[index], ref mC_pZ[index], ref mC_pTX[index], ref mC_pTY[index]);
+                if (sMR_T[0].pos.X == 0 && sMR_T[0].pos.Y == 0)
+                {
+                    newTX = 0;
+                    newTY = 0;
+                }
+                mFAL.mFZM.Extract6DMotion(index, ptsTop, ptsSide, ref lTranslation, ref mC_pTZ[index], ref mC_pZ[index], ref mC_pTX[index], ref mC_pTY[index], newTX, newTY);
+
+                //if (index == 0)
+                //    mNewTX = newTX;
+
+                //newTX -= mNewTX;
+                mC_pNewTX[index] = newTX;
+
+                lPrismTXTYTZ = mFAL.mFZM.ConvertTXTYTZofCSHtoPrism(mC_pTX[index], mC_pTY[index], mC_pTZ[index], true);
+
+                mPrism_pTX[index] = lPrismTXTYTZ[0];
+                mPrism_pTY[index] = lPrismTXTYTZ[1];
+                mPrism_pTZ[index] = lPrismTXTYTZ[2];
 
                 mC_pX[index] = lTranslation.X;// - mFAL.mFZM.mZtoXst[1] * mC_pZ[index] + (mC_pY[index] + 4* mC_pZ[index])* mC_pX[index] /120000;   //  120000 -> 
                 mC_pY[index] = lTranslation.Y;// - mFAL.mFZM.mZtoYst[1] * mC_pZ[index] - mFAL.mFZM.mXtoYst[1] * mC_pX[index] + mC_pTX[index] * 1.875134602 ; //  영상에서 위쪽으로 이동이 + 방향 되도록 조정함.
@@ -2557,15 +2708,36 @@ namespace S2System.Vision
                 mC_pTX[index] = 0;
                 mC_pTY[index] = 0;
                 mC_pTZ[index] = 0;
-            }
 
-            if ((lTranslation.X == 0 && bSaveLostMarkFrame) )
+                mPrism_pTX[index] = 0;
+                mPrism_pTY[index] = 0;
+                mPrism_pTZ[index] = 0;
+            }
+            if ((lTranslation.X == 0 && bSaveLostMarkFrame))
             {
                 DateTime dtNow = DateTime.Now;
                 string filename = "C:\\CSHTest\\Result\\log\\Err" + index.ToString() + "_" + dtNow.ToString("ddHHmmss.fff") + ".bmp";
                 mFAL.mSourceImg[iBuf].SaveImage(filename);
             }
+            if (bPseudoOMM)
+            {
+                if (index == 0)
+                {
+                    mPseudoPtsOrg = mFAL.FineOMM(index, iBuf);
+                }
+                mPOMM_sX[index] = mPseudoPtsOrg[0].X;
+                mPOMM_sY[index] = mPseudoPtsOrg[0].Y;
+                mPOMM_tX[index] = mPseudoPtsOrg[3].X;
+                mPOMM_tY[index] = mPseudoPtsOrg[3].Y;
 
+                double[] lxyzTxTyTz = mFAL.RelativeToPheudoOMM(index, allPts, mPseudoPtsOrg, mC_pY[index], mC_pZ[index]);
+                mPOMM_X[index] = lxyzTxTyTz[0];
+                mPOMM_Y[index] = lxyzTxTyTz[1];
+                mPOMM_Z[index] = lxyzTxTyTz[2];
+                mPOMM_TX[index] = lxyzTxTyTz[3];
+                mPOMM_TY[index] = lxyzTxTyTz[4];
+                mPOMM_TZ[index] = lxyzTxTyTz[5];
+            }
             return true;
         }
 
@@ -2607,12 +2779,12 @@ namespace S2System.Vision
             //mFAL.ApplyYLUT(ref ptsSide[0].Y, ref ptsSide[2].Y, ref ptsSide[3].Y);
 
             if ( index < 0)
-                mFAL.mFZM.Extract6DMotion(-1, ptsTop, ptsSide, ref lTranslation, ref mC_pTZ[0], ref mC_pZ[0], ref mC_pTX[0], ref mC_pTY[0]);
+                mFAL.mFZM.Extract6DMotion(-1, ptsTop, ptsSide, ref lTranslation, ref mC_pTZ[0], ref mC_pZ[0], ref mC_pTX[0], ref mC_pTY[0], 0,0);
             else
             {
                 // ApplyY1Y2Y3LUT() 와 Extract6DMotion() 는 항상 Pair
                 //mFAL.ApplyY1Y2Y3LUT(ref ptsSide[0].Y, ref ptsSide[2].Y, ref ptsSide[3].Y);
-                mFAL.mFZM.Extract6DMotion(index, ptsTop, ptsSide, ref lTranslation, ref mC_pTZ[index], ref mC_pZ[index], ref mC_pTX[index], ref mC_pTY[index], false);
+                mFAL.mFZM.Extract6DMotion(index, ptsTop, ptsSide, ref lTranslation, ref mC_pTZ[index], ref mC_pZ[index], ref mC_pTX[index], ref mC_pTY[index], 0, 0,false);
                 mC_pX[index] = lTranslation.X;// - mFAL.mFZM.mZtoXst[1] * mC_pZ[index];
                 mC_pY[index] = lTranslation.Y;// - mFAL.mFZM.mZtoYst[1] * mC_pZ[index]; //  영상에서 위쪽으로 이동이 + 방향 되도록 조정함.
             }
@@ -2637,13 +2809,13 @@ namespace S2System.Vision
 
             if (index < 0)
             {
-                mFAL.mFZM.Extract6DMotion(-1, ptsTop, ptsSide, ref lTranslation, ref mC_pTZ[0], ref mC_pZ[0], ref mC_pTX[0], ref mC_pTY[0]);
+                mFAL.mFZM.Extract6DMotion(-1, ptsTop, ptsSide, ref lTranslation, ref mC_pTZ[0], ref mC_pZ[0], ref mC_pTX[0], ref mC_pTY[0], 0,0);
             }
             else
             {
                 // ApplyY1Y2Y3LUT() 와 Extract6DMotion() 는 항상 Pair
                 //mFAL.ApplyY1Y2Y3LUT(ref ptsSide[0].Y, ref ptsSide[2].Y, ref ptsSide[3].Y);
-                mFAL.mFZM.Extract6DMotion(index, ptsTop, ptsSide, ref lTranslation, ref mC_pTZ[index], ref mC_pZ[index], ref mC_pTX[index], ref mC_pTY[index]);
+                mFAL.mFZM.Extract6DMotion(index, ptsTop, ptsSide, ref lTranslation, ref mC_pTZ[index], ref mC_pZ[index], ref mC_pTX[index], ref mC_pTY[index], 0, 0);
                 mC_pX[index] = lTranslation.X;// - mFAL.mFZM.mZtoXst[1] * mC_pZ[index];
                 mC_pY[index] = lTranslation.Y;// - mFAL.mFZM.mZtoYst[1] * mC_pZ[index]; //  영상에서 위쪽으로 이동이 + 방향 되도록 조정함.
             }

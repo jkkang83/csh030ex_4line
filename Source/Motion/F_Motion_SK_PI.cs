@@ -906,7 +906,7 @@ namespace MotorizedStage_SK_PI
 
                     if (string.IsNullOrEmpty(port))
                     {
-                        port = "COM10";
+                        port = "COM11";
                     }
 
                     res = SK.Connect(_skAxes, port);

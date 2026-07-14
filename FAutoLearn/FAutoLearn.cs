@@ -19,6 +19,7 @@ using OpenCvSharp.Extensions;
 using System.Diagnostics;
 using System.Runtime.InteropServices.ComTypes;
 using static FAutoLearn.FZMath;
+using System.Diagnostics.Eventing.Reader;
 
 namespace FAutoLearn
 {
@@ -34,6 +35,9 @@ namespace FAutoLearn
 
         //public Mat mSourceImgFile = null;
         public Mat[] mSourceImg = new Mat[30];
+        public Mat[] mSourceImg2 = new Mat[30];
+        public Mat[] mOMMSImg = new Mat[30];
+        public Mat[] mOMMTImg = new Mat[30];
         public Mat mCustomImg = null;
         public Mat mCustomImg2 = null;
 
@@ -244,7 +248,11 @@ namespace FAutoLearn
 
         public int mBaseModelCnt = 0;
 
+        public byte[][] qOMMS_Value = new byte[30][];   //  축소이미지
+        public byte[][] qOMMT_Value = new byte[30][];   //  축소이미지
+
         public byte[][] q_Value = new byte[30][];   //  축소이미지
+        public byte[][] q_Value2 = new byte[30][];   //  축소이미지
 
         public sSearchModel[] mSearchModel = new sSearchModel[10];
         public sSearchModel[] mNewSearchModel = new sSearchModel[10];
@@ -317,7 +325,12 @@ namespace FAutoLearn
             //    mLearnedModel[i].slaveCnt = 0;
             //}
             for (int i = 0; i < 20; i++)
+            {
                 mSourceImg[i] = new Mat();
+                mSourceImg2[i] = new Mat(420, 550, MatType.CV_8UC1);
+                mOMMSImg[i] = new Mat();
+                mOMMTImg[i] = new Mat();
+            }
 
             //for (int i = 0; i < mCsmSide.Count; i++)
             //{
@@ -628,21 +641,42 @@ namespace FAutoLearn
             SaveMarkPosOnPanel();
         }
 
-        public System.Drawing.Point[] mMarkPosOnPanel = null;
-        public long[] mMarkConvOnPanel = null;
+        public System.Drawing.Point[] mMarkPosOnPanel = new System.Drawing.Point[5];
+        public long[] mMarkConvOnPanel = new long[5];
+
+        public void GetDefaultMarkPosOnPanel(Rect[] lSrcCropRect, out System.Drawing.Point[] markPos)
+        {
+            int x = 0;
+            int y = 0;
+
+            //  재구성영상기준
+            markPos = new System.Drawing.Point[5];
+            y = lSrcCropRect[0].Height/2;
+            x = (int)(lSrcCropRect[0].X + lSrcCropRect[0].Width / 2 + (mFidMarkSide[0].fidInfo.X + mFidMarkSide[1].fidInfo.X) * 500);
+            markPos[0] = new System.Drawing.Point(x, y);
+            x = (int)(lSrcCropRect[0].X + lSrcCropRect[0].Width / 2 - (mFidMarkSide[0].fidInfo.X + mFidMarkSide[1].fidInfo.X) * 500);
+            markPos[1] = new System.Drawing.Point(x, y);
+
+            x = 390;
+            y = (int)(190 + lSrcCropRect[0].Height / 2);
+            markPos[2] = new System.Drawing.Point(x, y);
+
+            y = lSrcCropRect[2].Height / 2;
+            x = (int)(520 + lSrcCropRect[2].X + lSrcCropRect[0].Width / 2);
+            markPos[3] = new System.Drawing.Point(x, y);
+
+            y = lSrcCropRect[2].Height / 2;
+            x = (int)(520 + lSrcCropRect[2].X - lSrcCropRect[0].Width / 2);
+            markPos[4] = new System.Drawing.Point(x, y);
+
+        }
 
         public void GetDefaultMarkPosOnPanel(out System.Drawing.Point[] markPos)
         {
             markPos = new System.Drawing.Point[mFidMarkSide.Count + mFidMarkTop.Count];
 
-            //int lWidth = mOverlayedImg.Width;
-            //int lHeight = mOverlayedImg.Height;
-
             double fWndOffset = (mOpticsFWOffset / (0.0055 / LensMag)); //  mOpticsFWOffset 에 -365 가 저장되어있어야 한다.
-            //double wy = lHeight / 2 + fWndOffset;
 
-            //double x = 0;
-            //double y = 0;
             double rx = 0;
             double ry = 0;
 
@@ -701,79 +735,6 @@ namespace FAutoLearn
 
             }
         }
-        public void GetMarkPosOnPanel(out System.Drawing.Point[] markPos)
-        {
-            markPos = new System.Drawing.Point[mFidMarkSide.Count + mFidMarkTop.Count];
-            if (mCandidateIndex < 1)
-                return;
-
-
-            //int lWidth = mOverlayedImg.Width;
-            //int lHeight = mOverlayedImg.Height;
-
-            double fWndOffset = (mOpticsFWOffset / (0.0055 / LensMag));
-            //double wy = lHeight / 2 + fWndOffset;
-
-            //double x = 0;
-            //double y = 0;
-            double rx = 0;
-            double ry = 0;
-
-            bool[] sideAzimuthUpper = new bool[8];  //  마크가 영상상반부에 위치하는지 하반부에 위치하는지 저장했다가 좌표계산 시 활용
-            bool[] sideAzimuthLeft = new bool[8];   //  마크가 영상좌반부에 위치하는지 우반부에 위치하는지 저장했다가 좌표계산 시 활용
-            int markCount = 0;
-
-            for (int i = 0; i < mFMSideCandidate[mCandidateIndex - 1].Count; i++)
-            {
-                bool yUpper = true;
-                if (mFMSideCandidate[mCandidateIndex - 1][i].fidInfo.TBXposY > pictureBox6.Height / 2)
-                    yUpper = false;
-
-                bool IsLeft = true;
-                if (mFMSideCandidate[mCandidateIndex - 1][i].fidInfo.TBYposX > pictureBox6.Width / 2)    //   Y 좌표 넣는 Box 가 우측에 있이면 우측
-                    IsLeft = false;
-
-                sideAzimuthUpper[mFMSideCandidate[mCandidateIndex - 1][i].Azimuth] = yUpper;
-                sideAzimuthLeft[mFMSideCandidate[mCandidateIndex - 1][i].Azimuth] = IsLeft;
-                TransferAbsToPicturePos(mFMSideCandidate[mCandidateIndex - 1][i].fidInfo.X, mFMSideCandidate[mCandidateIndex - 1][i].fidInfo.Y, ref rx, ref ry, yUpper, true, IsLeft);
-
-                markPos[markCount].X = (int)(rx + 0.4999);
-                markPos[markCount].Y = (int)(ry + 0.4999);
-                if (i < 2)
-                    markPos[markCount].Y -= 27;// 28;
-                else
-                    markPos[markCount].Y += 28;// 27;
-
-                markCount++;
-            }
-
-            for (int i = 0; i < mFMTopCandidate[mCandidateIndex - 1].Count; i++)
-            {
-                //  Top Azimuth = 0,1,2,3  :: corresponds to Side 0,1,4,5
-
-                //  mFidMarkTop[i].Azimuth
-                bool yUpper = true;
-                bool IsLeft = true;
-                if (mFMTopCandidate[mCandidateIndex - 1][i].Azimuth < 2)
-                {
-                    yUpper = sideAzimuthUpper[mFMTopCandidate[mCandidateIndex - 1][i].Azimuth];
-                    IsLeft = sideAzimuthLeft[mFMTopCandidate[mCandidateIndex - 1][i].Azimuth];
-                }
-                else
-                {
-                    yUpper = sideAzimuthUpper[mFMTopCandidate[mCandidateIndex - 1][i].Azimuth + 2];
-                    IsLeft = sideAzimuthLeft[mFMTopCandidate[mCandidateIndex - 1][i].Azimuth + 2];
-                }
-
-                TransferAbsToPicturePos(mFMTopCandidate[mCandidateIndex - 1][i].fidInfo.X, mFMTopCandidate[mCandidateIndex - 1][i].fidInfo.Y, ref rx, ref ry, yUpper, false, IsLeft);
-
-                markPos[markCount].X = (int)(rx + 0.4999);
-                markPos[markCount].Y = (int)(ry + 0.4999) + 34;
-                markCount++;
-
-            }
-        }
-
         public void SaveMarkPosOnPanel()
         {
             //int lWidth = mOverlayedImg.Width;
@@ -2284,15 +2245,540 @@ namespace FAutoLearn
 
         public int mCalcEffBand = 7;
 
+        //public void ResizeSourceImg(int srcBuf, int resizeBuf)
+        //{
+        //    //mSourceImg[srcBuf].GetArray(out p_Value[resizeBuf]);
+        //    Mat ImgDest = new Mat();
+        //    Cv2.Resize(mSourceImg[srcBuf], ImgDest, new OpenCvSharp.Size(mSourceImg[srcBuf].Width / mModelScale, mSourceImg[srcBuf].Height / mModelScale), 1.0 / mModelScale, 1.0 / mModelScale, InterpolationFlags.Area);  //  1/mModelScale 축소
+        //    ImgDest.GetArray(out q_Value[resizeBuf]);   //  ImgDest : 1/mModelScale Compressed Image
+        //    //mSourceImg[srcBuf].SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\Src.bmp");
+        //    //ImgDest.SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\qSrc.bmp");
+        //}
+
+        public bool m_bPseudoResize = false;
         public void ResizeSourceImg(int srcBuf, int resizeBuf)
         {
             //mSourceImg[srcBuf].GetArray(out p_Value[resizeBuf]);
             Mat ImgDest = new Mat();
             Cv2.Resize(mSourceImg[srcBuf], ImgDest, new OpenCvSharp.Size(mSourceImg[srcBuf].Width / mModelScale, mSourceImg[srcBuf].Height / mModelScale), 1.0 / mModelScale, 1.0 / mModelScale, InterpolationFlags.Area);  //  1/mModelScale 축소
             ImgDest.GetArray(out q_Value[resizeBuf]);   //  ImgDest : 1/mModelScale Compressed Image
+
+            if (m_bPseudoResize)
+            {
+                Cv2.Resize(mOMMSImg[srcBuf], ImgDest, new OpenCvSharp.Size(mOMMSImg[srcBuf].Width, mOMMSImg[srcBuf].Height / 2.0), 1.0, 1.0 / 2.0, InterpolationFlags.Area);  //  1/mModelScale 축소
+                ImgDest.GetArray(out qOMMS_Value[resizeBuf]);   //  OMM 용 Side 세로 1/2 축소
+
+                Cv2.Resize(mOMMTImg[srcBuf], ImgDest, new OpenCvSharp.Size(mOMMTImg[srcBuf].Width, mOMMTImg[srcBuf].Height / 2.0), 1.0, 1.0 / 2.0, InterpolationFlags.Area);  //  1/mModelScale 축소
+                ImgDest.GetArray(out qOMMT_Value[resizeBuf]);   //  OMM 용 Side 세로 1/3 축소
+            }
+
+
             //mSourceImg[srcBuf].SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\Src.bmp");
             //ImgDest.SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\qSrc.bmp");
         }
+
+        public bool mIsFile = false;
+        public void ResizeSourceImg2(int srcBuf, int resizeBuf)
+        {
+            //mSourceImg[srcBuf].GetArray(out p_Value[resizeBuf]);
+            Mat ImgDest = new Mat();
+            Cv2.Resize(mSourceImg2[srcBuf], ImgDest, new OpenCvSharp.Size(mSourceImg2[srcBuf].Width / mModelScale, mSourceImg2[srcBuf].Height / mModelScale), 1.0 / mModelScale, 1.0 / mModelScale, InterpolationFlags.Area);  //  1/mModelScale 축소
+            ImgDest.GetArray(out q_Value2[resizeBuf]);   //  ImgDest : 1/mModelScale Compressed Image
+        }
+
+        public OpenCvSharp.Point2d[] FineOMM(int iIndex, int iBuf = 0)
+        {
+            OpenCvSharp.Point2d[] ommres = new Point2d[6];
+
+            //  qOMMS_Value[] 에서 양단 좌표 찾고
+            //  qOMMㅆ_Value[] 에서 양단 좌표 찾아서 저장 후 리턴
+
+            int mOMMSImg_Height = mOMMSImg[iBuf].Height / 2;
+            int mOMMSImg_Width = mOMMSImg[iBuf].Width;
+
+            int mOMMTImg_Height = mOMMTImg[iBuf].Height / 2;
+            int mOMMTImg_Width = mOMMTImg[iBuf].Width;
+
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //  OMMS
+            int i0 = 451;   //  115더해야 절대좌표 565 ~ 595
+            int ie = 481;
+            int j0 = 15;// 27;    //  54 ~ 142
+            int je = 60;// 71;
+            int jLen = (je - j0) / 2;   //  71-27 = 44
+
+            //  위 영역에서  우에서 좌로 어두워지는 첫번째경계 추출
+            //  수직선 검출
+            int[][] xdiff = new int[jLen][];
+            Point2d[] ptS = new Point2d[jLen];
+
+            xdiff[0] = new int[ie - i0 + 1];
+            xdiff[1] = new int[ie - i0 + 1];
+            for (int j = 0; j < jLen; j++)
+            {
+                xdiff[j] = new int[ie - i0 + 1];
+                for (int i = i0; i < ie; i++)
+                {
+                    xdiff[j][i - i0] = qOMMS_Value[iBuf][i + (j0 + 2 * j) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j0 + 2 * j) * mOMMSImg_Width]
+                                     - qOMMS_Value[iBuf][i - 1 + (j0 + 2 * j) * mOMMSImg_Width] - qOMMS_Value[iBuf][i - 2 + (j0 + 2 * j) * mOMMSImg_Width];
+                    xdiff[j][i - i0] += qOMMS_Value[iBuf][i + (j0 + 2 * j + 1) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j0 + 2 * j + 1) * mOMMSImg_Width]
+                                      - qOMMS_Value[iBuf][i - 1 + (j0 + 2 * j + 1) * mOMMSImg_Width] - qOMMS_Value[iBuf][i - 2 + (j0 + 2 * j + 1) * mOMMSImg_Width];
+                }
+                ptS[j] = new Point2d(CalcPeakDiff(xdiff[j]) + i0 + 115, 2 * ((j0 + 2 * j) + 0.5));    //  Y 좌표는 2배 해준다
+
+            }
+            //  xdiff[0], xdiff[0] 에서 각각 Peak 찾는다. 일단 Y 축이 1/2 압축된 상태의 좌표로 확보한다.
+            //  X만 우선 절대 좌표계로 변환
+            FZMath.Line2D ommSedge = mFZM.FitLinePCA(ptS);
+
+
+            // 얻어진 pt0.X 좌표 + 2 ~ 27 의 범위에서 Y=0 -> +Scan
+            // 얻어진 pt1.X 좌표 + 2 ~ 27 의 범위에서 Y=95 -> -Scan
+            //  각각 X step 을 2 로 하여 모든 Peak 를 구한 다음 LMS 직선을 구한다.
+
+            //////  위쪽 수평선검출
+            Point2d[] ptSH1 = new Point2d[25];
+            int[][] ydiff = new int[25][];
+            int x = (int)(ptS[0].X + 4 - 115);
+            ////for (int i = x; i < x+25; i++)
+            ////{
+            ////    //  i 는 가로방향, j 는 세로방향이 된다.
+            ////    ydiff[i-x] = new int[25];
+            ////    for (int j = 2; j < 24; j++)
+            ////    {
+            ////        ydiff[i-x][j-2] = qOMMS_Value[iBuf][i + j * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + j * mOMMSImg_Width] - (qOMMS_Value[iBuf][i + (j - 1) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j - 1) * mOMMSImg_Width])
+            ////                      + qOMMS_Value[iBuf][i + (j + 1) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j + 1) * mOMMSImg_Width] - (qOMMS_Value[iBuf][i + (j - 2) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j - 2) * mOMMSImg_Width]);
+            ////    }
+            ////    ptSH1[i - x] = new Point2d(115 + i, CalcPeakDiff(ydiff[i - x]) + 2);
+            ////}
+            ////FZMath.Line2D ommSedgeTop = mFZM.FitLinePCA(ptSH1);
+
+            //  아래쪽 수평선검출
+            int HscanLen = 13;
+            Point2d[] ptSH2 = new Point2d[HscanLen];
+            int[][] ydiffB = new int[HscanLen][];
+            x = (int)(ptS[jLen - 1].X + 3 - 115);
+            int jstart = 58;
+            for (int i = x; i < x + HscanLen; i++)
+            {
+                //  i 는 가로방향, j 는 세로방향이 된다.
+                ydiffB[i - x] = new int[25];
+                for (int j = jstart; j < jstart + 25; j++)
+                {
+                    ydiffB[i - x][j - jstart] = -(qOMMS_Value[iBuf][i + j * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + j * mOMMSImg_Width] - (qOMMS_Value[iBuf][i + (j - 1) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j - 1) * mOMMSImg_Width])
+                                   + qOMMS_Value[iBuf][i + (j + 1) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j + 1) * mOMMSImg_Width] - (qOMMS_Value[iBuf][i + (j - 2) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j - 2) * mOMMSImg_Width]));
+                }
+                ptSH2[i - x] = new Point2d(115 + i + 0.5, 2 * (CalcPeakDiff(ydiffB[i - x]) + jstart)); //  Y 좌표 2배 해준다.
+            }
+            FZMath.Line2D ommSedgeBtm = mFZM.FitLinePCA(ptSH2);
+
+            //  a0, b0 - a1,b1 간 교점,   a0, b0 - a2,b2 간 교점 구한다.
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //  OMMT
+            i0 = 184;   //  520 더해야 절대좌표
+            ie = 214;
+            j0 = 11;// 19;
+            je = 92;// 95; //95-19 = 76
+            jLen = (je - j0) / 2;
+            //  위 영역에서  우에서 좌로 어두워지는 경계 추출
+            //  수직선 검출
+            xdiff = new int[jLen][];
+            Point2d[] ptT = new Point2d[jLen];
+            for (int j = 0; j < jLen; j++)
+            {
+                xdiff[j] = new int[ie - i0 + 1];
+                for (int i = i0; i < ie; i++)
+                {
+                    xdiff[j][i - i0] = qOMMT_Value[iBuf][i + (j0 + 2 * j) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j0 + 2 * j) * mOMMTImg_Width]
+                                     - qOMMT_Value[iBuf][i - 1 + (j0 + 2 * j) * mOMMTImg_Width] - qOMMT_Value[iBuf][i - 2 + (j0 + 2 * j) * mOMMTImg_Width];
+                    xdiff[j][i - i0] += qOMMT_Value[iBuf][i + (j0 + 2 * j + 1) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j0 + 2 * j + 1) * mOMMTImg_Width]
+                                      - qOMMT_Value[iBuf][i - 1 + (j0 + 2 * j + 1) * mOMMTImg_Width] - qOMMT_Value[iBuf][i - 2 + (j0 + 2 * j + 1) * mOMMTImg_Width];
+                }
+                ptT[j] = new Point2d(CalcPeakDiff(xdiff[j]) + i0 + 520, 2 * ((j0 + 2 * j) + 0.5 + 95)); //  Y 좌표 2배
+            }
+            //  xdiff[0], xdiff[0] 에서 각각 Peak 찾는다  일단 Y 축이 1/2 압축된 상태의 좌표로 확보한다.
+            FZMath.Line2D ommTedge = mFZM.FitLinePCA(ptT);
+
+
+            //  위쪽 수평선검출
+            // 얻어진 pt0.X 좌표 + 2 ~ 27 의 범위에서 Y=0 -> +Scan
+            // 얻어진 pt1.X 좌표 + 2 ~ 27 의 범위에서 Y=95 -> -Scan
+            //  각각 X step 을 2 로 하여 모든 Peak 를 구한 다음 LMS 직선을 구한다.
+
+            //////  위쪽 수평선검출
+            ////Point2d[] ptTH1 = new Point2d[16];
+            ////x = (int)(ptT[0].X + 4 - 520);
+            ////for (int i = x; i < x + 16; i++)
+            ////{
+            ////    //  i 는 가로방향, j 는 세로방향이 된다.
+            ////    ydiff[i - x] = new int[25];
+            ////    for (int j = 2; j < 25; j++)
+            ////    {
+            ////        ydiff[i - x][j-2] = qOMMT_Value[iBuf][i + j * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + j * mOMMTImg_Width] - (qOMMT_Value[iBuf][i + (j - 1) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j - 1) * mOMMTImg_Width])
+            ////                      + qOMMT_Value[iBuf][i + (j + 1) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j + 1) * mOMMTImg_Width] - (qOMMT_Value[iBuf][i + (j - 2) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j - 2) * mOMMTImg_Width]);
+            ////    }
+            ////    ptTH1[i - x] = new Point2d(i + 0.5 + 520, CalcPeakDiff(ydiff[i - x]) + 97);
+            ////}
+            ////FZMath.Line2D ommTedgeTop = mFZM.FitLinePCA(ptTH1);
+
+            //  아래쪽 수평선검출
+            HscanLen = 11;
+            Point2d[] ptTH2 = new Point2d[HscanLen];
+            ydiffB = new int[HscanLen][];
+            x = (int)(ptT[jLen - 1].X + 3 - 520);
+            jstart = 85;
+            for (int i = x; i < x + HscanLen; i++)
+            {
+                //  i 는 가로방향, j 는 세로방향이 된다.
+                ydiffB[i - x] = new int[35];
+                for (int j = jstart; j < jstart + 35; j++)
+                {
+                    ydiffB[i - x][j - jstart] = -(qOMMT_Value[iBuf][i + j * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + j * mOMMTImg_Width] - (qOMMT_Value[iBuf][i + (j - 1) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j - 1) * mOMMTImg_Width])
+                                   + qOMMT_Value[iBuf][i + (j + 1) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j + 1) * mOMMTImg_Width] - (qOMMT_Value[iBuf][i + (j - 2) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j - 2) * mOMMTImg_Width]));
+                }
+                ptTH2[i - x] = new Point2d(i + 0.5 + 520, 2 * (CalcPeakDiff(ydiffB[i - x]) + 95 + jstart));   //  Y 좌표 2배
+            }
+            FZMath.Line2D ommTedgeBtm = mFZM.FitLinePCA(ptTH2);
+
+            //  a0, b0 - a1,b1 간 교점,   a0, b0 - a2,b2 간 교점 구한다.
+            Point2d ptSide1 = new Point2d();
+            //mFZM.TryIntersect(ommSedge, ommSedgeTop, out ptSide1);
+            Point2d ptSide2 = new Point2d();
+            mFZM.TryIntersect(ommSedge, ommSedgeBtm, out ptSide2);
+
+            Point2d ptTop1 = new Point2d();
+            //mFZM.TryIntersect(ommTedge, ommTedgeTop, out ptTop1);
+            Point2d ptTop2 = new Point2d();
+            mFZM.TryIntersect(ommTedge, ommTedgeBtm, out ptTop2);
+
+            //  Y 방향으로 2배 다시 확대하여 Y 스케일 원상복귀
+            //ptSide1.Y = ptSide1.Y * 2;
+            //ptSide2.Y = ptSide2.Y * 2;
+            //ptTop1.Y = ptTop1.Y * 2;
+            //ptTop2.Y = ptTop2.Y * 2;
+            if (ptSide1.Y == 0)
+            {
+                ptSide1.X = ptSide2.X;
+                ptSide1.Y = ptSide2.Y;
+
+                ptTop1.X = ptTop2.X;
+                ptTop1.Y = ptTop2.Y;
+            }
+
+            //double sL = Math.Sqrt((ptSide2.X - ptSide1.X) * (ptSide2.X - ptSide1.X) + (ptSide2.Y - ptSide1.Y) * (ptSide2.Y - ptSide1.Y));
+            //double tL = Math.Sqrt((ptTop2.X - ptTop1.X) * (ptTop2.X - ptTop1.X) + (ptTop2.Y - ptTop1.Y) * (ptTop2.Y - ptTop1.Y));
+
+            ommres[0] = new Point2d((ptSide1.X + ptSide2.X) / 2, (ptSide1.Y + ptSide2.Y) / 2);
+            if (ommTedge.Direction.Y > 0)
+                ommres[1] = new Point2d(ommSedge.Direction.X, ommSedge.Direction.Y);//new Point2d((ptSide2.X - ptSide1.X) / sL, (ptSide2.Y - ptSide1.Y) / sL);  //  Unit Vector Y in Side View
+            else
+                ommres[1] = new Point2d(-ommSedge.Direction.X, -ommSedge.Direction.Y);//new Point2d((ptSide2.X - ptSide1.X) / sL, (ptSide2.Y - ptSide1.Y) / sL);  //  Unit Vector Y in Side View
+
+            ommres[2] = new Point2d(ommres[1].Y / vSin40, -ommres[1].X * vSin40);  //  Unit Vector X in Side View
+            double sXL = Math.Sqrt(ommres[2].X * ommres[2].X + ommres[2].Y * ommres[2].Y);
+            ommres[2].X = ommres[2].X / sXL;
+            ommres[2].Y = ommres[2].Y / sXL;
+
+            ommres[3] = new Point2d((ptTop1.X + ptTop2.X) / 2, (ptTop1.Y + ptTop2.Y) / 2);
+            if (ommTedge.Direction.Y > 0)
+                ommres[4] = new Point2d(ommTedge.Direction.X, ommTedge.Direction.Y);//new Point2d((ptTop2.X - ptTop1.X) / tL    , (ptTop2.Y - ptTop1.Y) / tL);    // Unit Vector Y in Top View
+            else
+                ommres[4] = new Point2d(-ommTedge.Direction.X, -ommTedge.Direction.Y);//new Point2d((ptTop2.X - ptTop1.X) / tL    , (ptTop2.Y - ptTop1.Y) / tL);    // Unit Vector Y in Top View
+
+            ommres[5] = new Point2d(ommres[4].Y, -ommres[4].X);                                     // Unit Vector X in Top View
+
+            return ommres;
+        }
+
+        public double[] mInitialPheudoOMM_XYZTXTYTZ = new double[6];
+        private double mInitialZrelativetoPseudoOMM = 0;
+        public double[] RelativeToPheudoOMM(int iIndex, double[] allMarks, Point2d[] ommData, double cofY, double cofZ)
+        {
+            //  allMarks[0] ~ [9] : X1, Y1, X2, Y2, X3, Y3, X4, Y4, X5, Y5
+            //  N mark on Side : X1,Y1
+            //  S mark on Side : X2,Y2
+            //  E mark on Side : X3,Y3
+            //  N mark on Side : X4,Y4
+            //  S mark on Side : X5,Y5
+            double[] resXYZTXTYTZ = new double[6];
+            if (iIndex == 0)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    mInitialPheudoOMM_XYZTXTYTZ[i] = 0;
+                }
+            }
+
+            //  초기영상에서의 Top View COE 에 대한 상대좌표 Top View ICS 기준
+            double COFXrelativeToCOE = ((allMarks[8] + allMarks[6]) / 2 - ommData[3].X);   //  X pixel
+            double COFYrelativeToCOE = ((allMarks[9] + allMarks[7]) / 2 - ommData[3].Y);   //  Y pixel
+
+            //  TZ relative to PseudoOMM, radian
+            resXYZTXTYTZ[5] = RadBetween2DVector(allMarks[8] - allMarks[6], allMarks[9] - allMarks[7], ommData[4].X, ommData[4].Y) - Math.PI / 2;   //  TZ
+
+            //  Top View 의 PseudoOMM 좌표계 기준으로 (X, Y) 좌표 표시 - Pixel 기준
+            //                      x                 d        -        y                 c                a              d        -       b             c
+            resXYZTXTYTZ[0] = -(COFXrelativeToCOE * ommData[4].Y - COFYrelativeToCOE * ommData[4].X) / (ommData[5].X * ommData[4].Y - ommData[5].Y * ommData[4].X);
+            //                      x                 b        -        y                 a                a              d        -       b             c
+            resXYZTXTYTZ[1] = -(-COFXrelativeToCOE * ommData[5].Y + COFYrelativeToCOE * ommData[5].X) / (ommData[5].X * ommData[4].Y - ommData[5].Y * ommData[4].X);
+
+            //  PseudoOMM 좌표계 기준 마크점의 높이 계산
+            //  Z 값이 있으므로 Z = 0 일때의 위치로 이동시킨 좌표
+            //      Z 값이 +면 Z = 0 으로 이동시키기 위해 Y 값을 빼줘야 한다.
+            //  Y 값이 있으므로 Y = 0 일때의 위치로 이동시킨 좌표 
+            //      Y 값이 +면 Y = 0 으로 이동시키기 위해 Y 값을 더해줘야 한다.
+            double zeroHeightYonSideView = (allMarks[1] + allMarks[3]) / 2 - cofZ * vCos40 + cofY * vSin40; //  방향성 확인 필요, img Y 좌표로 환산함
+            double zeroHeightYonTopView = (allMarks[7] + allMarks[9]) / 2 + cofY;
+            double deltaYAtZeroHeight = zeroHeightYonTopView - zeroHeightYonSideView;
+            double deltaYofCOE = ommData[3].Y - ommData[0].Y;   //  deltaYofCOE 가 크려면 ommData[0].Y 가 작아야 한다. 그것은 PseudoOMM 좌표계의 Z 높이가 (-) 방향으로 더 이동했다는 의미
+                                                                //  그런 경우에는 resXYZTXTYTZ[2] 가 +Z 방향으로 더 큰 값을 가져야 함.
+            double diffY = deltaYofCOE - deltaYAtZeroHeight;    //  따라서 diffY 가 더 큰값을 가져야 함.
+            if (iIndex == 0)
+            {
+                mInitialZrelativetoPseudoOMM = cofZ;
+                resXYZTXTYTZ[2] = diffY / vCos40;                   //  단위는 Pixel
+            }
+            else
+                resXYZTXTYTZ[2] = mInitialPheudoOMM_XYZTXTYTZ[2] - cofZ + mInitialZrelativetoPseudoOMM;
+
+            if (iIndex == 0)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    mInitialPheudoOMM_XYZTXTYTZ[i] = resXYZTXTYTZ[i];
+                    resXYZTXTYTZ[i] = 0;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    resXYZTXTYTZ[i] -= mInitialPheudoOMM_XYZTXTYTZ[i];
+                }
+            }
+
+            return resXYZTXTYTZ;
+        }
+
+        public double RadBetween2DVector(double a1, double b1, double a2, double b2)
+        {
+            //  return Radian Angle
+            return Math.Acos((a1 * a2 + b1 + b2) / (Math.Sqrt(a1 * a1 + b1 * b1) * Math.Sqrt(a2 * a2 + b2 * b2)));
+        }
+
+        public double CalcPeakDiff(int[] diffs)
+        {
+            double res = 0;
+
+            double res1st = 0;
+
+            int xi0 = 0;
+            int yi0 = 0;
+
+            int fxi0 = xi0;
+            double oldf = fxi0;
+            double sumXY = 0;
+            double sumY = 0;
+            int kLength = diffs.Length;
+
+            double[] roughPeakBk = new double[kLength + 6];
+            int[] peakIndex = new int[kLength + 6];
+            double[] effPeak = new double[kLength];
+            int[] effIndex = new int[kLength];
+            double[] intgPeak = new double[kLength + 6];
+
+            int i = 0;
+            if (xi0 < 0) xi0 = 0;
+            if (yi0 < 0) yi0 = 0;
+            double ry = 0 - yi0;
+            int pIndex = 0;
+            double peak = -99999;
+
+            int maxLength = 0;
+            bool firstPeakFound = false;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //  반복성향상 전후 비교검토용
+            //if ( edgeDir > 1) //   향상 전 기준치
+            //    yH = yH / 2;
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            try
+            {
+                for (i = 0; i < kLength; i++)
+                {
+
+                    roughPeakBk[i] = diffs[i];
+
+                    if (!firstPeakFound)
+                    {
+                        if (peak < roughPeakBk[i])  //   첫번쨰 Peak 는 항상 양수이어야 한다.
+                        {
+                            pIndex = i;
+                            peak = roughPeakBk[i];
+                        }
+                        if (pIndex > 0 && peak > 1000 && roughPeakBk[i] < -1000)
+                        {
+                            firstPeakFound = true;
+                        }
+                    }
+                }
+
+                fxi0 = pIndex;
+            }
+            catch (Exception e)
+            {
+                //MessageBox.Show("ConvergePeakX() 1>> \r\n" + e.ToString());
+                //return fxi0;
+            }
+
+            //  xW 의 자동조정은, xW 를 조절할 수 있는 분해능이 매우 낮아서 오히려 역효과 발생.
+            //  상황에 따라 고정값 적용이 적합. 즉 Focusing 수준에 따라서 2가지 또는 3가지 값중 선택하는 방식은 가능할 것 같음.
+            //  실험적으로 xW = 7 일때 반복성이 가장 좋은 것으로 나타남.
+
+            int icur = 0;
+            sumXY = 0;
+            sumY = 0;
+            int newi = 0;
+            double ratioXroughPeak = 0;
+            maxLength = roughPeakBk.Length - 1;
+            for (newi = -2; newi < 3; newi++)
+            {
+                icur = newi + fxi0;// - (int)xi0;
+                if (icur < 0) continue;
+                if (icur >= maxLength) break;
+                //ratioXroughPeak = ratio[newi - i0] * roughPeakBk[icur];
+                ratioXroughPeak = roughPeakBk[icur];
+                if (ratioXroughPeak < 0)
+                    ratioXroughPeak = ratioXroughPeak / 5;
+                sumXY += ratioXroughPeak * (newi + fxi0);
+                sumY += ratioXroughPeak;
+            }
+            res1st = sumXY / (double)sumY;
+
+            if (res1st - xi0 < 0) //  극히 비정상인 경우 두번째 Peak 를 활용한다.
+                res1st = peakIndex[kLength - 2]; //  Peak 좌표
+
+            double oldres = res1st;
+            double pY = 0;
+            double err = 999;
+            double err_1 = 999;
+
+            uint itr = 0;
+            double[] errMem = new double[10];
+            int errMemCnt = 0;
+            double roughpeak_icur = 0;
+            double roughPeak_icur_1 = 0;
+            int edgeFound = 0;
+            int slopeDir = 1;
+            double[] maxSlope = new double[8];
+
+            try
+            {
+                if (edgeFound % 2 == 0)
+                    slopeDir = 1;
+                else
+                    slopeDir = -1;
+
+                err = 999;
+                err_1 = 999;
+
+                for (itr = 0; itr < 25; itr++)
+                {
+                    int irx = (int)res1st;
+                    double rx = res1st - irx;
+                    sumXY = 0;
+                    sumY = 0;
+                    for (newi = -3; newi < 4; newi++)
+                    {
+                        icur = newi + irx;// - (int)xi0;
+                        if (icur < 0) continue;
+                        if (icur >= kLength) continue;
+
+                        roughpeak_icur = slopeDir * roughPeakBk[icur];
+                        roughPeak_icur_1 = slopeDir * roughPeakBk[icur + 1];
+
+                        if (roughpeak_icur < 0)
+                            roughpeak_icur = roughpeak_icur / 5;
+                        if (roughPeak_icur_1 < 0)
+                            roughPeak_icur_1 = roughPeak_icur_1 / 5;
+
+                        if (rx > 0)
+                        {
+                            if (icur + 1 - (int)xi0 < kLength)
+                            {
+                                pY = (1 - rx) * roughpeak_icur + rx * roughPeak_icur_1;
+                            }
+                            else
+                            {
+                                pY = roughpeak_icur;   //  다음 값이 없으면 같은 값으로 가정.
+                            }
+                        }
+                        else
+                        {
+                            pY = roughpeak_icur;
+                        }
+
+                        sumXY += (newi + res1st) * pY;
+
+                        sumY += pY;
+                    }
+                    res1st = sumXY / (double)sumY;
+                    if (sumY == 0)
+                    {
+                        res1st = fxi0;
+                        break;
+                    }
+                    err = oldres - res1st;
+                    err = err < 0 ? -err : err;
+                    if (err < 0.00015)   //  0.0001 일때 반복성 더 나쁘다.
+                    {
+                        //maxSlope[edgeFound] = Math.Abs((1 - rx) * roughPeakBk[irx] + rx * roughPeakBk[irx + 1]);
+                        break;
+                    }
+
+                    if (err > 5 * err_1)    //  오차가 직전 오차보다 오히려 5배이상 커지면 직전을 최종 값으로 선택한다.
+                    {
+                        res1st = errMem[(errMemCnt - 1) % 6];
+                        break;
+                    }
+                    res1st = res1st + (res1st - oldres) / 4;// 3.5 ; //  최대한 빨리 수렴하도록 접근속도를 변경함. 평균적으로 가장 빠르게 수렴시키는 최적값이 정확히 얼마인지는 알 수 없음.
+                    err_1 = err;
+                    oldres = res1st;
+                    errMem[errMemCnt] = res1st;
+                    errMemCnt = (errMemCnt + 1) % 6;
+                }
+                if (itr == 25)
+                {
+                    res1st = 0;
+                    int emiCnt = 0;
+                    for (int emi = 0; emi < 6; emi++)
+                    {
+                        if (errMem[emi] == 0)
+                            break;
+                        res1st += errMem[emi];
+                        emiCnt++;
+                    }
+                    res1st = res1st / emiCnt;
+                }
+                res = res1st;// + lshift;
+
+                //  아래는 다음 경계추출을 위한 준비
+            }
+            catch (Exception e)
+            {
+                //MessageBox.Show("ConvergePeakX() 2>>\r\n" + e.ToString());
+                //return simpleRes;
+            }
+
+            return res;
+        }
+
+
         public void DetectInSelectedFile(int findex = 0)
         {
             //  Find Current Model in the file focsed in the list box
@@ -5592,10 +6078,12 @@ namespace FAutoLearn
         }
 
         public List<byte[]> mCommonImgFile = new List<byte[]>();
+        public List<byte[]> mCommonImgFile2 = new List<byte[]>();
 
         public void ClearCommonImgFile()
         {
             mCommonImgFile.Clear();
+            mCommonImgFile2.Clear();
         }
 
         public void LoadBMPtoBufN(string filename, int N)
@@ -5603,9 +6091,26 @@ namespace FAutoLearn
             Mat tmp = new Mat(filename);
             Mat tmpByte = new Mat();
             Cv2.CvtColor(tmp, tmpByte, ColorConversionCodes.RGB2GRAY);
-            byte[] buf = null;
-            tmpByte.GetArray(out buf);
-            mCommonImgFile.Add(buf);
+
+            if(tmpByte.Width <781)
+            {
+                byte[] buf = null;
+                tmpByte.GetArray(out buf);
+                mCommonImgFile.Add(buf);
+            }
+            else
+            {
+                Mat matL = new Mat(tmpByte, new Rect(0, 0, 780, 460)).Clone();
+                Mat matR = new Mat(tmpByte, new Rect(780, 0, 550, 420)).Clone();
+
+                byte[] buf = null;
+                matL.GetArray(out buf);
+                mCommonImgFile.Add(buf);
+
+                byte[] buf2 = null;
+                matR.GetArray(out buf2);
+                mCommonImgFile2.Add(buf2);
+            }
         }
 
         public int FindMarkID(Mat IDimg)
@@ -7224,12 +7729,8 @@ namespace FAutoLearn
 
                     if (lfMark.xPosType == 0)    //  Left Harf & Right Half
                     {
-
-                        lupdown = GetCurUpDown(0, mUpDown[smr[si].Azimuth]);
-                                    // 경계를 x = 2 부터 찾아간다.
-                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (int)(yT[7] - yT[0]), ref lupdown, ref mPeakType[smr[si].Azimuth].type[0], iIndex);
+                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
                         dgbIndex = 1;
-                        lupdown = GetCurUpDown(1, mUpDown[smr[si].Azimuth]);
 
                         gapX = (int)(xL[0] + ((int)((tWidth - 1) - xL[1])))/2;
                         if ((int)((tWidth - 1) - xL[1]) < 5)
@@ -7357,7 +7858,7 @@ namespace FAutoLearn
                         lupdown = GetCurUpDown(2, mUpDown[smr[si].Azimuth]);
                         /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
                         //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
-                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0]-3, mCalcEffBand, (int)(xL[1] - xL[0]+6), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0]-3, mCalcEffBand, (xL[1] - xL[0]+6), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
                         dgbIndex = 5;
 
                         gapY = (int)(yT[7] - yT[0]) / 100.0;
@@ -7403,11 +7904,8 @@ namespace FAutoLearn
 
                     if (lfMark.xPosType == 0)    //  Left Harf & Right Half
                     {
-                        lupdown = GetCurUpDown(0, mUpDown[smr[si].Azimuth]);
-                        // 경계를 x = 2 부터 찾아간다.
-                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (int)(yT[7] - yT[0]), ref lupdown, ref mPeakType[smr[si].Azimuth].type[0], iIndex);
+                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
                         dgbIndex = 1;
-                        lupdown = GetCurUpDown(1, mUpDown[smr[si].Azimuth]);
 
                         gapX = (int)xL[0] + ((int)((tWidth - 1) - xL[1])) / 100.0;
                         if ((int)((tWidth - 1) - xL[1]) < 6)
@@ -7462,7 +7960,7 @@ namespace FAutoLearn
                         lupdown = GetCurUpDown(2, mUpDown[smr[si].Azimuth]);
                         /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
                         //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
-                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (int)(xL[1] - xL[0] + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
                         dgbIndex = 5;
 
                         gapY = (int)(yT[7] - yT[0]) / 100.0;
@@ -7621,6 +8119,7 @@ namespace FAutoLearn
             return posFoundS;
         }
 
+        public double mSideToEastX = 0;
         public OpenCvSharp.Point[] FineCOG(bool IsFirst, int iIndex, ref sMarkResult[] smr, ref sMarkResult[] smr_T, ref sMarkResult[] smr_B, ref long Nfound, bool IsDebug = false, int iBuf = 0, int whichModel = -1)
         {
             //  q_Value[iBuf] 에서 Object 를 찾은 뒤ㄹ
@@ -7651,6 +8150,7 @@ namespace FAutoLearn
 
             int cntFound = 0;
             OpenCvSharp.Point[] posFoundS = new OpenCvSharp.Point[12];
+            OpenCvSharp.Point[] posFound_2 = new OpenCvSharp.Point[3];
 
             long[] convFoundS = new long[12];
             int[] shiftX = new int[3] { -1, 0, 1 };
@@ -7664,6 +8164,8 @@ namespace FAutoLearn
             int mHeight = 0;
             int mSourceImg_Height = mSourceImg[iBuf].Height;
             int mSourceImg_Width = mSourceImg[iBuf].Width;
+            int mSourceImg2_Height = mSourceImg2[iBuf].Height;
+            int mSourceImg2_Width = mSourceImg2[iBuf].Width;
 
             if (iIndex == 1)
                 cntFound = 0;
@@ -7791,16 +8293,41 @@ namespace FAutoLearn
                     continue;
                 }
 
+                bool bUseSubmark = true;
                 if (si == 0)
+                {
                     posFoundS[si] = CalcConv4line(si, ref lfMark, iBuf);
+                    //if (posFoundS[0].X < 193)  //  끝단 200um 는 포기
+                        posFound_2[si] = CalcConv4line2(si, ref lfMark, iBuf, posFoundS[si].X - 21);
+                    //else
+                    //    bUseSubmark = false;
+                }
                 else if (si == 1)
+                {
                     posFoundS[si] = CalcConv4line(si, ref lfMark, iBuf, posFoundS[0].X - 65);
+                    //if (posFoundS[0].X < 193)  //  끝단 200um 는 포기
+                        posFound_2[si] = CalcConv4line2(si, ref lfMark, iBuf, posFoundS[si].X - 21);
+                    //else
+                    //    bUseSubmark = false;
+                }
                 else if (si == 2)
-                    posFoundS[si] = CalcConv4line(si, ref lfMark, iBuf, (posFoundS[0].X + posFoundS[1].X)/2 + 12) ;
+                {
+                    posFoundS[si] = CalcConv4line(si, ref lfMark, iBuf, (posFoundS[0].X + posFoundS[1].X) / 2 + 12);
+                    //if (posFoundS[0].X < 193)  //  끝단 200um 는 포기
+                        posFound_2[si] = CalcConv4line2(si, ref lfMark, iBuf, posFoundS[si].X - 21);
+                    //else
+                    //    bUseSubmark = false;
+                }
                 else if (si == 3)
+                {
+                    bUseSubmark = false;
                     posFoundS[si] = CalcConv4line(si, ref lfMark, iBuf, posFoundS[0].X + 57);
+                }
                 else if (si == 4)
+                {
+                    bUseSubmark = false;
                     posFoundS[si] = CalcConv4line(si, ref lfMark, iBuf, posFoundS[1].X - 32);
+                }
 
                 cntFound++;
                 if (IsSide)
@@ -7815,9 +8342,6 @@ namespace FAutoLearn
 
                 if (iIndex == 0)
                 {
-                    //if (modelIndex == 1)
-                    //    FoundIt = true;
-
                     //  모든 mPrevPos 에 값을 넣어준다.
                     for (int cntBuf = 0; cntBuf < mPrevPos.Length; cntBuf++)
                     {
@@ -7825,46 +8349,22 @@ namespace FAutoLearn
                         mPrevPos[cntBuf][si].Y = posFoundS[si].Y;
                         mPrevConv[cntBuf][si] = convFoundS[si];
                     }
-                    //if ( si==2)
-                    //    prevConv[si] = convFoundS[si];
-
-                    ////  현재 검색된 영역을 기준으로 모델을 업데이트한다.
-                    //Rect lsubRoi = new Rect(posFoundS[si].X, posFoundS[si].Y, mWidth, mHeight);
-                    //byte[] lsrcData = new byte[lfMark.img.Length];
-                    //int quaterWidth = mSourceImg[iBuf].Width / lfMark.MScale;// lfmark.MScale;
-
-                    //for (int yy = 0; yy < mHeight; yy++)
-                    //    for (int xx = 0; xx < mWidth; xx++)
-                    //        lsrcData[xx + yy * mWidth] = q_Value[iBuf][xx + posFoundS[si].X + (yy + posFoundS[si].Y) * quaterWidth];
-
-                    //CreateModelFromSubImg(lsrcData, mWidth, mHeight, lfMark.MScale, ref lfMark, false);
-
-                    //prevConv[si] = lfMark.conv;
-
-                    //if (mCandidateIndex > 0 && mFMSideCandidate.Count > mCandidateIndex - 1)
-                    //{
-                    //    //  여기는 추가 검증 필요
-                    //    if (modelIndex < mFMSideCandidate[mCandidateIndex - 1].Count)
-                    //        mFidMarkSide[modelIndex] = lfMark;
-                    //    else
-                    //        mFidMarkTop[modelIndex - mFidMarkSide.Count] = lfMark;
-                    //}
                 }
                 smr[si].mMTF = convFoundS[si];
-                //  각 마크의 COG 를 구한다.
                 if (posFoundS[si].X == 0 && posFoundS[si].Y == 0)
                 {
                     si++;
                     continue;
                 }
 
-                //Rect rc = new Rect();
 
+
+                //  각 마크의 COG 를 구한다.
                 int xhead = 3;
                 int yhead = 4;
 
                 int xtail = 8;
-                int ytail = 5;
+                int ytail = 7;
                 if (lfMark.xPosType == 3 || lfMark.yPosType == 3)
                 {
                     xhead = 4;
@@ -7886,7 +8386,7 @@ namespace FAutoLearn
                     subTop = 0;
 
 
-                TailExtension:
+            TailExtension:
 
                 gotoLoopCount++;
 
@@ -7922,50 +8422,10 @@ namespace FAutoLearn
                 }
                 catch (Exception e)
                 {
-                    //MessageBox.Show("Goto Loop Count = " + gotoLoopCount.ToString() + "\r\nxHead = " + xhead.ToString() + "\r\nyHead = " + yhead.ToString() + "\r\nxTail = " + xtail.ToString() + "\r\nyTail = " + ytail.ToString());
                     Nfound = 0;
                     return posFoundS;
                 }
-                //if (si == 3)
-                //    tgtImg.SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\tgt.bmp");
-                //////if (si == 2)
-                //////{
-                //////    tgtImg.SaveImage("img" + iIndex.ToString() + "_" + si.ToString() + "_" + convFoundS[si].ToString() + ".bmp");
-                //////    StreamWriter wr = new StreamWriter("rawbin" + iIndex.ToString() + "_" + si.ToString() + ".csv");
-                //////    string rawStr = "";
-                //////    for (int y = 0; y < subRoi.Height; y++)
-                //////    {
-                //////        rawStr = "";
-                //////        for (int x = 0; x < subRoi.Width; x++)
-                //////        {
-                //////            rawStr += tgtBuf[x + y * subRoi.Width].ToString() + ",";
-                //////        }
-                //////        wr.WriteLine(rawStr);
-                //////    }
-                //////    wr.Close();
-                //////}
-                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                /////   다음 지우지 말 것
-                //if ( iIndex < 2)
-                //{
-                //    StreamWriter wr = new StreamWriter("RawBin" + iIndex.ToString() + "_" + si.ToString() + ".csv");
-                //    string rawStr = "";
-                //    for (int y = 0; y < subRoi.Height; y++)
-                //    {
-                //        rawStr = "";
-                //        for (int x = 0; x < subRoi.Width; x++)
-                //        {
-                //            rawStr += tgtBuf[x + y * subRoi.Width].ToString() + ",";
-                //        }
-                //        wr.WriteLine(rawStr);
-                //    }
-                //    wr.Close();
-                //}
-                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
                 if (iIndex == 0 && mbGetHistogram && gotoLoopCount == 1)
                 {
                     numPixHisto = subRoi.Width * subRoi.Height;
@@ -7990,18 +8450,6 @@ namespace FAutoLearn
                         }
                     }
                     mEffectiveContrast[si] = bin98pro - bin30pro;
-                    //if (si == 5 )
-                    //{
-                    //    DateTime now = DateTime.Now;
-                    //    string filename = "C:\\CSHTest\\Result\\RawData\\Image\\HistMark" + mCandidateIndex.ToString() + "_" + now.ToString("MMddhhmmss") + ".csv";
-
-                    //    StreamWriter sr = new StreamWriter(filename);
-                    //    for (int j = 0; j < 255; j++)
-                    //    {
-                    //        sr.WriteLine(lHisto[0][j].ToString("F0") + "," + lHisto[1][j].ToString("F0") + "," + lHisto[2][j].ToString("F0") + "," + lHisto[3][j].ToString("F0") + "," + lHisto[4][j].ToString("F0"));
-                    //    }
-                    //    sr.Close();
-                    //}
                 }
 
                 int tHeight = subRoi.Height;
@@ -8016,173 +8464,67 @@ namespace FAutoLearn
 
                 int[] xDiffimg = null;
                 int[] yDiffimg = null;
+                int[] xDiffimg2 = null;
+                int[] yDiffimg2 = null;
                 //int[] diffSign = new int[2] { 1, -1 };
 
                 if (lfMark.xPosType != 3)
                 {
                     xDiffimg = new int[subRoi.Width * subRoi.Height];
                     yDiffimg = new int[tWidth * tHeight_1];
-                    if (lfMark.exArea.Width > 0)
+
+                    int y_tWidth = 0;
+                    int y_tWidth_1 = 0;
+
+                    for (int y = 0; y < tHeight; y++)
                     {
-                        Rect exRc = lfMark.exArea;
-                        exRc.X *= 3;
-                        exRc.Y *= 3;
-                        exRc.Width *= 3 + 1;
-                        exRc.Height *= 3 + 1;
-                        int y_tWidth = 0;
-                        int y_tWidth_1 = 0;
-                        int tmpdiff = 0;
-                        int tmp2diff = 0;
+                        y_tWidth = y * tWidth;
 
-                        for (int y = 0; y < tHeight; y++)
+                        y_tWidth_1 = y * tWidth_1;
+                        for (int x = 1; x < tWidth_1; x++)
                         {
-                            y_tWidth = y * tWidth;
-                            y_tWidth_1 = y * tWidth_1;
+                            xDiffimg[x + y_tWidth_1] = 5 * ((int)tgtBuf[x + y_tWidth] - tgtBuf[x - 1 + y_tWidth]);// - LUTBgNoise[subLeft + x + 1] + LUTBgNoise[subLeft + x - 1]);
 
-                            for (int x = 1; x < tWidth_1; x++)
-                            {
-                                tmpdiff = 2 * ((int)tgtBuf[x + 1 + y_tWidth] - tgtBuf[x - 1 + y_tWidth]);
+                            if (x > 1 && x < tWidth_2)
+                                xDiffimg[x + y_tWidth_1] += 5 * ((int)tgtBuf[x + 1 + y_tWidth] - tgtBuf[x - 2 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
 
-                                if (x > 1 && x < tWidth_2)
-                                    tmp2diff = ((int)tgtBuf[x + 2 + y_tWidth] - tgtBuf[x - 2 + y_tWidth]);
+                            if (x > 2 && x < tWidth_2 - 1)
+                                xDiffimg[x + y_tWidth_1] += 5 * ((int)tgtBuf[x + 2 + y_tWidth] - tgtBuf[x - 3 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
 
-                                if (exRc.Contains(x, y))
-                                {
-                                    if (Math.Abs(tmpdiff) > 14 || Math.Abs(tmp2diff) > 7)
-                                        continue;
-                                }
-
-                                xDiffimg[x + y_tWidth_1] = tmpdiff;// - LUTBgNoise[subLeft + x + 1] + LUTBgNoise[subLeft + x - 1]);
-                                if (x > 1 && x < tWidth_2)
-                                    xDiffimg[x + y_tWidth_1] += tmp2diff;// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
-                            }
                         }
-                        int x_tHeight_1 = 0;
-                        for (int x = 0; x < tWidth; x++)
-                        {
-                            x_tHeight_1 = x * tHeight_1;
-                            for (int y = 1; y < tHeight_1; y++)
-                            {
-                                int curSign = y < tHeightOver2 ? 1 : -1;    //  경계를 무조건 밝게 표시하게 해준다.
-                                tmpdiff = 2 * ((int)tgtBuf[x + (y + 1) * tWidth] - tgtBuf[x + (y - 1) * tWidth]);
-
-                                if (y > 1 && y < tHeight_2)
-                                    tmp2diff = ((int)tgtBuf[x + (y + 2) * tWidth] - tgtBuf[x + (y - 2) * tWidth]);
-
-                                if (exRc.Contains(x, y))
-                                {
-                                    if (Math.Abs(tmpdiff) > 14 || Math.Abs(tmp2diff) > 7)
-                                        continue;
-                                }
-
-                                yDiffimg[y + x_tHeight_1] = tmpdiff;// - LUTBgNoiseY[subTop + y + 1] + LUTBgNoiseY[subTop + y - 1];
-                                if (y > 1 && y < tHeight_2)
-                                    yDiffimg[y + x_tHeight_1] += tmp2diff;// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
-                            }
-                        }
-
-                        //  Diff 영상 저장용. 지우지 말것.
-                        //if (si == 0)
-                        //{
-                        //    byte[] tmpByte = new byte[yDiffimg.Length];
-                        //    for (int pi = 0; pi < yDiffimg.Length; pi++)
-                        //    {
-                        //        tmpByte[pi] = (byte)((128 + yDiffimg[pi]));
-                        //    }
-                        //    Mat tmpImg = new Mat(tWidth, tHeight_1, MatType.CV_8U, tmpByte);
-                        //    tmpImg.SaveImage("Ydiff.bmp");
-
-                        //    tmpByte = new byte[xDiffimg.Length];
-                        //    for (int pi = 0; pi < xDiffimg.Length; pi++)
-                        //    {
-                        //        tmpByte[pi] = (byte)((128 + xDiffimg[pi]));
-                        //    }
-                        //    tmpImg = new Mat(tHeight, tWidth_1, MatType.CV_8U, tmpByte);
-                        //    tmpImg.SaveImage("Xdiff.bmp");
-                        //}
                     }
-                    else
+                    int x_tHeight_1 = 0;
+                    for (int x = 0; x < tWidth; x++)
                     {
-                        int y_tWidth = 0;
-                        int y_tWidth_1 = 0;
-
-                        for (int y = 0; y < tHeight; y++)
+                        x_tHeight_1 = x * tHeight_1;
+                        for (int y = 1; y < tHeight_1; y++)
                         {
-                            y_tWidth = y * tWidth;
+                            yDiffimg[y + x_tHeight_1] = 5 * ((int)tgtBuf[x + (y) * tWidth] - tgtBuf[x + (y - 1) * tWidth]);// - LUTBgNoiseY[subTop + y + 1] + LUTBgNoiseY[subTop + y - 1];
 
-                            y_tWidth_1 = y * tWidth_1;
-                            for (int x = 1; x < tWidth_1; x++)
-                            {
-                                //xDiffimg[x + y_tWidth_1] = 2 * curSign * ((int)tgtBuf[x+1 + y_tWidth] - tgtBuf[x - 1 + y_tWidth]);// - LUTBgNoise[subLeft + x + 1] + LUTBgNoise[subLeft + x - 1]);
+                            if (y > 1 && y < tHeight_2)
+                                yDiffimg[y + x_tHeight_1] += 5 * ((int)tgtBuf[x + (y + 1) * tWidth] - tgtBuf[x + (y - 2) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
 
-                                //if (x > 1 && x < tWidth_2)
-                                //    xDiffimg[x + y_tWidth_1] += curSign * ((int)tgtBuf[x + 2 + y_tWidth] - tgtBuf[x - 2 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
-
-
-                                xDiffimg[x + y_tWidth_1] = 5 * ((int)tgtBuf[x + y_tWidth] - tgtBuf[x - 1 + y_tWidth]);// - LUTBgNoise[subLeft + x + 1] + LUTBgNoise[subLeft + x - 1]);
-
-                                if (x > 1 && x < tWidth_2)
-                                    xDiffimg[x + y_tWidth_1] += 5 * ((int)tgtBuf[x + 1 + y_tWidth] - tgtBuf[x - 2 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
-
-                                if (x > 2 && x < tWidth_2 - 1)
-                                    xDiffimg[x + y_tWidth_1] += 5 * ((int)tgtBuf[x + 2 + y_tWidth] - tgtBuf[x - 3 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
-
-                                //if (x > 3 && x < tWidth_2 - 2)
-                                //    xDiffimg[x + y_tWidth_1] += 2 * curSign * ((int)tgtBuf[x + 3 + y_tWidth] - tgtBuf[x - 4 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
-                            }
-                        }
-                        //int x_tHeight_1 = 0;
-                        //for (int x = 0; x < tWidth; x++)
-                        //{
-                        //    x_tHeight_1 = x * tHeight_1;
-                        //    for (int y = 1; y < tHeight_1; y++)
-                        //    {
-                        //        int curSign = y < tHeightOver2 ? 1 : -1;    //  경계를 무조건 밝게 표시하게 해준다.
-
-                        //        yDiffimg[y + x_tHeight_1] = 2 * curSign * ((int)tgtBuf[x + (y + 1) * tWidth] - tgtBuf[x + (y - 1) * tWidth]);// - LUTBgNoiseY[subTop + y + 1] + LUTBgNoiseY[subTop + y - 1];
-
-                        //        if (y > 1 && y < tHeight_2)
-                        //            yDiffimg[y + x_tHeight_1] += curSign * ((int)tgtBuf[x + (y + 2) * tWidth] - tgtBuf[x + (y - 2) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
-                        //    }
-                        //}
-                        int x_tHeight_1 = 0;
-                        for (int x = 0; x < tWidth; x++)
-                        {
-                            x_tHeight_1 = x * tHeight_1;
-                            for (int y = 1; y < tHeight_1; y++)
-                            {
-                                //yDiffimg[y + x_tHeight_1] = 2 * curSign * ((int)tgtBuf[x + (y + 1) * tWidth] - tgtBuf[x + (y - 1) * tWidth]);// - LUTBgNoiseY[subTop + y + 1] + LUTBgNoiseY[subTop + y - 1];
-
-                                //if (y > 1 && y < tHeight_2)
-                                //    yDiffimg[y + x_tHeight_1] += curSign * ((int)tgtBuf[x + (y + 2) * tWidth] - tgtBuf[x + (y - 2) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
-
-                                yDiffimg[y + x_tHeight_1] = 5 * ((int)tgtBuf[x + (y) * tWidth] - tgtBuf[x + (y - 1) * tWidth]);// - LUTBgNoiseY[subTop + y + 1] + LUTBgNoiseY[subTop + y - 1];
-
-                                if (y > 1 && y < tHeight_2)
-                                    yDiffimg[y + x_tHeight_1] += 5 * ((int)tgtBuf[x + (y + 1) * tWidth] - tgtBuf[x + (y - 2) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
-
-                                if (y > 2 && y < tHeight_2 - 1)
-                                    yDiffimg[y + x_tHeight_1] += 5 * ((int)tgtBuf[x + (y + 2) * tWidth] - tgtBuf[x + (y - 3) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
-                            }
-                        }
-
-                        //Diff 영상 저장용.지우지 말것.
-                        //byte[] tmpByte = new byte[yDiffimg.Length];
-                        //for (int pi = 0; pi < yDiffimg.Length; pi++)
-                        //{
-                        //    tmpByte[pi] = (byte)((128 + yDiffimg[pi] / 2));
-                        //}
-                        //Mat tmpImg = new Mat(tWidth, tHeight_1, MatType.CV_8U, tmpByte);
-                        //tmpImg.SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\Ydiff" + si.ToString() + ".bmp");
-
-                        //tmpByte = new byte[xDiffimg.Length];
-                        //for (int pi = 0; pi < xDiffimg.Length; pi++)
-                        //{
-                        //    tmpByte[pi] = (byte)((128 + xDiffimg[pi] / 2));
-                        //}
-                        //tmpImg = new Mat(tHeight, tWidth_1, MatType.CV_8U, tmpByte);
-                        //tmpImg.SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\Xdiff" + si.ToString() + ".bmp");
+                            if (y > 2 && y < tHeight_2 - 1)
+                                yDiffimg[y + x_tHeight_1] += 5 * ((int)tgtBuf[x + (y + 2) * tWidth] - tgtBuf[x + (y - 3) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
+                        }
                     }
+
+                    //Diff 영상 저장용.지우지 말것.
+                    //byte[] tmpByte = new byte[yDiffimg.Length];
+                    //for (int pi = 0; pi < yDiffimg.Length; pi++)
+                    //{
+                    //    tmpByte[pi] = (byte)((128 + yDiffimg[pi] / 2));
+                    //}
+                    //Mat tmpImg = new Mat(tWidth, tHeight_1, MatType.CV_8U, tmpByte);
+                    //tmpImg.SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\Ydiff" + si.ToString() + ".bmp");
+
+                    //tmpByte = new byte[xDiffimg.Length];
+                    //for (int pi = 0; pi < xDiffimg.Length; pi++)
+                    //{
+                    //    tmpByte[pi] = (byte)((128 + xDiffimg[pi] / 2));
+                    //}
+                    //tmpImg = new Mat(tHeight, tWidth_1, MatType.CV_8U, tmpByte);
+                    //tmpImg.SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\Xdiff" + si.ToString() + ".bmp");
                 }
 
                 int debugValue = 0;
@@ -8208,12 +8550,8 @@ namespace FAutoLearn
 
                     if (lfMark.xPosType == 0)    //  Left Harf & Right Half
                     {
-
-                        lupdown = GetCurUpDown(0, mUpDown[smr[si].Azimuth]);
                         // 경계를 x = 2 부터 찾아간다.
-                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (int)(yT[7] - yT[0]), ref lupdown, ref mPeakType[smr[si].Azimuth].type[0], iIndex);
-                        dgbIndex = 1;
-                        lupdown = GetCurUpDown(1, mUpDown[smr[si].Azimuth]);
+                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
 
                         gapX = (int)(xL[0] + ((int)((tWidth - 1) - xL[1]))) / 2;
                         if ((int)((tWidth - 1) - xL[1]) < 6)
@@ -8236,14 +8574,9 @@ namespace FAutoLearn
                     }
                     else if (lfMark.xPosType == 3)     //  Shape
                     {
-                        //  tgtBuf 를 이용해서 중심좌표를 바로 구한다.
-                        //  xL 은 Dark Area 중심, xR 은 Bright Area 중심
-                        //  yT 은 Dark Area 중심, yB 은 Bright Area 중심
-                        //  19 -> 21 for 530 um
                         double xia = tWidth / 2.0;
                         double yia = tHeight / 2.0;
 
-                        //mFZM.CogOfShape(4 * si + 1, ref tgtBuf, tWidth, tHeight, ref xia, ref yia, 19, ref xL, ref xR, ref yT, ref yB, iIndex);
                         int xshift = 0;
                         int yshift = 0;
 
@@ -8261,22 +8594,6 @@ namespace FAutoLearn
                                 xshift = 0;
                                 yshift = 0;
                             }
-                            //if ( iIndex == 0 && si == 0)
-                            //{
-                            //    Mat tmpImg = new Mat(tHeight, tWidth, MatType.CV_8U, tgtBuf);
-                            //    tmpImg.SaveImage("TroubleddImg_" + iIndex.ToString() + ".bmp");
-                            //    xshift = 0;
-                            //    yshift = 0;
-                            //    mFZM.CogOfShape(si, ref tgtBuf, tWidth, tHeight, ref xia, ref yia, ref xshift, ref yshift, iIndex);
-                            //}
-                            //if ( iIndex == 1 && si == 0)
-                            //{
-                            //    Mat tmpImg = new Mat(tHeight, tWidth, MatType.CV_8U, tgtBuf);
-                            //    tmpImg.SaveImage("TroubleddImg_" + iIndex.ToString() + ".bmp");
-                            //    xshift = 0;
-                            //    yshift = 0;
-                            //    mFZM.CogOfShape(si, ref tgtBuf, tWidth, tHeight, ref xia, ref yia, ref xshift, ref yshift, iIndex);
-                            //}
                         }
                         else
                             ;
@@ -8341,7 +8658,7 @@ namespace FAutoLearn
                         lupdown = GetCurUpDown(2, mUpDown[smr[si].Azimuth]);
                         /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
                         //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
-                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 3, mCalcEffBand, (int)(xL[1] - xL[0] + 6), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 3, mCalcEffBand, (xL[1] - xL[0] + 6), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
                         //if ( si==3 && (Math.Abs(((yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8) - 42.7) > 1 && Math.Abs(((yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8) - 39.7 ) > 1))
                         //    dgbIndex = 5;
 
@@ -8374,14 +8691,7 @@ namespace FAutoLearn
                     }
                     else if (lfMark.yPosType == 3)     //  Shape
                     {
-                        ////  tgtBuf 를 이용해서 중심좌표를 바로 구한다.
-                        ////  xL 은 Dark Area 중심, xR 은 Bright Area 중심
-                        ////  yT 은 Dark Area 중심, yB 은 Bright Area 중심
-                        ////  18
-                        //mFZM.CogOfShape(4 * si + 1, ref tgtBuf, tWidth, tHeight, (xL + xR)/2, (yT + yB)/2 , 21, ref xL, ref xR, ref yT, ref yB, iIndex);
-                        //dgbIndex = 4;
-                        ////SetCurUpDown(1, lupdown, ref resUpDown);
-                        //smr[si].pos.Y = (yT + yB) / 2;
+                        ;
                     }
                     else      // None
                     {
@@ -8397,11 +8707,7 @@ namespace FAutoLearn
 
                     if (lfMark.xPosType == 0)    //  Left Harf & Right Half
                     {
-                        lupdown = GetCurUpDown(0, mUpDown[smr[si].Azimuth]);
-                        // 경계를 x = 2 부터 찾아간다.
-                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (int)(yT[7] - yT[0]), ref lupdown, ref mPeakType[smr[si].Azimuth].type[0], iIndex);
-                        dgbIndex = 1;
-                        lupdown = GetCurUpDown(1, mUpDown[smr[si].Azimuth]);
+                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
 
                         gapX = (int)xL[0] + ((int)((tWidth - 1) - xL[1])) / 100.0;
                         if ((int)((tWidth - 1) - xL[1]) < 6)
@@ -8424,14 +8730,7 @@ namespace FAutoLearn
                     }
                     else if (lfMark.xPosType == 3)     //  Shape
                     {
-                        ////  tgtBuf 를 이용해서 중심좌표를 바로 구한다.
-                        ////  xL 은 Dark Area 중심, xR 은 Bright Area 중심
-                        ////  yT 은 Dark Area 중심, yB 은 Bright Area 중심
-                        ////  19 -> 21 for 530 um
-                        //mFZM.CogOfShape(4 * si + 1, ref tgtBuf, tWidth, tHeight, (xL + xR) / 2, (yT + yB) / 2, 21, ref xL, ref xR, ref yT, ref yB, iIndex);
-                        //dgbIndex = 4;
-                        ////SetCurUpDown(1, lupdown, ref resUpDown);
-                        //smr[si].pos.X = (xL + xR) / 2;
+                        ;
                     }
                     else      // None
                     {
@@ -8456,7 +8755,7 @@ namespace FAutoLearn
                         lupdown = GetCurUpDown(2, mUpDown[smr[si].Azimuth]);
                         /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
                         //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
-                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (int)(xL[1] - xL[0] + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
 
                         gapY = (int)(yT[7] - yT[0]) / 100.0;
                         if ((int)((tHeight - 1) - yT[7]) < 6 && !EOY)
@@ -8484,20 +8783,30 @@ namespace FAutoLearn
                         //    smr[si].pos.Y = (yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8;    //  3 Line  ConvergePeakX3( )
                         //else
                         //    smr[si].pos.Y = (yT[0] + yT[1] + 2*(yT[2] + yT[3] + yT[4] + yT[5]) + yT[6] + yT[7]) / 12;    //  3 Line  ConvergePeakX3( )
+                        //string[] str8y = new string[1];
+                        //str8y[0] = yT[0].ToString("F5") + "," + yT[1].ToString("F5") + "," + yT[2].ToString("F5") + "," + yT[3].ToString("F5") + "," + yT[4].ToString("F5") + "," + yT[5].ToString("F5") + "," + yT[6].ToString("F5") + "," + yT[7].ToString("F5");
+                        //if ( si == 0)
+                        //{
+                        //    File.AppendAllLines("D:\\Linearity\\Pos8Y0.csv", str8y);
+                        //}else if ( si == 1)
+                        //{
+                        //    File.AppendAllLines("D:\\Linearity\\Pos8Y1.csv", str8y);
+                        //}else if ( si== 2)
+                        //{
+                        //    File.AppendAllLines("D:\\Linearity\\Pos8Y2.csv", str8y);
+                        //}
 
-                        smr_T[si].pos.Y = yT[0] + subTop;// + compT;
-                        smr_B[si].pos.Y = yT[7] + subTop;// + compB;
+                        //smr_T[si].pos.Y = yT[0] + subTop;// + compT;
+                        //smr_B[si].pos.Y = yT[7] + subTop;// + compB;
+                        //if (si < 2)
+                        //    smr_T[si].pos.Y -= ((yT[6] + yT[7] + yT[5] + yT[4]) / 4 - (yT[0] + yT[1] + yT[2] + yT[3]) / 4 - 24.744) / 50;
+                        //else if (si == 2)
+                        //    smr_T[si].pos.Y += ((yT[6] + yT[7] + yT[5] + yT[4]) / 4 - (yT[0] + yT[1] + yT[2] + yT[3]) / 4 - 24.744) / 50;
+
                     }
                     else if (lfMark.yPosType == 3)     //  Shape
                     {
-                        ////  tgtBuf 를 이용해서 중심좌표를 바로 구한다.
-                        ////  xL 은 Dark Area 중심, xR 은 Bright Area 중심
-                        ////  yT 은 Dark Area 중심, yB 은 Bright Area 중심
-                        ////  18
-                        //mFZM.CogOfShape(4 * si + 1, ref tgtBuf, tWidth, tHeight, (xL + xR) / 2, (yT + yB) / 2, 21, ref xL, ref xR, ref yT, ref yB, iIndex);
-                        //dgbIndex = 4;
-                        ////SetCurUpDown(1, lupdown, ref resUpDown);
-                        //smr[si].pos.Y = (yT + yB) / 2;
+                        ;
                     }
                     else      // None
                     {
@@ -8512,31 +8821,12 @@ namespace FAutoLearn
 
 
                     smr[si].pos.X = (xL[0] + xL[1]) / 2;
-                    smr_T[si].pos.X = (xL[0] + xL[1]) / 2 + subLeft;
-                    smr_B[si].pos.X = (xL[0] + xL[1]) / 2 + subLeft;
 
                     mUpDown[smr[si].Azimuth] = resUpDown;
                     if (smr[si].pos.X > 0 && smr[si].pos.Y > 0)
                     {
                         smr[si].pos.X += subLeft;    //  중심좌표의 절대좌표 X
                         smr[si].pos.Y += subTop;     //  중심좌표의 절대좌표 Y
-                        //if (iIndex == 0)
-                        //{
-                        //    if (modelIndex == 1)
-                        //        FoundIt = true;
-
-                        //    //  모든 mPrevPos 에 값을 넣어준다.
-                        //    for (int cntBuf = 0; cntBuf < mPrevPos.Length; cntBuf++)
-                        //    {
-                        //        mPrevPos[cntBuf][si].X = (int)(smr[si].pos.X / modelScaleFactor - mWidth / 2);
-                        //        mPrevPos[cntBuf][si].Y = (int)(smr[si].pos.Y / modelScaleFactor - mHeight / 2);
-                        //    }
-                        //}
-                        //else
-                        //{
-                        //    prevPos.X = (int)(smr[si].pos.X / modelScaleFactor - mWidth / 2);
-                        //    prevPos.Y = (int)(smr[si].pos.Y / modelScaleFactor - mHeight / 2);
-                        //}
                     }
                 }
                 catch (Exception e)
@@ -8557,67 +8847,454 @@ namespace FAutoLearn
                 ////////////////////////////////////////////////////////////////////////////
                 ////////////////////////////////////////////////////////////////////////////
 
+
+                ////////////////////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////////////////////
+                ///
+                ///     2nd 영상 분석
+                ///
+                if (!mIsFile && bUseSubmark)
+                {
+                    //sMarkResult smr2 = new sMarkResult();
+
+                    xhead = 3;
+                    yhead = 4;
+
+                    xtail = 8;
+                    ytail = 7;
+                    if (lfMark.xPosType == 3 || lfMark.yPosType == 3)
+                    {
+                        xhead = 4;
+                        yhead = 4;
+                        xtail = 6;
+                        ytail = 6;
+                    }
+                    ItrCountHeadExtension = 0;
+                    gotoLoopCount = 0;
+
+                HeadExtension2:
+
+                    subLeft = posFound_2[si].X * modelScaleFactor - xhead;
+                    subTop = posFound_2[si].Y * modelScaleFactor - yhead;
+
+                    if (subLeft < 0)
+                        subLeft = 0;
+                    if (subTop < 0)
+                        subTop = 0;
+
+
+                TailExtension2:
+
+                    gotoLoopCount++;
+
+                    EOY = false;
+                    subRoi = new Rect(subLeft, subTop, (int)(mWidth * modelScaleFactor + xtail), (int)(mHeight * modelScaleFactor + ytail));
+                    if (subRoi.Bottom >= mSourceImg2_Height)
+                    {
+                        int deltaY = subRoi.Bottom - mSourceImg2_Height;
+                        if (deltaY > 1 && subRoi.Y > 0)
+                        {
+                            subRoi.Height -= (deltaY - 1);
+                            subRoi.Y -= 1;
+                            subTop--;
+                            EOY = true;
+                        }
+                        else
+                        {
+                            subRoi.Height -= deltaY;
+                        }
+                    }
+                    if (subRoi.Right >= mSourceImg2_Width)
+                    {
+                        subRoi.Left--;
+                        subLeft--;
+                        subRoi.Width = mSourceImg2_Width - subRoi.Left;
+                    }
+                    tgtImg = null;
+                    tgtBuf = null;
+                    try
+                    {
+                        tgtImg = mSourceImg2[iBuf].SubMat(subRoi);
+                        tgtImg.GetArray(out tgtBuf);
+                    }
+                    catch (Exception e)
+                    {
+                        Nfound = 0;
+                        return posFoundS;
+                    }
+
+                    if (iIndex == 0 && mbGetHistogram && gotoLoopCount == 1)
+                    {
+                        numPixHisto = subRoi.Width * subRoi.Height;
+                        GetHistogramData(tgtImg, ref lHisto[si]);
+                        int bin30pro = 0;
+                        int bin98pro = 0;
+                        float binSum = 0;
+                        float binSumPast = 0;
+                        int numPixHisto30pro = (int)(numPixHisto * 0.3);
+                        int numPixHisto98pro = (int)(numPixHisto * 0.98);
+                        for (int b = 0; b < 256; b++)
+                        {
+                            binSumPast = binSum;
+                            binSum += lHisto[si][b];
+                            if (binSum >= numPixHisto30pro && binSumPast < numPixHisto30pro)
+                            {
+                                bin30pro = b;
+                            }
+                            if (binSum >= numPixHisto98pro && binSumPast < numPixHisto98pro)
+                            {
+                                bin98pro = b;
+                            }
+                        }
+                        mEffectiveContrast[si] = bin98pro - bin30pro;
+                    }
+
+                    tHeight = subRoi.Height;
+                    tWidth = subRoi.Width;
+
+                    tWidth_1 = tWidth - 1;
+                    tHeight_1 = tHeight - 1;
+                    tWidth_2 = tWidth - 2;
+                    tHeight_2 = tHeight - 2;
+                    tWidthOver2 = tWidth / 2;
+                    tHeightOver2 = tHeight / 2;
+
+                    xDiffimg = null;
+                    yDiffimg = null;
+                    xDiffimg2 = null;
+                    yDiffimg2 = null;
+                    //int[] diffSign = new int[2] { 1, -1 };
+
+                    if (lfMark.xPosType != 3)
+                    {
+                        xDiffimg = new int[subRoi.Width * subRoi.Height];
+                        yDiffimg = new int[tWidth * tHeight_1];
+
+                        int y_tWidth = 0;
+                        int y_tWidth_1 = 0;
+
+                        for (int y = 0; y < tHeight; y++)
+                        {
+                            y_tWidth = y * tWidth;
+
+                            y_tWidth_1 = y * tWidth_1;
+                            for (int x = 1; x < tWidth_1; x++)
+                            {
+                                xDiffimg[x + y_tWidth_1] = 5 * ((int)tgtBuf[x + y_tWidth] - tgtBuf[x - 1 + y_tWidth]);// - LUTBgNoise[subLeft + x + 1] + LUTBgNoise[subLeft + x - 1]);
+
+                                if (x > 1 && x < tWidth_2)
+                                    xDiffimg[x + y_tWidth_1] += 5 * ((int)tgtBuf[x + 1 + y_tWidth] - tgtBuf[x - 2 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
+
+                                if (x > 2 && x < tWidth_2 - 1)
+                                    xDiffimg[x + y_tWidth_1] += 5 * ((int)tgtBuf[x + 2 + y_tWidth] - tgtBuf[x - 3 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
+
+                            }
+                        }
+                        int x_tHeight_1 = 0;
+                        for (int x = 0; x < tWidth; x++)
+                        {
+                            x_tHeight_1 = x * tHeight_1;
+                            for (int y = 1; y < tHeight_1; y++)
+                            {
+                                yDiffimg[y + x_tHeight_1] = 5 * ((int)tgtBuf[x + (y) * tWidth] - tgtBuf[x + (y - 1) * tWidth]);// - LUTBgNoiseY[subTop + y + 1] + LUTBgNoiseY[subTop + y - 1];
+
+                                if (y > 1 && y < tHeight_2)
+                                    yDiffimg[y + x_tHeight_1] += 5 * ((int)tgtBuf[x + (y + 1) * tWidth] - tgtBuf[x + (y - 2) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
+
+                                if (y > 2 && y < tHeight_2 - 1)
+                                    yDiffimg[y + x_tHeight_1] += 5 * ((int)tgtBuf[x + (y + 2) * tWidth] - tgtBuf[x + (y - 3) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
+                            }
+                        }
+
+                        //Diff 영상 저장용.지우지 말것.
+                        //byte[] tmpByte = new byte[yDiffimg.Length];
+                        //for (int pi = 0; pi < yDiffimg.Length; pi++)
+                        //{
+                        //    tmpByte[pi] = (byte)((128 + yDiffimg[pi] / 2));
+                        //}
+                        //Mat tmpImg = new Mat(tWidth, tHeight_1, MatType.CV_8U, tmpByte);
+                        //tmpImg.SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\Ydiff" + si.ToString() + ".bmp");
+
+                        //tmpByte = new byte[xDiffimg.Length];
+                        //for (int pi = 0; pi < xDiffimg.Length; pi++)
+                        //{
+                        //    tmpByte[pi] = (byte)((128 + xDiffimg[pi] / 2));
+                        //}
+                        //tmpImg = new Mat(tHeight, tWidth_1, MatType.CV_8U, tmpByte);
+                        //tmpImg.SaveImage("C:\\CSHTest\\Result\\RawData\\Image\\Xdiff" + si.ToString() + ".bmp");
+                    }
+
+                    debugValue = 0;
+                    xL = new double[3];
+                    yT = new double[8] { 3, 0, 0, 0, 0, 0, 0, tHeight - 3 };
+
+                    gapX = 0;
+                    gapY = 0;
+
+                    dgbIndex = 0;
+
+
+                    try
+                    {
+
+                        if (lfMark.xPosType == 0)    //  Left Harf & Right Half
+                        {
+
+                            xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
+
+                            gapX = (int)(xL[0] + ((int)((tWidth - 1) - xL[1]))) / 2;
+                            if ((int)((tWidth - 1) - xL[1]) < 6)
+                            {
+                                xtail += 2;
+                                goto TailExtension2;
+                            }
+                            if (xL[0] < 6 && xhead < 2)
+                            {
+                                xhead += (int)(7 - xL[0]);
+
+                                ItrCountHeadExtension++;
+                                if (ItrCountHeadExtension < 4)
+                                    goto HeadExtension2;
+                            }
+                            if (xhead == 0)
+                                xhead++;
+
+                            smr_T[si].pos.X = (xL[0] + xL[1]) / 2;
+                        }
+                        else if (lfMark.xPosType == 3)     //  Shape
+                        {
+                            double xia = tWidth / 2.0;
+                            double yia = tHeight / 2.0;
+
+                            int xshift = 0;
+                            int yshift = 0;
+
+                            if (mBreakIndex == iIndex)
+                                dgbIndex = 0;
+
+                            if (tgtBuf != null)
+                            {
+                                try
+                                {
+                                    mFZM.CogOfShape(si, ref tgtBuf, tWidth, tHeight, ref xia, ref yia, ref xshift, ref yshift, iIndex);
+                                }
+                                catch (Exception e)
+                                {
+                                    xshift = 0;
+                                    yshift = 0;
+                                }
+                            }
+                            else
+                                ;
+
+                            dgbIndex = 4;
+                            bool bRangeRetry = false;
+                            //SetCurUpDown(1, lupdown, ref resUpDown);
+                            if (xshift < 0 && xhead < 8)
+                            {
+                                xhead = xhead - xshift / 2;
+                                //if (xhead > 2)
+                                bRangeRetry = true;
+                            }
+                            else if (xshift > 0 && xhead > 0)
+                            {
+                                xhead = xhead - xshift / 2;
+                                //if (xhead > 2)
+                                bRangeRetry = true;
+                            }
+                            if (yshift < 0 && yhead < 8)
+                            {
+                                yhead = yhead - yshift / 2;
+                                //if (yhead > 2)
+                                bRangeRetry = true;
+                            }
+                            else if (yshift > 0 && yhead > 0)
+                            {
+                                yhead = yhead - yshift / 2;
+                                //if (yhead > 2)
+                                bRangeRetry = true;
+                            }
+
+                            if (bRangeRetry)
+                            {
+                                //mGotoLoopCount+= yshift;
+                                //mAccuShiftX += xshift;ㄹ
+                                //mAccuShiftY += yshift;
+                                ItrCountHeadExtension++;
+                                if (ItrCountHeadExtension < 4)
+                                    goto HeadExtension2;
+                            }
+
+                            smr_T[si].pos.X = xia;
+                            smr_T[si].pos.Y = yia;
+                            xL[0] = xia;
+                            yT[0] = yia;
+                        }
+                        else      // None
+                        {
+                            xL[0] = modelScaleFactor;
+                            smr_T[si].pos.X = -1;
+                            xL[1] = tWidth - modelScaleFactor;
+                        }
+
+                        if (lfMark.yPosType == 0)    //  Top Harf & Bottom Half
+                        {
+                            /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
+                            //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                            yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 3, mCalcEffBand, (xL[1] - xL[0] + 6), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                            //if ( si==3 && (Math.Abs(((yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8) - 42.7) > 1 && Math.Abs(((yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8) - 39.7 ) > 1))
+                            //    dgbIndex = 5;
+
+                            gapY = (int)(yT[7] - yT[0]) / 100.0;
+                            if ((int)((tHeight - 1) - yT[7]) < 5 && !EOY)
+                            {
+                                ytail += 6 - (int)((tHeight - 1) - yT[7]);
+                                goto TailExtension2;
+                            }
+                            if (yT[0] < 6 && yhead < 2 && !EOY)
+                            {
+                                yhead += (int)(7 - yT[0]);
+
+                                ItrCountHeadExtension++;
+                                if (ItrCountHeadExtension < 4)
+                                    goto HeadExtension2;
+                            }
+                            ///////////////////////////////////////////////////////////////////////////////////////
+                            ///     2 Line or 3 Line 선택 필요
+                            //if (si < 2)
+                            //if (si == 2)
+                            //    smr[si].pos.Y = (yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 6;    //  2,3,4  - 3 Line  ConvergePeakX3( )
+                            //else
+                            smr_T[si].pos.Y = (yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8;    //  3 Line  ConvergePeakX3( )
+                                                                                                                    //else if (si<2)
+                                                                                                                    //    smr[si].pos.Y = (yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8;    //  3 Line  ConvergePeakX3( )
+                                                                                                                    //else
+                                                                                                                    //    smr[si].pos.Y = (yT[0] + yT[1] + 2*(yT[2] + yT[3] + yT[4] + yT[5]) + yT[6] + yT[7]) / 12;    //  3 Line  ConvergePeakX3( )
+
+                        }
+                        else if (lfMark.yPosType == 3)     //  Shape
+                        {
+                            ;
+                        }
+                        else      // None
+                        {
+                            yT[0] = modelScaleFactor;
+                            smr_T[si].pos.Y = -1;
+                            yT[7] = tHeight - modelScaleFactor;
+                        }
+
+                        if (lfMark.xPosType == 0)    //  Left Harf & Right Half
+                        {
+                            // 경계를 x = 2 부터 찾아간다.
+                            xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
+
+                            gapX = (int)xL[0] + ((int)((tWidth - 1) - xL[1])) / 100.0;
+                            if ((int)((tWidth - 1) - xL[1]) < 6)
+                            {
+                                xtail += 2;
+                                goto TailExtension2;
+                            }
+                            if (xL[0] < 6 && xhead < 2)
+                            {
+                                xhead += (int)(7 - xL[0]);
+
+                                ItrCountHeadExtension++;
+                                if (ItrCountHeadExtension < 4)
+                                    goto HeadExtension2;
+                            }
+                            if (xhead == 0)
+                                xhead++;
+
+                            smr_T[si].pos.X = (xL[0] + xL[1]) / 2;
+                        }
+                        else if (lfMark.xPosType == 3)     //  Shape
+                        {
+                            ;
+                        }
+                        else      // None
+                        {
+                            xL[0] = modelScaleFactor;
+                            smr_T[si].pos.X = -1;
+                            xL[1] = tWidth - modelScaleFactor;
+                        }
+
+                        ////////////////////////////////////////////////////////////////////////////////////
+                        ////////////////////////////////////////////////////////////////////////////////////
+                        ////////////////////////////////////////////////////////////////////////////////////
+
+                        if (lfMark.yPosType == 0)    //  Top Harf & Bottom Half
+                        {
+                            /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
+                            //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                            yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+
+                            gapY = (int)(yT[7] - yT[0]) / 100.0;
+                            if ((int)((tHeight - 1) - yT[7]) < 6 && !EOY)
+                            {
+                                ytail += 2;
+                                goto TailExtension2;
+                            }
+                            if (yT[0] < 6 && yhead < 2 && !EOY)
+                            {
+                                yhead += (int)(7 - yT[0]);
+
+                                ItrCountHeadExtension++;
+                                if (ItrCountHeadExtension < 4)
+                                    goto HeadExtension2;
+                            }
+                            ///////////////////////////////////////////////////////////////////////////////////////
+                            smr_T[si].pos.Y = (yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8;    //  3 Line  ConvergePeakX3( )
+                            //if (si < 2)
+                            //    smr_T[si].pos.Y -= ((yT[6] + yT[7] + yT[5] + yT[4]) / 4 - (yT[0] + yT[1] + yT[2] + yT[3]) / 4 - 24.744)/50;
+                            //else if ( si == 2)
+                            //    smr_T[si].pos.Y += ((yT[6] + yT[7] + yT[5] + yT[4]) / 4 - (yT[0] + yT[1] + yT[2] + yT[3]) / 4 - 24.744)/50;
+
+                        }
+                        else if (lfMark.yPosType == 3)     //  Shape
+                        {
+                            ;
+                        }
+                        else      // None
+                        {
+                            yT[0] = modelScaleFactor;
+                            smr_T[si].pos.Y = -1;
+                            yT[7] = tHeight - modelScaleFactor;
+                        }
+
+                        smr_T[si].pos.X = (xL[0] + xL[1]) / 2;
+
+                        if (smr_T[si].pos.X > 0 && smr_T[si].pos.Y > 0)
+                        {
+                            smr_T[si].pos.X += subLeft;    //  중심좌표의 절대좌표 X
+                            smr_T[si].pos.Y += subTop;     //  중심좌표의 절대좌표 Y
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        //  mPeakType[smr[si].Azimuth].type[2]
+                        ;
+                    }
+                    ////////////////////////////////////////////////////////////////////////////
+                    /////   임시코드 -> 모델 설정이 잘 됬는지 확인용 코드
+                    ////////////////////////////////////////////////////////////////////////////
+                    if (mCheckCompatibility)
+                    {
+                        smr_T[si].pos.X = gapX;    //  X 방향으로 Gap 이 충분한지 확인 용
+                        smr_T[si].pos.Y = gapY;    //  Y 방향으로 Gap 이 충분한지 확인 용
+                    }
+                    ////////////////////////////////////////////////////////////////////////////
+                    ////////////////////////////////////////////////////////////////////////////
+                    //smr_T[si].pos.X = smr2.pos.X;
+                    //smr_T[si].pos.Y = smr2.pos.Y;
+                }
+                else
+                {
+                    smr_T[si].pos.X = 0;
+                    smr_T[si].pos.Y = 0;
+                }
+
                 si++;
             }
-
-            //if ( iIndex == 0 && mbGetHistogram)
-            //{
-            //    if (Directory.Exists("D:\\CSH035\\NoiseTest\\"))
-            //    {
-            //        float[] sumHisto = new float[256];
-            //        for (int i = 0; i < 3; i++)
-            //        {
-            //            for (int h = 0; h < 256; h++)
-            //                sumHisto[h] += lHisto[i][h];
-            //        }
-            //        try
-            //        {
-            //            StreamWriter lsw = new StreamWriter("D:\\CSH035\\NoiseTest\\Histo_" + numPixHisto.ToString() + ".csv");
-            //            for (int h = 0; h < 256; h++)
-            //                lsw.WriteLine(sumHisto[h].ToString());
-            //            lsw.Close();
-
-            //            mSourceImg[iBuf].SaveImage("D:\\CSH035\\NoiseTest\\HistoImg.bmp");
-            //        }
-            //        catch(Exception e)
-            //        {
-            //            ;
-            //        }
-            //    }else
-            //    {
-            //        float[] sumHisto = new float[256];
-            //        for (int i = 0; i < 4; i++)
-            //        {
-            //            for (int h = 0; h < 256; h++)
-            //                sumHisto[h] += lHisto[i][h];
-            //        }
-            //        try
-            //        {
-            //            StreamWriter lsw = new StreamWriter("Histo_" + numPixHisto.ToString() + ".csv");
-            //            for (int h = 0; h < 256; h++)
-            //                lsw.WriteLine(sumHisto[h].ToString() + "," + lHisto[0][h] + "," + lHisto[1][h] + "," + lHisto[2][h] + "," + lHisto[3][h] + "," + lHisto[4][h]);
-            //            lsw.Close();
-
-            //            mSourceImg[iBuf].SaveImage("HistoImg.bmp");
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            ;
-            //        }
-            //    }
-            //}
-
-            //  앞에서 이미 처리해주고 있음.
-            //if ( IsFirst )
-            //{
-            //    for ( int bi = 0; bi< mPrevPos.Length; bi++)
-            //        for ( int si=0; si<cntFound; si++)
-            //        {
-            //            mPrevPos[bi][si].X = posFoundS[si].X;
-            //            mPrevPos[bi][si].Y = posFoundS[si].Y;
-            //            mPrevConv[bi][si] = convFoundS[si];
-            //        }
-            //}
 
             Nfound = cntFound;
             return posFoundS;
@@ -9706,170 +10383,22 @@ namespace FAutoLearn
         }
         //public long mCalcConv(byte[] srcData, ref sFiducialMark lfmark)   //  srcData 는 정확히 관심영역
 
-        public OpenCvSharp.Point CalcConv3line(int si, ref sFiducialMark lfmark, int iBuf)
-        {
-            OpenCvSharp.Point res = new OpenCvSharp.Point();
-            Rect[] searchVline = new Rect[5];
-            int[] searchHline = new int[5] { 390 / 3, 130 / 3, 260 / 3, 520 / 3, 0 };
-            int[][] resVline = new int[5][];    //  
-            int[][] resHline = new int[5][];
-
-            // use 1/3 image
-            //                        Typical Center of X
-            int HsearchStep = 14;
-            searchVline[0] = new Rect(170, 0, HsearchStep, 190 / 3);  //  N on side view : x, y, x step, y height
-            searchVline[1] = new Rect(90, 0, HsearchStep, 190 / 3);  //  S on side view : x, y, x step, y height
-            searchVline[2] = new Rect(130, 190 / 3, HsearchStep, 250 / 3);  //  E on side view : x, y, x step, y height
-            searchVline[3] = new Rect(217, 190 / 3, HsearchStep, 250 / 3);  //  N on Top view : x, y, x step, y height
-            searchVline[4] = new Rect(43, 190 / 3, HsearchStep, 250 / 3);  //  S on Top view : x, y, x step, y height
-
-
-            List<int[]> Vlines = new List<int[]>();
-            int quaterWidth = mSourceImg[iBuf].Width / lfmark.MScale;   //  1/3 영상버퍼의 폭
-            ref byte[] q_ValueImg = ref q_Value[iBuf];                  //  1/3 영상버퍼
-            int q_ValueImg_Length = q_ValueImg.Length;                  //  1/3 영상버퍼의 전체 길이
-
-            int[][] aVline = new int[4][];
-            bool foundMark = false;
-            int[] Xoffset = new int[5] { 0, -1, 1, -2, 2 };
-            for (int i = 0; i < 5; i++)
-            {
-                int vLen = searchVline[si].Height;
-                int xPos = searchVline[si].X + Xoffset[i] * HsearchStep;  //  51 pixel in the 1:1 image
-                int j0 = searchVline[si].Y;
-                int je = j0 + vLen;
-                aVline[i] = new int[vLen];
-                for (int j = j0; j < je; j++)
-                {
-                    aVline[i][j - j0] = q_ValueImg[xPos + j * quaterWidth];
-                }
-                //  4개의 Line 중에서 4개의 peak 가 있는 놈을 고른다.
-                //  4개의 Peak 는 서로 인접해있어야한다.
-                //  4개의 Peak 의 첫번째와 4번째간 거리는 Side View 는 15 이내, Top View 는 23 이내이어야 함.
-                //  Peak 는 60 이상, Peak-Valley 차이는 30 이상이어야 함
-                int k = 3;
-                int peakCount = 0;
-                int[] peakIndex = new int[10];
-                bool afterValley = true;
-                int lastPeak = 0;
-                while (k < vLen - 1)
-                {
-                    if (aVline[i][k] > 50 && aVline[i][k + 1] < aVline[i][k])
-                    {
-                        if (afterValley)
-                        {
-                            lastPeak = aVline[i][k];
-                            peakIndex[peakCount] = k;
-                            peakCount++;
-                            afterValley = false;
-                        }
-                    }
-                    if (peakCount > 0)
-                    {
-                        if (aVline[i][k] < lastPeak - 20 && aVline[i][k + 1] > aVline[i][k])
-                            afterValley = true;
-                    }
-                    k++;
-                }
-                while (peakCount >= 3)
-                {
-                    if (si < 3)
-                    {
-                        if (peakIndex[peakCount - 1] - peakIndex[0] < 13)
-                        {
-                            //                          //  Pos of Left Ref, Pos of Top Line, Pos of Bottom Line
-                            resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[peakCount - 1] + j0 };
-                            foundMark = true;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        if (peakIndex[peakCount - 1] - peakIndex[0] < 23)
-                        {
-                            //                          //    Pos of Left Ref, Pos of Top Line, Pos of Bottom Line
-                            resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[peakCount - 1] + j0 };
-                            foundMark = true;
-                            break;
-                        }
-                    }
-                    //  종료조건이 만족되지 않았다면 첫번째 Peak 를 버리고 다음 Peak 를 찾는다.
-                    for (int pi = 1; pi < peakCount; pi++)
-                        peakIndex[pi - 1] = peakIndex[pi];
-
-                    peakCount--;
-                }
-                if (peakCount < 4)
-                {
-                    // 마크가 없는 경우 초기위치와 초기 크기로 설정한다.
-                    resVline[si] = new int[3] { 0, 0, lfmark.modelSize.Height - 4 };
-                }
-                if (foundMark)
-                    break;
-            }
-
-            //  이상으로 X 방향 및 Y 방향에 대해서 기준좌표를 1/3 영상에서 획득함
-            int[] left = new int[5];
-            int[] right = new int[5];
-
-            //  각 마크위치 정보에 따라 마크별 0, 3번째 Line 가로방향데이터 합산
-            if (resVline[si][0] > 0)
-            {
-                resHline[si] = new int[86];  //  260/3 = 86.67 -> 86
-                for (int xi = 0; xi < 86; xi++)
-                {
-                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + resVline[si][1] * quaterWidth] + q_ValueImg[xi + searchHline[si] + resVline[si][2] * quaterWidth];
-                }
-                //  횡방향 기울기 최대점/최소점 x 위치 기록
-                int slopeMax = -9999;
-                int slopeMin = 9999;
-                int curSlope = 0;
-                //  관찰된 x 위치에서 앞뒤로 17.333pixel(52pixel) 만 확인하면 됨.
-                for (int xi = resVline[si][0] - 16 - searchHline[si]; xi < 84; xi++)
-                {
-                    curSlope = resHline[si][xi + 1] + resHline[si][xi + 2] - resHline[si][xi] - resHline[si][xi - 1];
-                    if (curSlope > slopeMax)
-                    {
-                        slopeMax = curSlope;
-                        left[si] = xi + searchHline[si];
-                    }
-                    if (xi > 13)
-                    {
-                        if (curSlope < slopeMin)
-                        {
-                            slopeMin = curSlope;
-                            right[si] = xi + searchHline[si];
-                        }
-                    }
-                    if (right[si] - left[si] > 15 && right[si] - left[si] < 21)
-                        break;
-                }
-                res = new OpenCvSharp.Point(left[si] - 1, resVline[si][1] - 3); //  Top Left of each mark region
-            }
-            else
-            {
-                //  마크 못찾은 경우
-                res = new OpenCvSharp.Point(0, 0); //  Top Left of each mark region
-            }
-            return res;
-        }
-
         public OpenCvSharp.Point CalcConv4line(int si, ref sFiducialMark lfmark, int iBuf, int initialX = -1)
         {
             OpenCvSharp.Point res = new OpenCvSharp.Point();
             Rect[] searchVline = new Rect[5];
-            int[] searchHline = new int[5] { 390/3 - 3, 130/3 - 3, 260/3, 520/3, 0 };
+            int[] searchHline = new int[5] { 390 / 3 - 3, 130 / 3 - 3, 260 / 3, 520 / 3, 0 };
             int[][] resVline = new int[5][];    //  
             int[][] resHline = new int[5][];
 
             // use 1/3 image
             //                        Typical Center of X
-            int HsearchStep = 19;   // 1045um
-            searchVline[0] = new Rect(170,      0,          HsearchStep, 190 / 3);  //  N on side view : x, y, x step, y height
-            searchVline[1] = new Rect(90,       0,          HsearchStep, 190 / 3);  //  S on side view : x, y, x step, y height
-            searchVline[2] = new Rect(130,      190/3,      HsearchStep, 250 / 3);  //  E on side view : x, y, x step, y height
-            searchVline[3] = new Rect(217,      190/3,      HsearchStep, 250 / 3);  //  N on Top view : x, y, x step, y height
-            searchVline[4] = new Rect(43,       190/3,      HsearchStep, 250 / 3);  //  S on Top view : x, y, x step, y height
+            int HsearchStep = 20;   // 1045um
+            searchVline[0] = new Rect(170, 0, HsearchStep, 190 / 3);  //  N on side view : x, y, x step, y height
+            searchVline[1] = new Rect(90, 0, HsearchStep, 190 / 3);  //  S on side view : x, y, x step, y height
+            searchVline[2] = new Rect(130, 190 / 3, HsearchStep, 270 / 3);  //  E on side view : x, y, x step, y height
+            searchVline[3] = new Rect(217, 190 / 3, HsearchStep, 270 / 3);  //  N on Top view : x, y, x step, y height
+            searchVline[4] = new Rect(43, 190 / 3, HsearchStep, 270 / 3);  //  S on Top view : x, y, x step, y height
 
 
             List<int[]> Vlines = new List<int[]>();
@@ -9886,19 +10415,19 @@ namespace FAutoLearn
             //else if (si == 4)
             //    Xoffset = new int[3] { 1, 0, -1 };    //  side N 마크는 우측부터 검색
 
-            for ( int i=0; i<3; i++)
+            for (int i = 0; i < 3; i++)
             {
                 int vLen = searchVline[si].Height;
                 int xPos = searchVline[si].X + Xoffset[i] * HsearchStep;  //  51 pixel in the 1:1 image
-                if (initialX>0)
-                    xPos = initialX + Xoffset[i] * HsearchStep/2;  //  51 pixel in the 1:1 image    예상위치가 있는 경우 좌우로 조금만 써치한다.
+                if (initialX > 0)
+                    xPos = initialX + Xoffset[i] * HsearchStep / 2;  //  51 pixel in the 1:1 image    예상위치가 있는 경우 좌우로 조금만 써치한다.
 
                 int j0 = searchVline[si].Y;
                 int je = j0 + vLen;
                 aVline[i] = new int[vLen];
-                for (int j = j0; j< je; j++)
+                for (int j = j0; j < je; j++)
                 {
-                    aVline[i][j-j0] = q_ValueImg[xPos + j * quaterWidth];
+                    aVline[i][j - j0] = q_ValueImg[xPos + j * quaterWidth];
                 }
                 //  4개의 Line 중에서 4개의 peak 가 있는 놈을 고른다.
                 //  4개의 Peak 는 서로 인접해있어야한다.
@@ -9907,22 +10436,41 @@ namespace FAutoLearn
                 int k = 3;
                 int peakCount = 0;
                 int[] peakIndex = new int[10];
+                int[] peakEach = new int[10];
                 bool afterValley = true;
                 int lastPeak = 0;
                 int minPeak = 9999;
-                int lastValley =  aVline[i][0];
+                int lastValley = aVline[i][0];
                 int lastValleyIndex = 0;
-                while (k< vLen-1)
+                while (k < vLen - 1)
                 {
                     //if (aVline[i][k] > 35 && aVline[i][k + 1] < aVline[i][k])   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
-                    if (aVline[i][k] > 35 && aVline[i][k + 1] < aVline[i][k] && aVline[i][k - 1] <= aVline[i][k] && aVline[i][k] < 250 && aVline[i][k - 1] < 250)   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
+                    if (si < 3 && peakCount == 0)
+                        if (aVline[i][k - 2] + 10 > aVline[i][k])
+                        {
+                            k++;
+                            continue;
+                        }
+
+                    if (aVline[i][k] > 30 && aVline[i][k + 1] < aVline[i][k] && aVline[i][k - 1] <= aVline[i][k] && aVline[i][k] < 252 && aVline[i][k - 1] < 252)   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
                     {
                         if (peakCount == 10)
                             break;
-                        if (lastValley + 20 < aVline[i][k] && afterValley)
+                        if ((lastValley + 20 < aVline[i][k] && afterValley) || (lastPeak + 50) < aVline[i][k])
                         {
+                            if (peakCount == 1)
+                            {
+                                //  첫번쨰 Peak는 가짜 peak 일 수 있는데 가짜인 경우 valley보다 어두울 수도있다.
+                                //  따라서 첫번쨰 Peak가 가짜 Peak 인 경우는 제거해야한다.
+                                if (/*peakIndex[0] < k - 6 || */ lastPeak < aVline[i][k] / 2)
+                                {
+                                    peakCount--;
+                                    minPeak = 9999;
+                                }
+                            }
                             lastPeak = aVline[i][k];
                             peakIndex[peakCount] = k;
+                            peakEach[peakCount] = lastPeak;
                             peakCount++;
                             afterValley = false;
                             if (minPeak > lastPeak)
@@ -9933,20 +10481,23 @@ namespace FAutoLearn
                     {
                         //if (aVline[i][k] < lastPeak - 20 && aVline[i][k + 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
                         //    afterValley = true;
-                        if (aVline[i][k] < lastPeak - 20 && aVline[i][k + 1] >= aVline[i][k] && aVline[i][k - 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
-                            if (aVline[i][k] < minPeak) //  Valley 는 minPeak 보다 어두워야 한다.
-                            {
-                                lastValley = aVline[i][k];
-                                afterValley = true;
-                                if (k - lastValleyIndex > 6 && peakCount > 4)   //   Valley와 Valley 간 간격이 너무 넓으면 이전 Peak 는 잘못된 Peak임
-                                    peakCount--;
+                        if (aVline[i][k] < 100)
+                        {
+                            if (aVline[i][k] < lastPeak - 12 && aVline[i][k + 1] >= aVline[i][k] && aVline[i][k - 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
+                                if (aVline[i][k] < minPeak) //  Valley 는 minPeak 보다 어두워야 한다.
+                                {
+                                    lastValley = aVline[i][k];
+                                    if (k - lastValleyIndex > 6 && peakCount > 4 && !afterValley)   //   Valley와 Valley 간 간격이 너무 넓으면 이전 Peak 는 잘못된 Peak임
+                                        peakCount--;
 
-                                lastValleyIndex = k;
-                            }
+                                    afterValley = true;
+                                    lastValleyIndex = k;
+                                }
+                        }
                     }
                     else
                     {
-                        if (lastValley > aVline[i][k] )
+                        if (lastValley > aVline[i][k])
                         {
                             lastValley = aVline[i][k];
                             lastValleyIndex = k;
@@ -9954,16 +10505,66 @@ namespace FAutoLearn
                     }
                     k++;
                 }
-                while (peakCount>=4)
+                while (peakCount >= 4)
                 {
-                    if ( si<3)
+                    if (si < 3)
                     {
                         if (peakIndex[3] - peakIndex[0] < 16)
                         {
                             //                          //  Pos of Left Ref, Pos of Top Line, Pos of Bottom Line
-                            resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
-                            foundMark = true;
-                            break;
+                            if ((peakEach[0] > peakEach[1] / 2 && peakCount > 4 && peakEach[0] < 1.5 * peakEach[1]) || peakCount == 4)
+                            {
+                                if (peakCount > 4)
+                                {
+                                    int gap01 = peakIndex[1] - peakIndex[0];
+                                    int gap12 = peakIndex[2] - peakIndex[1];
+                                    int gap23 = peakIndex[3] - peakIndex[2];
+                                    int gap45 = peakIndex[4] - peakIndex[3];
+                                    if (gap01 > gap12 + 1 && gap01 > gap23 + 1)
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                        foundMark = true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                        foundMark = true;
+                                        break;
+
+                                    }
+                                }
+                                else
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
+                            }
+                            else if (peakCount > 4)
+                            {
+                                if (peakIndex[4] - peakIndex[1] < 16)
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
+                                else if (peakCount == 5)
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
+                                else if (peakCount == 6)
+                                {
+                                    if (peakIndex[5] - peakIndex[2] < 16)
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[2] + j0, peakIndex[5] + j0 };
+                                        foundMark = true;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                     else
@@ -9977,12 +10578,13 @@ namespace FAutoLearn
                         }
                     }
                     //  종료조건이 만족되지 않았다면 첫번째 Peak 를 버리고 다음 Peak 를 찾는다.
-                    if (peakIndex[1] - peakIndex[0] > peakIndex[peakCount-1] - peakIndex[peakCount - 2])
+                    if (peakIndex[1] - peakIndex[0] > peakIndex[peakCount - 1] - peakIndex[peakCount - 2])
                     {
                         //  첫번째 Peak 가 동떨어진 경우
                         for (int pi = 1; pi < peakCount; pi++)
                             peakIndex[pi - 1] = peakIndex[pi];
-                    }else
+                    }
+                    else
                     {
                         //  마지막 Peak 가 동떨어진 경우
                         peakIndex[peakCount - 1] = 0;
@@ -10020,24 +10622,30 @@ namespace FAutoLearn
             {
                 for (int xi = 0; xi < HbufLength; xi++)
                 {
-                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + resVline[si][1]     * quaterWidth] + q_ValueImg[xi + searchHline[si] + resVline[si][2]     * quaterWidth];
-                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1]+1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2]+1) * quaterWidth];
-                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1]-1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2]-1) * quaterWidth];
+                    if (xi + searchHline[si] < resVline[si][0] - 24)
+                    {
+                        resHline[si][xi] = 6 * 255;
+                        continue;
+                    }
+
+                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + resVline[si][1] * quaterWidth] + q_ValueImg[xi + searchHline[si] + resVline[si][2] * quaterWidth];
+                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] + 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] + 1) * quaterWidth];
+                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] - 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] - 1) * quaterWidth];
                 }
                 //  횡방향 기울기 최대점/최소점 x 위치 기록
                 int slopeMax = 127;
                 int slopeMin = -127;
                 int curSlope = 0;
                 //  관찰된 x 위치에서 앞뒤로 17.333pixel(52pixel) 만 확인하면 됨.
-                for (int xi = 1; xi < HbufLength-2; xi++)
+                for (int xi = 1; xi < HbufLength - 2; xi++)
                 {
                     curSlope = resHline[si][xi + 1] + resHline[si][xi + 2] - resHline[si][xi] - resHline[si][xi - 1];
-                    if (curSlope > slopeMax && xi < HbufLength-16)
+                    if (curSlope > slopeMax && xi < HbufLength - 16)
                     {
                         //  상승엣지는 260/3 - 18 까지에서만 찾아야 한다.
                         //slopeMax = curSlope;
                         //left[si] = xi + searchHline[si];
-                        if ((resHline[si][xi + 4] + resHline[si][xi + 6]) > 402)
+                        if ((resHline[si][xi + 4] + resHline[si][xi + 6]) >= 1.6 * resHline[si][xi + 2])
                             if (resHline[si][xi] < resHline[si][xi + 2] && resHline[si][xi] < resHline[si][xi + 3] && resHline[si][xi] < resHline[si][xi + 4])
                             {
                                 slopeMax = curSlope;
@@ -10046,7 +10654,7 @@ namespace FAutoLearn
                                 leftFInalSlope = curSlope;
                             }
                     }
-                    if ( xi > left[si]+18 && xi < left[si] + 28 && left[si] > 0)
+                    if (xi > left[si] + 18 && xi < left[si] + 28 && left[si] > 0)
                     {
                         // 하강 엣지는 유효한 상승엣지로부터 26 이내에서만 찾아야 한다.
                         if (curSlope < slopeMin)
@@ -10063,7 +10671,7 @@ namespace FAutoLearn
                             FoundSlopeMin = false;
 
                     }
-                    if (right[si] - left[si] > 20 && right[si] - left[si] < 26 && FoundSlopeMin== false)
+                    if (right[si] - left[si] > 20 && right[si] - left[si] < 26 && FoundSlopeMin == false)
                         break;
                 }
                 res = new OpenCvSharp.Point(left[si] + searchHline[si] - 1, resVline[si][1] - 3); //  Top Left of each mark region
@@ -10075,7 +10683,310 @@ namespace FAutoLearn
             }
             return res;
         }
+        public OpenCvSharp.Point CalcConv4line2(int si, ref sFiducialMark lfmark, int iBuf, int initialX = -1)
+        {
+            if (mIsFile)
+                return new OpenCvSharp.Point(0, 0);
 
+            OpenCvSharp.Point res = new OpenCvSharp.Point();
+            Rect[] searchVline = new Rect[3];
+            int[] searchHline = new int[3] { 225 / 3, 0, 145 / 3, };
+            int[][] resVline = new int[3][];    //  
+            int[][] resHline = new int[3][];
+
+            // use 1/3 image
+            //                        Typical Center of X
+            int HsearchStep = 20;   // 1045um
+            searchVline[0] = new Rect(170, 0, HsearchStep, 210 / 3);  //  N on side view : x, y, x step, y height
+            searchVline[1] = new Rect(90, 0, HsearchStep, 210 / 3);  //  S on side view : x, y, x step, y height
+            searchVline[2] = new Rect(130, 210 / 3, HsearchStep, 210 / 3);  //  E on side view : x, y, x step, y height
+
+
+            List<int[]> Vlines = new List<int[]>();
+            int quaterWidth = mSourceImg2[iBuf].Width / lfmark.MScale;   //  1/3 영상버퍼의 폭
+            ref byte[] q_ValueImg = ref q_Value2[iBuf];                  //  1/3 영상버퍼
+            int q_ValueImg_Length = q_ValueImg.Length;                  //  1/3 영상버퍼의 전체 길이
+
+            int[][] aVline = new int[4][];
+            bool foundMark = false;
+            int[] Xoffset = new int[3] { 0, -1, 1 };
+
+            //mSourceImg2[iBuf].SaveImage("D:\\AAA.bmp");
+            int peakThreshold = 20;
+            int valleyThreshold = 8;
+            if (si == 2)
+            {
+                peakThreshold = 25;
+                valleyThreshold = 13;
+            }
+
+            for (int i = 0; i < 3; i++)
+            {
+                int vLen = searchVline[si].Height;
+                int xPos = searchVline[si].X + Xoffset[i] * HsearchStep;  //  51 pixel in the 1:1 image
+                if (initialX > 0)
+                    xPos = initialX + Xoffset[i] * HsearchStep / 2;  //  51 pixel in the 1:1 image    예상위치가 있는 경우 좌우로 조금만 써치한다.
+
+                int j0 = searchVline[si].Y;
+                int je = j0 + vLen;
+                aVline[i] = new int[vLen];
+                for (int j = j0; j < je; j++)
+                {
+                    aVline[i][j - j0] = q_ValueImg[xPos + j * quaterWidth];
+                }
+                //  4개의 Line 중에서 4개의 peak 가 있는 놈을 고른다.
+                //  4개의 Peak 는 서로 인접해있어야한다.
+                //  4개의 Peak 의 첫번째와 4번째간 거리는 Side View 는 15 이내, Top View 는 23 이내이어야 함.
+                //  Peak 는 60 이상, Peak-Valley 차이는 30 이상이어야 함
+                int k = 3;
+                int peakCount = 0;
+                int[] peakIndex = new int[10];
+                int[] peakEach = new int[10];
+                bool afterValley = true;
+                int lastPeak = 0;
+                int minPeak = 9999;
+                int lastValley = aVline[i][0];
+                int lastValleyIndex = 0;
+                while (k < vLen - 1)
+                {
+                    //if (aVline[i][k] > 35 && aVline[i][k + 1] < aVline[i][k])   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
+                    if (si < 3 && peakCount == 0)
+                        if (aVline[i][k - 2] + 10 > aVline[i][k])
+                        {
+                            k++;
+                            continue;
+                        }
+
+                    if (aVline[i][k] > peakThreshold && aVline[i][k + 1] < aVline[i][k] && aVline[i][k - 1] <= aVline[i][k])   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
+                    {
+                        if (peakCount == 10)
+                            break;
+                        if ((lastValley + valleyThreshold < aVline[i][k] && afterValley) || (lastPeak + 50) < aVline[i][k])
+                        {
+                            if (peakCount == 1)
+                            {
+                                //  첫번쨰 Peak는 가짜 peak 일 수 있는데 가짜인 경우 valley보다 어두울 수도있다.
+                                //  따라서 첫번쨰 Peak가 가짜 Peak 인 경우는 제거해야한다.
+                                if (peakIndex[0] < k - 6 || lastPeak < aVline[i][k] / 2)
+                                {
+                                    peakCount--;
+                                    minPeak = 9999;
+                                }
+                            }
+                            peakIndex[peakCount] = k;
+                            peakEach[peakCount] = lastPeak;
+                            lastPeak = aVline[i][k];
+                            peakCount++;
+                            afterValley = false;
+                            if (minPeak > lastPeak)
+                                minPeak = lastPeak;
+                        }
+                    }
+                    else if (peakCount > 0)
+                    {
+                        //if (aVline[i][k] < lastPeak - 20 && aVline[i][k + 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
+                        //    afterValley = true;
+                        if (aVline[i][k] < lastPeak - valleyThreshold && aVline[i][k + 1] >= aVline[i][k] && aVline[i][k - 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
+                            if (aVline[i][k] < minPeak/*lastPeak - 15*/) //  Valley 는 minPeak 보다 어두워야 한다.
+                            {
+                                lastValley = aVline[i][k];
+                                if (k - lastValleyIndex > 6 && peakCount > 4 && !afterValley)   //   Valley와 Valley 간 간격이 너무 넓으면 이전 Peak 는 잘못된 Peak임
+                                {
+                                    if (peakIndex[peakCount] > lastValleyIndex)
+                                        peakCount--;
+                                }
+                                afterValley = true;
+                                lastValleyIndex = k;
+                            }
+                    }
+                    else
+                    {
+                        if (lastValley > aVline[i][k])
+                        {
+                            lastValley = aVline[i][k];
+                            lastValleyIndex = k;
+                        }
+                    }
+                    k++;
+                }
+                while (peakCount >= 4)
+                {
+                    if (si < 3)
+                    {
+                        if (peakIndex[3] - peakIndex[0] < 16)
+                        {
+                            //                          //  Pos of Left Ref, Pos of Top Line, Pos of Bottom Line
+                            if ((peakEach[0] > peakEach[1] / 2 && peakCount > 4 && peakEach[0] < 1.5 * peakEach[1]) || peakCount == 4)
+                            {
+                                if (peakCount > 4)
+                                {
+                                    int gap01 = peakIndex[1] - peakIndex[0];
+                                    int gap12 = peakIndex[2] - peakIndex[1];
+                                    int gap23 = peakIndex[3] - peakIndex[2];
+                                    int gap45 = peakIndex[4] - peakIndex[3];
+                                    if (gap01 > gap12 + 1 && gap01 > gap23 + 1)
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                        foundMark = true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                        foundMark = true;
+                                        break;
+
+                                    }
+                                }
+                                else
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
+                            }
+                            else if (peakCount > 4)
+                            {
+                                if (peakIndex[4] - peakIndex[1] < 16)
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
+                                else if (peakCount == 5)
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
+                                else if (peakCount == 6)
+                                {
+                                    if (peakIndex[5] - peakIndex[2] < 16)
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[2] + j0, peakIndex[5] + j0 };
+                                        foundMark = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (peakIndex[3] - peakIndex[0] < 24)
+                        {
+                            //                          //    Pos of Left Ref, Pos of Top Line, Pos of Bottom Line
+                            resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                            foundMark = true;
+                            break;
+                        }
+                    }
+                    //  종료조건이 만족되지 않았다면 첫번째 Peak 를 버리고 다음 Peak 를 찾는다.
+                    if (peakIndex[1] - peakIndex[0] > peakIndex[peakCount - 1] - peakIndex[peakCount - 2])
+                    {
+                        //  첫번째 Peak 가 동떨어진 경우
+                        for (int pi = 1; pi < peakCount; pi++)
+                            peakIndex[pi - 1] = peakIndex[pi];
+                    }
+                    else
+                    {
+                        //  마지막 Peak 가 동떨어진 경우
+                        peakIndex[peakCount - 1] = 0;
+                    }
+
+                    peakCount--;
+                }
+                if (peakCount < 4)
+                {
+                    // 마크가 없는 경우 초기위치와 초기 크기로 설정한다.
+                    resVline[si] = new int[3] { 0, 0, lfmark.modelSize.Height - 4 };
+                }
+                if (foundMark)
+                    break;
+            }
+
+            //  이상으로 X 방향 및 Y 방향에 대해서 기준좌표를 1/3 영상에서 획득함
+            int[] left = new int[5];
+            int[] right = new int[5];
+            bool FoundSlopeMin = false;
+            int rightsideofLeftEdge = 0;
+            int leftFInalSlope = 0;
+            int rightFinalSlope = 0;
+
+            //  각 마크위치 정보에 따라 마크별 0, 3번째 Line 가로방향데이터 합산
+            resHline[si] = new int[89];  //  270/3 = 90 -> 88 -> 여기서 마크 X 길이만큼 빼줘야 한다. 따라서 86-18 = 68
+            int HbufLength = 89;
+            if (si < 2)
+            {
+                HbufLength = 89;
+                resHline[si] = new int[HbufLength];  //  260/3 = 86.67 -> 86 -> 여기서 마크 X 길이만큼 빼줘야 한다. 따라서 86-18 = 68
+            }
+
+            if (resVline[si][0] > 0)
+            {
+                for (int xi = 0; xi < HbufLength; xi++)
+                {
+                    if (xi + searchHline[si] < resVline[si][0] - 24)
+                    {
+                        resHline[si][xi] = 6 * 255;
+                        continue;
+                    }
+
+                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + resVline[si][1] * quaterWidth] + q_ValueImg[xi + searchHline[si] + resVline[si][2] * quaterWidth];
+                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] + 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] + 1) * quaterWidth];
+                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] - 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] - 1) * quaterWidth];
+                }
+                //  횡방향 기울기 최대점/최소점 x 위치 기록
+                int slopeMax = 127;
+                int slopeMin = -127;
+                int curSlope = 0;
+                //  관찰된 x 위치에서 앞뒤로 17.333pixel(52pixel) 만 확인하면 됨.
+                for (int xi = 1; xi < HbufLength - 2; xi++)
+                {
+                    curSlope = resHline[si][xi + 1] + resHline[si][xi + 2] - resHline[si][xi] - resHline[si][xi - 1];
+                    if (curSlope > slopeMax && xi < HbufLength - 16)
+                    {
+                        //  상승엣지는 260/3 - 18 까지에서만 찾아야 한다.
+                        //slopeMax = curSlope;
+                        //left[si] = xi + searchHline[si];
+                        if ((resHline[si][xi + 4] + resHline[si][xi + 6]) > 1.6 * resHline[si][xi + 2])
+                            if (resHline[si][xi] < resHline[si][xi + 2] && resHline[si][xi] < resHline[si][xi + 3] && resHline[si][xi] < resHline[si][xi + 4])
+                            {
+                                slopeMax = curSlope;
+                                left[si] = xi;
+                                rightsideofLeftEdge = (resHline[si][xi + 4] + resHline[si][xi + 6]) / 2;
+                                leftFInalSlope = curSlope;
+                            }
+                    }
+                    if (xi > left[si] + 18 && xi < left[si] + 28 && left[si] > 0)
+                    {
+                        // 하강 엣지는 유효한 상승엣지로부터 26 이내에서만 찾아야 한다.
+                        if (curSlope < slopeMin)
+                        {
+                            //slopeMin = curSlope;
+                            //right[si] = xi + searchHline[si];
+                            //FoundSlopeMin = true;
+                            slopeMin = curSlope;
+                            right[si] = xi;
+                            FoundSlopeMin = true;
+                            rightFinalSlope = curSlope;
+                        }
+                        else
+                            FoundSlopeMin = false;
+
+                    }
+                    if (right[si] - left[si] > 20 && right[si] - left[si] < 26 && FoundSlopeMin == false)
+                        break;
+                }
+                res = new OpenCvSharp.Point(left[si] + searchHline[si] - 1, resVline[si][1] - 3); //  Top Left of each mark region
+            }
+            else
+            {
+                //  마크 못찾은 경우
+                res = new OpenCvSharp.Point(0, 0); //  Top Left of each mark region
+            }
+            return res;
+        }
         public long CalcConv(ref sFiducialMark lfmark, int x, int y, int iBuf, ref double subconv )
         {
             //  Preprocess for q_Value to have -1,0,1 only
@@ -14571,7 +15482,7 @@ private void button15_Click(object sender, EventArgs e)
 
             //  입력값이 mm 단위면 mm. rad 로 결과 나오고
             //  입력값이 pixel 단위면, pixel, rad 로 결과 나온다.
-            mFZM.CalcZPhiTheta(pSide1, pSide, trM, wT, ref ZTXTY);  //  pSide 는 초기상태, pSide1 는 현재 상태, Z 변위 및 tilt X, tilt Y 를 구한다.
+            mFZM.CalcZPhiTheta(pSide1, pSide, trM, wT, ref ZTXTY, 0,0);  //  pSide 는 초기상태, pSide1 는 현재 상태, Z 변위 및 tilt X, tilt Y 를 구한다.
 
             double dZ = ZTXTY[0] * sec40;   //  Pixel 입력시 pixel, mm 입력 시 mm
             double TX = ZTXTY[1] * sec40;   //  radian
