@@ -3591,7 +3591,38 @@ namespace FAutoLearn
             MatrixCross(ref XXTinv, ref XTA, ref A, 3);
             //  y = A[0] x^2 + A[1] + A[2];
         }
+        public void mcLMS2ndPoly(Point2d[] wp, int length, ref double[] A)
+        {
+            //  Poly2nd.a, Poly2nd.b, Poly2nd.c =>
+            //  y = A[0] x^2 + A[1] + A[2];
 
+            double[,] XXTinv = new double[3, 3];
+            double[] XTA = new double[3];
+            double XX = 0;
+
+            for (int i = 0; i < length; i++)
+            {
+                XX = wp[i].X * wp[i].X;
+                XXTinv[0, 0] += XX * XX;
+                XXTinv[0, 1] += XX * wp[i].X;
+                XXTinv[0, 2] += XX;
+
+                XXTinv[1, 0] += XX * wp[i].X;
+                XXTinv[1, 1] += XX;
+                XXTinv[1, 2] += wp[i].X;
+
+                XXTinv[2, 0] += XX;
+                XXTinv[2, 1] += wp[i].X;
+                XXTinv[2, 2]++;
+
+                XTA[0] += wp[i].Y * XX;
+                XTA[1] += wp[i].Y * wp[i].X;
+                XTA[2] += wp[i].Y;
+            }
+            InverseU(ref XXTinv, 3);
+            MatrixCross(ref XXTinv, ref XTA, ref A, 3);
+            //  y = A[0] x^2 + A[1] + A[2];
+        }
         public void mcLP2ndPoly(Point2D[] wp, int length, ref double[] A, int begin = 0, bool minimizedPP = false)
         {
             //  Simplyfied Linear Programming
@@ -5806,9 +5837,9 @@ namespace FAutoLearn
             double res2nd = 0;
 
             int xi0 = (int)xia;
-            int yi0 = (int)yia - 5;
+            int yi0 = (int)yia - 6;
             int xW = xW_;
-            int yH = yH_ + 10;
+            int yH = yH_ + 7;
 
 
             int fxi0 = xi0;
@@ -5881,7 +5912,7 @@ namespace FAutoLearn
                     {
                         xi0_i = (int)(xi0 + i);
                         peakIndex[i] = i;
-                        for (int j = yi0; j < yH; j++)
+                        for (int j = yi0; j < yi0 + yH; j++)
                             roughPeak[i] += (1 - ry) * Xidiffsrc[xi0_i + j * width] + ry * Xidiffsrc[xi0_i + (j + 1) * width];
 
                         //  좌측 찾고 우측 이어서 찾을 것이므로 부호 불필요
@@ -6091,7 +6122,7 @@ namespace FAutoLearn
                     {
                         xi0_i = (int)(xi0 + i);
                         peakIndex[i] = i;
-                        for (int j = yi0; j < yH; j++)
+                        for (int j = yi0; j < yi0 + yH; j++)
                             roughPeak[i] -= ((1 - ry) * Xidiffsrc[xi0_i + j * width] + ry * Xidiffsrc[xi0_i + (j + 1) * width]);
 
                         //  우측 찾기 부호반전함.
