@@ -10478,8 +10478,9 @@ namespace FAutoLearn
                                 if (aVline[i][k] < minPeak) //  Valley 는 minPeak 보다 어두워야 한다.
                                 {
                                     lastValley = aVline[i][k];
-                                    if (k - lastValleyIndex > 6 && peakCount > 4 && !afterValley)   //   Valley와 Valley 간 간격이 너무 넓으면 이전 Peak 는 잘못된 Peak임
-                                        peakCount--;
+                                    if (peakCount<4)
+                                        if (k - lastValleyIndex > 6 && peakCount > 4 && !afterValley)   //   Valley와 Valley 간 간격이 너무 넓으면 이전 Peak 는 잘못된 Peak임
+                                            peakCount--;
 
                                     afterValley = true;
                                     lastValleyIndex = k;

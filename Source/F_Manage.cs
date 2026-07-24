@@ -2607,8 +2607,8 @@ namespace CSH030Ex
             {
                 BeginInvoke((MethodInvoker)delegate
                 {
-                    //if (mViewLog1.Text.Length > 10000)
-                    //    mViewLog1.Text = "";
+                    if (mViewLog1.Text.Length > 10000)
+                        mViewLog1.Text = "";
                     DateTime dtNow = DateTime.Now;
 
                     mViewLog1.Text += "DummyID " + mStrDummyIndex + "\t" + string.Format("{0}, ", dtNow.ToString("yyyy-MM-dd HH:mm:ss.fff")) + lstr;
@@ -2618,8 +2618,8 @@ namespace CSH030Ex
             }
             else
             {
-                //if (mViewLog1.Text.Length > 10000)
-                //    mViewLog1.Text = "";
+                if (mViewLog1.Text.Length > 10000)
+                    mViewLog1.Text = "";
                 DateTime dtNow = DateTime.Now;
 
                 mViewLog1.Text += "DummyID " + mStrDummyIndex + "\t" + string.Format("{0}, ", dtNow.ToString("yyyy-MM-dd HH:mm:ss.fff")) + lstr;

@@ -3007,7 +3007,7 @@ namespace CSH030Ex
             {
                 Task[] taskArray = new Task[5];
 
-                m__G.fManage.AddViewLog(string.Format("FineCOG Parallel\r\n"));
+                if (!m__G.m_bHideAllGraph) m__G.fManage.AddViewLog(string.Format("FineCOG Parallel\r\n"));
                 int count = mavNum + 1;
                 Task task1 = Task.Run(() =>
                 {
@@ -3479,7 +3479,7 @@ namespace CSH030Ex
             m__G.mDoingStatus = "IDLE";
             m__G.mIDLEcount = 0;
         }
-        public void ManualFindMarks(int Nth, bool IsShowResult = true, bool fromFirst = false)
+        public void ManualFindMarks(int Nth, bool IsShowResult = true, bool fromFirst = false, bool isOperate = false)
         {
             m__G.mDoingStatus = "Checking Vision";
 
@@ -3635,7 +3635,7 @@ namespace CSH030Ex
                 for (int i = 0; i < 12; i++)
                 {
                     if (xavg[i] == 0) continue;
-                    if (IsShowResult)
+                    if (IsShowResult && !isOperate)
                         strtmp[ci] += xavg[i].ToString("F3") + "\t" + yavg[i].ToString("F3") + "\t";
 
                     lCalibrationData[6 + 2 * kk] = xavg[i];
@@ -4170,7 +4170,9 @@ namespace CSH030Ex
             {
                 m__G.fGraph.mDriverIC.SetLEDpower(1, (int)((mLEDcurrent[0]) * 500));
                 m__G.fGraph.mDriverIC.SetLEDpower(2, (int)((mLEDcurrent[1]) * 500));
-                ManualFindMarks(i, true, true);
+                bool isOperate = true;
+                if (BtnAdminMode.Text == "Amdin Mode") isOperate = false;
+                ManualFindMarks(i, true, true, isOperate);
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6228,7 +6230,7 @@ namespace CSH030Ex
                 CalcVisionData(0, 0, count, 1, 1, IsFile);
             else
             {
-                m__G.fManage.AddViewLog(string.Format("FineCOG Parallel\r\n"));
+                if (!m__G.m_bHideAllGraph) m__G.fManage.AddViewLog(string.Format("FineCOG Parallel\r\n"));
 
                 Parallel.ForEach(taskIndices, taskIndex =>
                 {

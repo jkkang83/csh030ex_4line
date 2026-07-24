@@ -3394,7 +3394,7 @@ namespace S2System.Vision
             string resDirectory = "C:\\CSHTest\\Data\\" + dt.Year + "\\" + dt.Month + "\\" + dt.Day + "\\" + "GrabTiming\\";
             if (!Directory.Exists(resDirectory))
                 Directory.CreateDirectory(resDirectory);
-            if (mRequestedTriggerCount > mTriggeredFrameCount)
+            //if (mRequestedTriggerCount > mTriggeredFrameCount)
             {
                 StreamWriter wr = new StreamWriter(resDirectory + "F_GrabTiming_" + mRequestedTriggerCount.ToString() + dt.ToString("_hhmmss") + ".csv");
                 string gstr = "";
