@@ -10764,7 +10764,7 @@ namespace FAutoLearn
                                 }
                             }
                             peakIndex[peakCount] = k;
-                            peakEach[peakCount] = lastPeak;
+                            peakEach[peakCount] = aVline[i][k];
                             lastPeak = aVline[i][k];
                             peakCount++;
                             afterValley = false;
