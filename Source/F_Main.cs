@@ -836,9 +836,9 @@ namespace CSH030Ex
             this.Show();
             lblDefaultModel.Text = m__G.mFAL.GetLastFMI();
 
-            m__G.fVision.StartLive();
-            Thread.Sleep(100);
-            m__G.fVision.GrabHalt();
+            //m__G.fVision.StartLive();
+            //Thread.Sleep(100);
+            //m__G.fVision.GrabHalt();
         }
         public bool ReadPrevCBstates()
         {

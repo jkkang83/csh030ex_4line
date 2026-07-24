@@ -397,7 +397,7 @@ namespace CSH030Ex
             try
             {
                 m__G = Global.GetInstance();
-                cbContinuosMode.Enabled = false;
+                cbContinuosMode.Enabled = true;
                 //string which = "true";
                 //int i = 0;
 
