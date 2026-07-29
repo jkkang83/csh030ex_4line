@@ -1979,7 +1979,7 @@ namespace CSH030Ex
 
             int structCnt = 44;
             int databufCnt = 9;
-            if (m__G.m_bPseudoOMM) databufCnt = 14;
+            if (m__G.m_bPseudoOMM) databufCnt = 13;
             byte[] dataBuf = new byte[structCnt + framCnt * 8 * databufCnt];
 
             double umscale = 5.5 / Global.LensMag;                           //  rad to min
@@ -2383,7 +2383,7 @@ namespace CSH030Ex
                                 sResult.X[i], sResult.Y[i], sResult.Z[i]
                                 , sResult.CoX[i], sResult.CoY[i], sResult.CoZ[i], sResult.TX[i], sResult.TY[i], sResult.TZ[i]
                                 , sResult.pOmmX[i], sResult.pOmmY[i], sResult.pOmmZ[i], sResult.pOmmTZ[i]
-                                , sResult.pOmmRefX[i], sResult.pOmmRefY[i], sResult.pOmmRefVX[i], sResult.pOmmRefVY[i]
+                                //, sResult.pOmmRefX[i], sResult.pOmmRefY[i], sResult.pOmmRefVX[i], sResult.pOmmRefVY[i]
                                 ));
                         }
                     }
@@ -2412,7 +2412,7 @@ namespace CSH030Ex
                                 sResult.X[i], sResult.Y[i], sResult.Z[i],
                                 sResult.TX[i], sResult.TY[i], sResult.TZ[i], sResult.CoX[i], sResult.CoY[i], sResult.CoZ[i]
                                 , sResult.pOmmX[i], sResult.pOmmY[i], sResult.pOmmZ[i], sResult.pOmmTZ[i]
-                                , sResult.pOmmRefX[i], sResult.pOmmRefY[i], sResult.pOmmRefVX[i], sResult.pOmmRefVY[i]
+                                //, sResult.pOmmRefX[i], sResult.pOmmRefY[i], sResult.pOmmRefVX[i], sResult.pOmmRefVY[i]
                                 ));
                         }
                     }
