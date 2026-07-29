@@ -217,6 +217,8 @@
             this.BtnAdminMode = new System.Windows.Forms.Button();
             this.PanelAdmin1 = new System.Windows.Forms.Panel();
             this.PanelAdmin2 = new System.Windows.Forms.Panel();
+            this.cbLongTerm = new System.Windows.Forms.CheckBox();
+            this.cbP45_5Times = new System.Windows.Forms.CheckBox();
             this.grpAdjust.SuspendLayout();
             this.grbCalibration.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -796,6 +798,8 @@
             // 
             // grbCalibration
             // 
+            this.grbCalibration.Controls.Add(this.cbP45_5Times);
+            this.grbCalibration.Controls.Add(this.cbLongTerm);
             this.grbCalibration.Controls.Add(this.tbRepeatMeasure);
             this.grbCalibration.Controls.Add(this.label39);
             this.grbCalibration.Controls.Add(this.cbMicroYcal);
@@ -852,12 +856,13 @@
             this.cbMicroYcal.AutoSize = true;
             this.cbMicroYcal.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbMicroYcal.ForeColor = System.Drawing.Color.White;
-            this.cbMicroYcal.Location = new System.Drawing.Point(283, 192);
+            this.cbMicroYcal.Location = new System.Drawing.Point(283, 163);
             this.cbMicroYcal.Name = "cbMicroYcal";
             this.cbMicroYcal.Size = new System.Drawing.Size(89, 19);
             this.cbMicroYcal.TabIndex = 497;
             this.cbMicroYcal.Text = "micro Y cal";
             this.cbMicroYcal.UseVisualStyleBackColor = true;
+            this.cbMicroYcal.Visible = false;
             // 
             // btnPivotTest
             // 
@@ -880,7 +885,7 @@
             this.chkSaveImg.AutoSize = true;
             this.chkSaveImg.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.chkSaveImg.ForeColor = System.Drawing.Color.White;
-            this.chkSaveImg.Location = new System.Drawing.Point(283, 163);
+            this.chkSaveImg.Location = new System.Drawing.Point(283, 148);
             this.chkSaveImg.Name = "chkSaveImg";
             this.chkSaveImg.Size = new System.Drawing.Size(94, 19);
             this.chkSaveImg.TabIndex = 495;
@@ -2840,6 +2845,32 @@
             this.PanelAdmin2.Size = new System.Drawing.Size(402, 345);
             this.PanelAdmin2.TabIndex = 514;
             // 
+            // cbLongTerm
+            // 
+            this.cbLongTerm.AutoSize = true;
+            this.cbLongTerm.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbLongTerm.ForeColor = System.Drawing.Color.White;
+            this.cbLongTerm.Location = new System.Drawing.Point(283, 193);
+            this.cbLongTerm.Name = "cbLongTerm";
+            this.cbLongTerm.Size = new System.Drawing.Size(88, 19);
+            this.cbLongTerm.TabIndex = 500;
+            this.cbLongTerm.Text = "Long Term";
+            this.cbLongTerm.UseVisualStyleBackColor = true;
+            this.cbLongTerm.Visible = false;
+            // 
+            // cbP45_5Times
+            // 
+            this.cbP45_5Times.AutoSize = true;
+            this.cbP45_5Times.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbP45_5Times.ForeColor = System.Drawing.Color.White;
+            this.cbP45_5Times.Location = new System.Drawing.Point(283, 178);
+            this.cbP45_5Times.Name = "cbP45_5Times";
+            this.cbP45_5Times.Size = new System.Drawing.Size(71, 19);
+            this.cbP45_5Times.TabIndex = 501;
+            this.cbP45_5Times.Text = "5 Times";
+            this.cbP45_5Times.UseVisualStyleBackColor = true;
+            this.cbP45_5Times.Visible = false;
+            // 
             // FVision
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -3134,5 +3165,7 @@
         private System.Windows.Forms.Button BtnAdminMode;
         private System.Windows.Forms.Panel PanelAdmin1;
         private System.Windows.Forms.Panel PanelAdmin2;
+        private System.Windows.Forms.CheckBox cbP45_5Times;
+        private System.Windows.Forms.CheckBox cbLongTerm;
     }
 }

@@ -1605,6 +1605,10 @@ namespace CSH030Ex
             public double[] pOmmTX;
             public double[] pOmmTY;
             public double[] pOmmTZ;
+            public double[] pOmmRefX;
+            public double[] pOmmRefY;
+            public double[] pOmmRefVX;
+            public double[] pOmmRefVY;
         }
         public class sSaveResultPos
         {
@@ -1975,7 +1979,7 @@ namespace CSH030Ex
 
             int structCnt = 44;
             int databufCnt = 9;
-            if (m__G.m_bPseudoOMM) databufCnt = 13;
+            if (m__G.m_bPseudoOMM) databufCnt = 14;
             byte[] dataBuf = new byte[structCnt + framCnt * 8 * databufCnt];
 
             double umscale = 5.5 / Global.LensMag;                           //  rad to min
@@ -2038,6 +2042,12 @@ namespace CSH030Ex
             //sResult.pOmmTY = new double[framCnt];
             sResult.pOmmTZ = new double[framCnt];
 
+            //sResult.pOmmRefX = new double[framCnt];
+            //sResult.pOmmRefY = new double[framCnt];
+            //sResult.pOmmRefVX = new double[framCnt];
+            //sResult.pOmmRefVY = new double[framCnt];
+
+
             for (i = 0; i < framCnt; i++)
             {
                 sResult.CoX[i] = 0;
@@ -2071,6 +2081,11 @@ namespace CSH030Ex
                             //sResult.pOmmTX[0] += m__G.oCam[0].mPOMM_TX[i] * minscale / 5; //  min
                             //sResult.pOmmTY[0] += m__G.oCam[0].mPOMM_TY[i] * minscale / 5; //  min
                             sResult.pOmmTZ[0] += m__G.oCam[0].mPOMM_TZ[i] * minscale / 5; //  min
+                            //==
+                            //sResult.pOmmRefX[0] += m__G.oCam[0].mPOMM_sX[i]* minscale / 5; //  min
+                            //sResult.pOmmRefY[0] += m__G.oCam[0].mPOMM_sY[i]* minscale / 5; //  min
+                            //sResult.pOmmRefVX[0] += m__G.oCam[0].mPOMM_tX[i]* minscale / 5; //  min
+                            //sResult.pOmmRefVY[0] += m__G.oCam[0].mPOMM_tY[i] * minscale / 5; //  min
                         }
                     }
 
@@ -2096,6 +2111,11 @@ namespace CSH030Ex
                             //sResult.pOmmTX[i] += m__G.oCam[0].mPOMM_TX[i] * minscale ; //  min
                             //sResult.pOmmTY[i] += m__G.oCam[0].mPOMM_TY[i] * minscale ; //  min
                             sResult.pOmmTZ[i] += m__G.oCam[0].mPOMM_TZ[i] * minscale ; //  min
+                            //==
+                            //sResult.pOmmRefX[i] += m__G.oCam[0].mPOMM_sX[i] * minscale; //  min
+                            //sResult.pOmmRefY[i] += m__G.oCam[0].mPOMM_sY[i] * minscale; //  min
+                            //sResult.pOmmRefVX[i] += m__G.oCam[0].mPOMM_tX[i] * minscale; //  min
+                            //sResult.pOmmRefVY[i] += m__G.oCam[0].mPOMM_tY[i] * minscale; //  min
                         }
                     }
                 }
@@ -2123,6 +2143,11 @@ namespace CSH030Ex
                             //sResult.pOmmTX[i] += m__G.oCam[0].mPOMM_TX[i] * minscale; //  min
                             //sResult.pOmmTY[i] += m__G.oCam[0].mPOMM_TY[i] * minscale; //  min
                             sResult.pOmmTZ[i] += m__G.oCam[0].mPOMM_TZ[i] * minscale; //  min
+                            //==
+                            //sResult.pOmmRefX[i] += m__G.oCam[0].mPOMM_sX[i] * minscale; //  min
+                            //sResult.pOmmRefY[i] += m__G.oCam[0].mPOMM_sY[i] * minscale; //  min
+                            //sResult.pOmmRefVX[i] += m__G.oCam[0].mPOMM_tX[i] * minscale; //  min
+                            //sResult.pOmmRefVY[i] += m__G.oCam[0].mPOMM_tY[i] * minscale; //  min
                         }
                     }
                 }
@@ -2149,6 +2174,11 @@ namespace CSH030Ex
                         //sResult.pOmmTX[i] += m__G.oCam[0].mPOMM_TX[i] * minscale; //  min
                         //sResult.pOmmTY[i] += m__G.oCam[0].mPOMM_TY[i] * minscale; //  min
                         sResult.pOmmTZ[i] += m__G.oCam[0].mPOMM_TZ[i] * minscale; //  min
+                        //==
+                        //sResult.pOmmRefX[i] += m__G.oCam[0].mPOMM_sX[i] * minscale; //  min
+                        //sResult.pOmmRefY[i] += m__G.oCam[0].mPOMM_sY[i] * minscale; //  min
+                        //sResult.pOmmRefVX[i] += m__G.oCam[0].mPOMM_tX[i] * minscale; //  min
+                        //sResult.pOmmRefVY[i] += m__G.oCam[0].mPOMM_tY[i] * minscale; //  min
                     }
                 }
             }
@@ -2272,32 +2302,52 @@ namespace CSH030Ex
             {
                 for (i = 0; i < framCnt; i++)
                 {
-                    //if (sResult.pOmmX[i] == 0) sResult.pOmmX[i] = 99999;
                     data = BitConverter.GetBytes(sResult.pOmmX[i]);
                     Array.Copy(data, 0, dataBuf, curCount, data.Length);
                     curCount += data.Length;
                 }
                 for (i = 0; i < framCnt; i++)
                 {
-                    //if (sResult.pOmmY[i] == 0) sResult.pOmmY[i] = 99999;
                     data = BitConverter.GetBytes(sResult.pOmmY[i]);
                     Array.Copy(data, 0, dataBuf, curCount, data.Length);
                     curCount += data.Length;
                 }
                 for (i = 0; i < framCnt; i++)
                 {
-                    //if (sResult.pOmmZ[i] == 0) sResult.pOmmZ[i] = 99999;
                     data = BitConverter.GetBytes(-sResult.pOmmZ[i]);
                     Array.Copy(data, 0, dataBuf, curCount, data.Length);
                     curCount += data.Length;
                 }
                 for (i = 0; i < framCnt; i++)
                 {
-                    if (sResult.pOmmTZ[i] == 0) sResult.pOmmTZ[i] = 99999;
                     data = BitConverter.GetBytes(sResult.pOmmTZ[i]);
                     Array.Copy(data, 0, dataBuf, curCount, data.Length);
                     curCount += data.Length;
                 }
+                //for (i = 0; i < framCnt; i++)
+                //{
+                //    data = BitConverter.GetBytes(sResult.pOmmRefX[i]);
+                //    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                //    curCount += data.Length;
+                //}
+                //for (i = 0; i < framCnt; i++)
+                //{
+                //    data = BitConverter.GetBytes(sResult.pOmmRefY[i]);
+                //    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                //    curCount += data.Length;
+                //}
+                //for (i = 0; i < framCnt; i++)
+                //{
+                //    data = BitConverter.GetBytes(sResult.pOmmRefVX[i]);
+                //    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                //    curCount += data.Length;
+                //}
+                //for (i = 0; i < framCnt; i++)
+                //{
+                //    data = BitConverter.GetBytes(sResult.pOmmRefVY[i]);
+                //    Array.Copy(data, 0, dataBuf, curCount, data.Length);
+                //    curCount += data.Length;
+                //}
             }
             //for (i = 0; i < framCnt; i++)
             //{
@@ -2324,13 +2374,16 @@ namespace CSH030Ex
 
                     if (m__G.m_bPseudoOMM)
                     {
+                        //wr.WriteLine("X,Y,Z,COMP_TX,COMP_TY,COMP_TZ,TX,TY,TZ,OmmX,OmmY,OmmZ,OmmTZ,OmmRefX,OmmRefY,OmmRefVX,OmmRefVY");
                         wr.WriteLine("X,Y,Z,COMP_TX,COMP_TY,COMP_TZ,TX,TY,TZ,OmmX,OmmY,OmmZ,OmmTZ");
                         for (i = 0; i < framCnt; i++)
                         {
+                            //wr.WriteLine(string.Format("{0:0.00},{1:0.00},{2:0.00},{3:0.00},{4:0.00},{5:0.00},{6:0.00},{7:0.00},{8:0.00},{9:0.00},{10:0.00},{11:0.00},{12:0.00},{13:0.00},{14:0.00},{15:0.00},{16:0.00}",
                             wr.WriteLine(string.Format("{0:0.00},{1:0.00},{2:0.00},{3:0.00},{4:0.00},{5:0.00},{6:0.00},{7:0.00},{8:0.00},{9:0.00},{10:0.00},{11:0.00},{12:0.00}",
                                 sResult.X[i], sResult.Y[i], sResult.Z[i]
                                 , sResult.CoX[i], sResult.CoY[i], sResult.CoZ[i], sResult.TX[i], sResult.TY[i], sResult.TZ[i]
                                 , sResult.pOmmX[i], sResult.pOmmY[i], sResult.pOmmZ[i], sResult.pOmmTZ[i]
+                                , sResult.pOmmRefX[i], sResult.pOmmRefY[i], sResult.pOmmRefVX[i], sResult.pOmmRefVY[i]
                                 ));
                         }
                     }
@@ -2350,13 +2403,16 @@ namespace CSH030Ex
                 {
                     if (m__G.m_bPseudoOMM)
                     {
+                        //wr.WriteLine("X,Y,Z,TX,TY,TZ,COMP_TX,COMP_TY,COMP_TZ,OmmX,OmmY,OmmZ,OmmTZ,OmmRefX,OmmRefY,OmmRefVX,OmmRefVY");
                         wr.WriteLine("X,Y,Z,TX,TY,TZ,COMP_TX,COMP_TY,COMP_TZ,OmmX,OmmY,OmmZ,OmmTZ");
                         for (i = 0; i < framCnt; i++)
                         {
+                            //wr.WriteLine(string.Format("{0:0.00},{1:0.00},{2:0.00},{3:0.00},{4:0.00},{5:0.00},{6:0.00},{7:0.00},{8:0.00},{9:0.00},{10:0.00},{11:0.00},{12:0.00},{13:0.00},{14:0.00},{15:0.00},{16:0.00}",
                             wr.WriteLine(string.Format("{0:0.00},{1:0.00},{2:0.00},{3:0.00},{4:0.00},{5:0.00},{6:0.00},{7:0.00},{8:0.00},{9:0.00},{10:0.00},{11:0.00},{12:0.00}",
                                 sResult.X[i], sResult.Y[i], sResult.Z[i],
                                 sResult.TX[i], sResult.TY[i], sResult.TZ[i], sResult.CoX[i], sResult.CoY[i], sResult.CoZ[i]
                                 , sResult.pOmmX[i], sResult.pOmmY[i], sResult.pOmmZ[i], sResult.pOmmTZ[i]
+                                , sResult.pOmmRefX[i], sResult.pOmmRefY[i], sResult.pOmmRefVX[i], sResult.pOmmRefVY[i]
                                 ));
                         }
                     }

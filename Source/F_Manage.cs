@@ -25,7 +25,8 @@ namespace CSH030Ex
 {
     public partial class FManage : Form
     {
-
+        public const long GB = 1024L * 1024 * 1024;
+        public const long mlimit = 100 * GB;
         public delegate void LoadData(int type, string data); //rcp : 0, spec : 1
         public event LoadData On_LoadData;
         public delegate void SaveData(int type, string data); //rcp : 0, spec : 1
@@ -1781,14 +1782,31 @@ namespace CSH030Ex
 
                 if (m__G.m_bSaveFImage)
                 {
-                    string fileName = m__G.m_RootDirectory + string.Format("\\Result\\RawData\\User\\Image{0}\\", m__G.oCam[0].mTargetTriggerCount);
-
+                    string fileName = m__G.m_SaveDirectory + string.Format("\\Result\\RawData\\User\\Image{0}\\", m__G.oCam[0].mTargetTriggerCount);
                     if (!Directory.Exists(fileName))
                         Directory.CreateDirectory(fileName);
-                    for (int imgIndex = 0; imgIndex < m__G.oCam[0].mTargetTriggerCount; imgIndex++)
+
+                    DriveInfo drive = new DriveInfo(Path.GetPathRoot(fileName));
+                    if (drive.IsReady)
                     {
-                        string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
-                        m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
+                        if (drive.AvailableFreeSpace <= mlimit)
+                        {
+                            double freeGB = drive.AvailableFreeSpace / (double)GB;
+
+                            MessageBox.Show(
+                                $"남은 용량 : {freeGB:F1} GB\n불필요한 파일을 삭제해 주세요.",
+                                "용량 부족",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                        }
+                        else
+                        {
+                            for (int imgIndex = 0; imgIndex < m__G.oCam[0].mTargetTriggerCount; imgIndex++)
+                            {
+                                string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
+                                m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
+                            }
+                        }
                     }
                 }
                 if (m__G.m_bSaveNgImage)
@@ -1814,14 +1832,31 @@ namespace CSH030Ex
                     if (NeedToSaveImage)
                     {
                         string sDate = DateTime.Now.ToString("yyMMddHHmmss");
-                        string fileName = m__G.m_RootDirectory + string.Format("\\Result\\RawData\\NG\\{0}\\Image{1}\\", sDate, m__G.oCam[0].mTargetTriggerCount);
-
+                        string fileName = m__G.m_SaveDirectory + string.Format("\\Result\\RawData\\NG\\{0}\\Image{1}\\", sDate, m__G.oCam[0].mTargetTriggerCount);
                         if (!Directory.Exists(fileName))
                             Directory.CreateDirectory(fileName);
-                        for (int imgIndex = 0; imgIndex < m__G.oCam[0].mTargetTriggerCount; imgIndex++)
+                        // 저장 경로의 드라이브 정보
+                        DriveInfo drive = new DriveInfo(Path.GetPathRoot(fileName));
+                        if (drive.IsReady)
                         {
-                            string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
-                            m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
+                            if (drive.AvailableFreeSpace <= mlimit)
+                            {
+                                double freeGB = drive.AvailableFreeSpace / (double)GB;
+
+                                MessageBox.Show(
+                                    $"남은 용량 : {freeGB:F1} GB\n불필요한 파일을 삭제해 주세요.",
+                                    "용량 부족",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Warning);
+                            }
+                            else
+                            {
+                                for (int imgIndex = 0; imgIndex < m__G.oCam[0].mTargetTriggerCount; imgIndex++)
+                                {
+                                    string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
+                                    m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
+                                }
+                            }
                         }
                     }
                 }

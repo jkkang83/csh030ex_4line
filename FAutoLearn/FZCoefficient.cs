@@ -5821,7 +5821,7 @@ namespace FAutoLearn
 
         public int[] mPeakOrder = new int[24];   //                mPeakOrder[i] = new int[24]; // 6 *  [ 0 - 1 - 2 - 3 : L - R - T - B ]
 
-        public double[] ConvergePeakX2(int id, ref int[] Xidiffsrc, int width, int height, double xia, double yia, int xW_, int yH_, ref int peaktype, int iIndex = 0)
+        public double[] ConvergePeakX2(int id, ref int[] Xidiffsrc, int width, int height, double xia, double yia, double xW_, double yH_, ref int peaktype, int iIndex = 0)
         {
             //  오직 X 방향 Edge 추출에만 활용한다.
 
@@ -5837,10 +5837,11 @@ namespace FAutoLearn
             double res2nd = 0;
 
             int xi0 = (int)xia;
+            double xi0_r = xia - xi0;
             int yi0 = (int)yia - 6;
-            int xW = xW_;
-            int yH = yH_ + 7;
-
+            double yi0_r = yia - yi0;
+            double xW = xW_;
+            double yH = yH_ + 7;
 
             int fxi0 = xi0;
             double oldf = fxi0;
@@ -5911,10 +5912,17 @@ namespace FAutoLearn
                     for (i = 0; i < kLength; i++)
                     {
                         xi0_i = (int)(xi0 + i);
+                        double weight = 1;
+                        if (i == 0)
+                            weight = 1 - xi0_r;
+                        else if (i == kLength - 1)
+                            weight = xi0_r;
+                        
                         peakIndex[i] = i;
                         for (int j = yi0; j < yi0 + yH; j++)
                             roughPeak[i] += (1 - ry) * Xidiffsrc[xi0_i + j * width] + ry * Xidiffsrc[xi0_i + (j + 1) * width];
 
+                        roughPeak[i] = weight * roughPeak[i];
                         //  좌측 찾고 우측 이어서 찾을 것이므로 부호 불필요
                         //  첫번째 + peak 찾으면 됨.
                         roughPeakBk[i] = roughPeak[i];
@@ -6307,7 +6315,7 @@ namespace FAutoLearn
         }
 
 
-        public double[] ConvergePeakX3(int si, ref int[] Xidiffsrc, int width, int height, double xia, double yia, int xW, int yH, ref int peaktype, int iIndex = 0)
+        public double[] ConvergePeakX3(int si, ref int[] Xidiffsrc, int width, int height, double xia, double yia, double xW, double yH, ref int peaktype, int iIndex = 0)
         {
             //  원본 영상의 크기 width, height 로서 ROI 범위의 조각영상인 것을 전제로 한다.
             //  xi0 : 경계가 있을 것으로 예상되는 BOX 영역의 좌상단 X 좌표
@@ -6320,7 +6328,9 @@ namespace FAutoLearn
             double res1st = 0;
 
             int xi0 = (int)xia;
+            double xi0_r = xia - xi0;
             int yi0 = (int)yia;
+            double yi0_r = yia - yi0;
 
             int fxi0 = xi0;
             double oldf = fxi0;
@@ -6388,6 +6398,16 @@ namespace FAutoLearn
                     {
                         xi0_i = (int)(xi0 + i);
                         peakIndex[i] = xi0_i;
+                        double weight = 1;
+                        if (i == 0)
+                        {
+                            weight = 1 - xi0_r;
+                        }
+                        else if (i == kLength - 1)
+                        {
+                            weight = xi0_r;
+                        }
+
                         for (uint j = 0; j < yH; j++)
                         {
                             if (j + yi0 >= height - 1)
@@ -6395,6 +6415,8 @@ namespace FAutoLearn
 
                             roughPeak[i] += (1 - ry) * Xidiffsrc[xi0_i + (j + yi0) * width] + ry * Xidiffsrc[xi0_i + (j + yi0 + 1) * width];
                         }
+                        roughPeak[i] = weight * roughPeak[i];
+                        
                         //  Y 방향은 한번에 8개의 peak 를 찾을 것이므로 첫번째 + peak 만 찾으면 된다.
                         //   따라서 inversion 은 사용하지 않는다.
                         roughPeakBk[i] = roughPeak[i];
@@ -6550,9 +6572,9 @@ namespace FAutoLearn
                             //}
 
                             if (roughpeak_icur < 0)
-                                roughpeak_icur = roughpeak_icur / 5;
+                                roughpeak_icur = roughpeak_icur / 4;
                             if (roughPeak_icur_1 < 0)
-                                roughPeak_icur_1 = roughPeak_icur_1 / 5;
+                                roughPeak_icur_1 = roughPeak_icur_1 / 4;
                             //if (roughPeak_icur_2 < 0)
                             //    roughPeak_icur_2 = roughPeak_icur_2 / 5;
 
@@ -6580,16 +6602,15 @@ namespace FAutoLearn
                             {
                                 pY = roughpeak_icur;
                             }
-                            //if (newi == -2 || newi == 2)
-                            //    pY = 1.1 * pY;      //  1보다 0.9 가 나빠짐, 1.1 해볼 필요 있음
 
-                            //if (newi == -3 || newi == 3)
-                            //    pY = 0.8*pY;      //  1, 1/2, 1/3, 2/3 비교 시 2/3 에서 반복성 가장 우수
+                            if (newi == 0)
+                                pY = 1.15 * pY;      //  1보다 0.9 가 나빠짐, 1.1 해볼 필요 있음
 
-                            //if (newi == -2 )
-                            //    lshift += pY;
-                            //if (newi == 2 )
-                            //    lshift -= pY;
+                            else if (newi == -1 || newi == 1)
+                                pY = 1.1 * pY;      //  1보다 0.9 가 나빠짐, 1.1 해볼 필요 있음
+
+                            else if (newi == -2 || newi == 2)
+                                pY = 1.05 * pY;      //  1보다 0.9 가 나빠짐, 1.1 해볼 필요 있음
 
                             sumXY += (newi + res1st) * pY;
 
@@ -7200,13 +7221,12 @@ namespace FAutoLearn
         double mMinToRad = Math.PI / (60 * 180);
         bool mbGrabInitial = false;
         double mYgapBetweenMarkNSandMarkE = 3.0;
-        public double mTXsinCoef = -2.0E-05;                            //  ID 기본값 -4E-05
-        public double mTYsinCoef = 4.0e-05;// ID 247488522 : 2e-05           // ID 기본값 : 5E-05
-        public double mTZsinCoef = 1.0e-5; //-3.55596E-05;                   //  ID 247488522 : -3e-5
-
-        public double mTXcosCoef =0.0E-05;                            //  ID 기본값 -4E-05
-        public double mTYcosCoef =0.0e-05;// ID 247488522 : 2e-05           // ID 기본값 : 5E-05
-        public double mTZcosCoef =0.0e-5; //-3.55596E-05;                   //  ID 247488522 : -3e-5
+        public double mTXsinCoef = 0.0;//-2.0E-05;//-3.83972E-05;                            //  ID 기본값 -4E-05
+        public double mTYsinCoef = 0.0;//4.0E-05;//4.9e-05;// ID 247488522 : 2e-05           // ID 기본값 : 5E-05
+        public double mTZsinCoef = 0.0;//1.0E-05;// 0.1e-5; //-3.55596E-05;                   //  ID 247488522 : -3e-5
+        public double mTXcosCoef = 0.00E-05;//-3.83972E-05;                            //  ID 기본값 -4E-05
+        public double mTYcosCoef = 0.00E-05;//4.9e-05;// ID 247488522 : 2e-05           // ID 기본값 : 5E-05
+        public double mTZcosCoef = 0.00E-05;// 0.1e-5; //-3.55596E-05;                   //  ID 247488522 : -3e-5
 
         public void SetYgapBetweenMarkNSandMarkE(double bymm)
         {
@@ -7556,10 +7576,14 @@ namespace FAutoLearn
             if (mOffsetTX != 0 && mOffsetTY != 0)
                 TX += 0.96 * TY * psi; //  P45 를 위한 보정 ,  0.1 일 때 P45 +/-180min 구동 시 P45 TY 양끝단을 0.4um 낮추는 효과있음
 
+            //if (mOffsetTX != 0 && mOffsetTY != 0)
+            //    psi += 0.05 * TY * psi; //  P45 를 위한 보정 ,  0.1 일 때 P45 +/-180min 구동 시 P45 TZ 양끝단을 0.4um 낮추는 효과있음
+
             if (mOffsetTX != 0 && mOffsetTY != 0)
-                psi += 0.05 * TY * psi; //  P45 를 위한 보정 ,  0.1 일 때 P45 +/-180min 구동 시 P45 TZ 양끝단을 0.4um 낮추는 효과있음
+                TY += 0.19 * TY * psi * Math.Sign(TY * psi);
 
             //TX = TX - 3437.747 * TY * TY / 96;// - (3.14e-8) * dZ*dZ;   //  180/pi
+
 
             if (mbApplyEuler)
             {
@@ -7616,7 +7640,7 @@ namespace FAutoLearn
                               double[] sTZ2Z,
                               double[] sTX2X, double[] sTX2Y, double[] sTX2Z,
                               double[] sTY2X, double[] sTY2Y, double[] sTY2Z,
-                              double[] sTZ2X, double[] sTZ2Y, double txSinCoef = -2E-05, double tySinCoef = 4.0e-05, double tzSinCoef = 1.0e-5, double txCosCoef = 0, double tyCosCoef = 0, double tzCosCoef = 0
+                              double[] sTZ2X, double[] sTZ2Y, double txSinCoef = -4E-05, double tySinCoef = 4.9e-05, double tzSinCoef = -0.1e-5, double txCosCoef = 0, double tyCosCoef = 0, double tzCosCoef = 0
                               )
 
         {
@@ -7872,10 +7896,11 @@ namespace FAutoLearn
 
             lZTXTY[0] = -((dYi[0] + dYi[1]) / 2) / vCos40;  //  Z
             lZTXTY[1] = Math.Atan(ZofMarkE / mYgapBetweenMarkNSandMarkE);   //  TX
+
             if (subTY == 0)
-                lZTXTY[2] = Math.Atan(((dYi[0] - dYi[1]) / vCos40) / (pSide[0].X - pSide[2].X));    //  TY
+                lZTXTY[2] = Math.Atan(((pSide[0].Y - pSide[2].Y) / vCos40) / (pSide[0].X - pSide[2].X));    //  TY
             else
-                lZTXTY[2] = Math.Atan((0.55 * (dYi[0] - dYi[1]) / vCos40 + 0.45 * subTY / vCos40) / (pSide[0].X - pSide[2].X));    //  TY
+                lZTXTY[2] = Math.Atan((0.55 * (pSide[0].Y - pSide[2].Y) / vCos40 + 0.45 * subTY / vCos40) / (pSide[0].X - pSide[2].X));    //  TY
 
             Array.Copy(lZTXTY, ZTXTY, 3);
         }

@@ -7729,7 +7729,7 @@ namespace FAutoLearn
 
                     if (lfMark.xPosType == 0)    //  Left Harf & Right Half
                     {
-                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (int)(yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
+                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
                         dgbIndex = 1;
 
                         gapX = (int)(xL[0] + ((int)((tWidth - 1) - xL[1]))) / 2;
@@ -7858,7 +7858,7 @@ namespace FAutoLearn
                         lupdown = GetCurUpDown(2, mUpDown[smr[si].Azimuth]);
                         /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
                         //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
-                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 3, mCalcEffBand, (int)(xL[1] - xL[0] + 6), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 3, mCalcEffBand, (xL[1] - xL[0] + 6), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
                         dgbIndex = 5;
 
                         gapY = (int)(yT[7] - yT[0]) / 100.0;
@@ -7904,7 +7904,7 @@ namespace FAutoLearn
 
                     if (lfMark.xPosType == 0)    //  Left Harf & Right Half
                     {
-                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (int)(yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
+                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
                         dgbIndex = 1;
 
                         gapX = (int)xL[0] + ((int)((tWidth - 1) - xL[1])) / 100.0;
@@ -7960,7 +7960,7 @@ namespace FAutoLearn
                         lupdown = GetCurUpDown(2, mUpDown[smr[si].Azimuth]);
                         /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
                         //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
-                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (int)(xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
                         dgbIndex = 5;
 
                         gapY = (int)(yT[7] - yT[0]) / 100.0;
@@ -8551,7 +8551,7 @@ namespace FAutoLearn
                     if (lfMark.xPosType == 0)    //  Left Harf & Right Half
                     {
                         // 경계를 x = 2 부터 찾아간다.
-                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (int)(yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
+                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
 
                         gapX = (int)(xL[0] + ((int)((tWidth - 1) - xL[1]))) / 2;
                         if ((int)((tWidth - 1) - xL[1]) < 6)
@@ -8658,7 +8658,7 @@ namespace FAutoLearn
                         lupdown = GetCurUpDown(2, mUpDown[smr[si].Azimuth]);
                         /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
                         //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
-                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 3, mCalcEffBand, (int)(xL[1] - xL[0] + 6), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 3, mCalcEffBand, (xL[1] - xL[0] + 6), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
                         //if ( si==3 && (Math.Abs(((yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8) - 42.7) > 1 && Math.Abs(((yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8) - 39.7 ) > 1))
                         //    dgbIndex = 5;
 
@@ -8707,7 +8707,7 @@ namespace FAutoLearn
 
                     if (lfMark.xPosType == 0)    //  Left Harf & Right Half
                     {
-                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (int)(yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
+                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
 
                         gapX = (int)xL[0] + ((int)((tWidth - 1) - xL[1])) / 100.0;
                         if ((int)((tWidth - 1) - xL[1]) < 6)
@@ -8755,7 +8755,7 @@ namespace FAutoLearn
                         lupdown = GetCurUpDown(2, mUpDown[smr[si].Azimuth]);
                         /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
                         //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
-                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (int)(xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
 
                         gapY = (int)(yT[7] - yT[0]) / 100.0;
                         if ((int)((tHeight - 1) - yT[7]) < 6 && !EOY)
@@ -9035,7 +9035,7 @@ namespace FAutoLearn
                         if (lfMark.xPosType == 0)    //  Left Harf & Right Half
                         {
 
-                            xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (int)(yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
+                            xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
 
                             gapX = (int)(xL[0] + ((int)((tWidth - 1) - xL[1]))) / 2;
                             if ((int)((tWidth - 1) - xL[1]) < 6)
@@ -9136,7 +9136,7 @@ namespace FAutoLearn
                         {
                             /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
                             //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
-                            yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 3, mCalcEffBand, (int)(xL[1] - xL[0] + 6), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                            yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 3, mCalcEffBand, (xL[1] - xL[0] + 6), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
                             //if ( si==3 && (Math.Abs(((yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8) - 42.7) > 1 && Math.Abs(((yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8) - 39.7 ) > 1))
                             //    dgbIndex = 5;
 
@@ -9181,7 +9181,7 @@ namespace FAutoLearn
                         if (lfMark.xPosType == 0)    //  Left Harf & Right Half
                         {
                             // 경계를 x = 2 부터 찾아간다.
-                            xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (int)(yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
+                            xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
 
                             gapX = (int)xL[0] + ((int)((tWidth - 1) - xL[1])) / 100.0;
                             if ((int)((tWidth - 1) - xL[1]) < 6)
@@ -9221,7 +9221,7 @@ namespace FAutoLearn
                         {
                             /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
                             //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
-                            yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (int)(xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                            yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
 
                             gapY = (int)(yT[7] - yT[0]) / 100.0;
                             if ((int)((tHeight - 1) - yT[7]) < 6 && !EOY)
@@ -10433,7 +10433,7 @@ namespace FAutoLearn
                 int minPeak = 9999;
                 int lastValley = aVline[i][0];
                 int lastValleyIndex = 0;
-                while (k < vLen - 1)
+                while (k < vLen - 2)
                 {
                     //if (aVline[i][k] > 35 && aVline[i][k + 1] < aVline[i][k])   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
                     if (si < 3 && peakCount == 0)
@@ -10459,13 +10459,23 @@ namespace FAutoLearn
                                     minPeak = 9999;
                                 }
                             }
-                            lastPeak = aVline[i][k];
-                            peakIndex[peakCount] = k;
-                            peakEach[peakCount] = lastPeak;
-                            peakCount++;
-                            afterValley = false;
-                            if (minPeak > lastPeak)
-                                minPeak = lastPeak;
+                            if (aVline[i][k + 1] < aVline[i][k] - 4 || aVline[i][k + 2] < aVline[i][k] - 4)
+                            {
+                                lastPeak = aVline[i][k];
+                                peakIndex[peakCount] = k;
+                                peakEach[peakCount] = lastPeak;
+                                peakCount++;
+                                afterValley = false;
+                                if (minPeak > lastPeak)
+                                    minPeak = lastPeak;
+                            }
+                            //lastPeak = aVline[i][k];
+                            //peakIndex[peakCount] = k;
+                            //peakEach[peakCount] = lastPeak;
+                            //peakCount++;
+                            //afterValley = false;
+                            //if (minPeak > lastPeak)
+                            //    minPeak = lastPeak;
                         }
                     }
                     else if (peakCount > 0)
@@ -10504,7 +10514,7 @@ namespace FAutoLearn
                         if (peakIndex[3] - peakIndex[0] < 16)
                         {
                             //                          //  Pos of Left Ref, Pos of Top Line, Pos of Bottom Line
-                            if ((peakEach[0] > peakEach[1]/2 && peakCount>4 && peakEach[0] < 1.5*peakEach[1]) || peakCount==4)
+                            if ((peakEach[0] > peakEach[1] / 2 && peakCount > 4 && peakEach[0] > 0.65 * peakEach[1] && peakEach[0] < 1.5 * peakEach[1]) || peakCount == 4)
                             {
                                 if (peakCount>4)
                                 {
@@ -10536,9 +10546,19 @@ namespace FAutoLearn
                             {
                                 if (peakIndex[4] - peakIndex[1] < 16)
                                 {
-                                    resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                    if (Math.Abs((peakEach[1] + peakEach[3]) / 2 - peakEach[0]) < Math.Abs((peakEach[1] + peakEach[3]) / 2 - peakEach[4]))
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                    }
+                                    else
+                                    {
+                                        resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                    }
                                     foundMark = true;
                                     break;
+                                    //resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                    //foundMark = true;
+                                    //break;
                                 }
                                 else if (peakCount==5)
                                 {
