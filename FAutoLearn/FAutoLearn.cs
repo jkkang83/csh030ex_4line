@@ -2290,6 +2290,13 @@ namespace FAutoLearn
         {
             OpenCvSharp.Point2d[] ommres = new Point2d[6];
 
+            //  ommres[0]   : Side View 에서의 OMM 좌표
+            //  ommres[1]   : Side View 에서의 OMM Edge 방향벡터
+            //  ommres[2]   : Side View 에서의 OMM 좌표계 X 방향 Unit Vector
+            //  ommres[3]   : Top View 에서의 OMM 좌표
+            //  ommres[4]   : Top View 에서의 OMM Edge 방향벡터
+            //  ommres[5]   : Top View 에서의 OMM 좌표계 X 방향 Unit Vector
+
             //  qOMMS_Value[] 에서 양단 좌표 찾고
             //  qOMMㅆ_Value[] 에서 양단 좌표 찾아서 저장 후 리턴
 
@@ -2470,7 +2477,14 @@ namespace FAutoLearn
             //double sL = Math.Sqrt((ptSide2.X - ptSide1.X) * (ptSide2.X - ptSide1.X) + (ptSide2.Y - ptSide1.Y) * (ptSide2.Y - ptSide1.Y));
             //double tL = Math.Sqrt((ptTop2.X - ptTop1.X) * (ptTop2.X - ptTop1.X) + (ptTop2.Y - ptTop1.Y) * (ptTop2.Y - ptTop1.Y));
 
-            ommres[0] = new Point2d((ptSide1.X + ptSide2.X) / 2, (ptSide1.Y + ptSide2.Y) / 2);
+            //  ommres[0]   : Side View 에서의 OMM 좌표
+            //  ommres[1]   : Side View 에서의 OMM Edge 방향벡터
+            //  ommres[2]   : Side View 에서의 OMM 좌표계 X 방향 Unit Vector
+            //  ommres[3]   : Top View 에서의 OMM 좌표
+            //  ommres[4]   : Top View 에서의 OMM Edge 방향벡터
+            //  ommres[5]   : Top View 에서의 OMM 좌표계 X 방향 Unit Vector
+
+            ommres[0] = new Point2d((ptSide1.X + ptSide2.X) / 2, (ptSide1.Y + ptSide2.Y) / 2);  
             if (ommTedge.Direction.Y > 0)
                 ommres[1] = new Point2d(ommSedge.Direction.X, ommSedge.Direction.Y);//new Point2d((ptSide2.X - ptSide1.X) / sL, (ptSide2.Y - ptSide1.Y) / sL);  //  Unit Vector Y in Side View
             else
@@ -2494,6 +2508,29 @@ namespace FAutoLearn
 
         public double[] mInitialPheudoOMM_XYZTXTYTZ = new double[6];
         private double mInitialZrelativetoPseudoOMM = 0;
+        public double[] ABSPheudoOMM(int iIndex, Point2d[] ommData)
+        {
+            //  ommres[0]   : Side View 에서의 OMM 좌표
+            //  ommres[1]   : Side View 에서의 OMM Edge 방향벡터
+            //  ommres[2]   : Side View 에서의 OMM 좌표계 X 방향 Unit Vector
+            //  ommres[3]   : Top View 에서의 OMM 좌표
+            //  ommres[4]   : Top View 에서의 OMM Edge 방향벡터
+            //  ommres[5]   : Top View 에서의 OMM 좌표계 X 방향 Unit Vector
+
+            double[] resXYZTXTYTZ = new double[6];
+
+            //  TZ of the Edge of OMM, radian
+            resXYZTXTYTZ[5] = Math.Atan2(ommData[4].Y, ommData[4].X ) - Math.PI / 2;   //  TZ
+
+            //  Top View 의 Center of FOV 기준으로하는 CSHead 좌표계에 대한 OMM 의 (X, Y) 좌표 표시 - Pixel 기준
+            resXYZTXTYTZ[0] = (520 - ommData[3].X);
+            resXYZTXTYTZ[1] = ((190+135) - ommData[3].Y);   //  460 x 780 영상 기준
+
+            //  OMM 점의 높이
+            resXYZTXTYTZ[2] = (ommData[0].Y + resXYZTXTYTZ[1]*vSin40 - 95) / vCos40;   //  pixel, 18.333333을 곱하면 um 단위로 변환됨.
+
+            return resXYZTXTYTZ;
+        }
         public double[] RelativeToPheudoOMM(int iIndex, double[] allMarks, Point2d[] ommData, double cofY, double cofZ)
         {
             //  allMarks[0] ~ [9] : X1, Y1, X2, Y2, X3, Y3, X4, Y4, X5, Y5
@@ -2515,8 +2552,9 @@ namespace FAutoLearn
             double COFXrelativeToCOE = ((allMarks[8] + allMarks[6]) / 2 - ommData[3].X);   //  X pixel
             double COFYrelativeToCOE = ((allMarks[9] + allMarks[7]) / 2 - ommData[3].Y);   //  Y pixel
 
-            //  TZ relative to PseudoOMM, radian
+            //  TZ relative to PseudoOMM, radian , 기존 방식
             resXYZTXTYTZ[5] = RadBetween2DVector(allMarks[8] - allMarks[6], allMarks[9] - allMarks[7], ommData[4].X, ommData[4].Y) - Math.PI / 2;   //  TZ
+
 
             //  Top View 의 PseudoOMM 좌표계 기준으로 (X, Y) 좌표 표시 - Pixel 기준
             //                      x                 d        -        y                 c                a              d        -       b             c
@@ -2543,6 +2581,7 @@ namespace FAutoLearn
             else
                 resXYZTXTYTZ[2] = mInitialPheudoOMM_XYZTXTYTZ[2] - cofZ + mInitialZrelativetoPseudoOMM;
 
+            //  첫번째 영상에서의 OMM 만을 기준으로 하는 경우
             if (iIndex == 0)
             {
                 for (int i = 0; i < 6; i++)
@@ -6091,11 +6130,22 @@ namespace FAutoLearn
             Mat tmp = new Mat(filename);
             Mat tmpByte = new Mat();
             Cv2.CvtColor(tmp, tmpByte, ColorConversionCodes.RGB2GRAY);
+            byte[] buf = null;
 
             if (tmpByte.Width < 781)
             {
-                byte[] buf = null;
-                tmpByte.GetArray(out buf);
+                if (tmpByte.Height == 450)
+                {
+                    Mat buf780x460 = Mat.Zeros(460, 780, tmpByte.Type());
+                    Mat topRoi = new Mat(buf780x460, new Rect(0, 0, tmpByte.Width, tmpByte.Height));
+
+                    tmpByte.CopyTo(topRoi);
+                    buf780x460.GetArray(out buf);
+                }
+                else
+                {
+                    tmpByte.GetArray(out buf);
+                }
                 mCommonImgFile.Add(buf);
             }
             else
@@ -6103,7 +6153,6 @@ namespace FAutoLearn
                 Mat matL = new Mat(tmpByte, new Rect(0, 0, 780, 460)).Clone();
                 Mat matR = new Mat(tmpByte, new Rect(780, 0, 550, 420)).Clone();
 
-                byte[] buf = null;
                 matL.GetArray(out buf);
                 mCommonImgFile.Add(buf);
 
@@ -10459,15 +10508,32 @@ namespace FAutoLearn
                                     minPeak = 9999;
                                 }
                             }
-                            if (aVline[i][k + 1] < aVline[i][k] - 4 || aVline[i][k + 2] < aVline[i][k] - 4)
+                            if ( si<3)
                             {
-                                lastPeak = aVline[i][k];
-                                peakIndex[peakCount] = k;
-                                peakEach[peakCount] = lastPeak;
-                                peakCount++;
-                                afterValley = false;
-                                if (minPeak > lastPeak)
-                                    minPeak = lastPeak;
+                                if (aVline[i][k + 1] < aVline[i][k] - 4 || aVline[i][k + 2] < aVline[i][k] - 4)
+                                {
+                                    lastPeak = aVline[i][k];
+                                    peakIndex[peakCount] = k;
+                                    peakEach[peakCount] = lastPeak;
+                                    peakCount++;
+                                    afterValley = false;
+                                    if (minPeak > lastPeak)
+                                        minPeak = lastPeak;
+                                }
+                            }
+                            else
+                            {
+                                if (aVline[i][k + 1] < aVline[i][k] || aVline[i][k + 2] < aVline[i][k])
+                                {
+                                    lastPeak = aVline[i][k];
+                                    peakIndex[peakCount] = k;
+                                    peakEach[peakCount] = lastPeak;
+                                    peakCount++;
+                                    afterValley = false;
+                                    if (minPeak > lastPeak)
+                                        minPeak = lastPeak;
+                                }
+
                             }
                             //lastPeak = aVline[i][k];
                             //peakIndex[peakCount] = k;

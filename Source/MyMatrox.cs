@@ -2758,13 +2758,21 @@ namespace S2System.Vision
                 mPOMM_tX[index] = mPseudoPtsOrg[3].X;
                 mPOMM_tY[index] = mPseudoPtsOrg[3].Y;
 
-                double[] lxyzTxTyTz = mFAL.RelativeToPheudoOMM(index, allPts, mPseudoPtsOrg, mC_pY[index], mC_pZ[index]);
+                //double[] lxyzTxTyTz = mFAL.RelativeToPheudoOMM(index, allPts, mPseudoPtsOrg, mC_pY[index], mC_pZ[index]);
+                //mPOMM_X[index] = lxyzTxTyTz[0];
+                //mPOMM_Y[index] = lxyzTxTyTz[1];
+                //mPOMM_Z[index] = lxyzTxTyTz[2];
+                //mPOMM_TX[index] = lxyzTxTyTz[3];
+                //mPOMM_TY[index] = lxyzTxTyTz[4];
+                //mPOMM_TZ[index] = lxyzTxTyTz[5];
+
+                double[] lxyzTxTyTz = mFAL.ABSPheudoOMM(index, mPseudoPtsOrg);
                 mPOMM_X[index] = lxyzTxTyTz[0];
                 mPOMM_Y[index] = lxyzTxTyTz[1];
                 mPOMM_Z[index] = lxyzTxTyTz[2];
                 mPOMM_TX[index] = lxyzTxTyTz[3];
                 mPOMM_TY[index] = lxyzTxTyTz[4];
-                mPOMM_TZ[index] = lxyzTxTyTz[5];
+                mPOMM_TZ[index] = lxyzTxTyTz[5];    
             }
             return true;
         }
