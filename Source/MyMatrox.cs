@@ -85,6 +85,13 @@ namespace S2System.Vision
         public double[] mPOMM_sY = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
         public double[] mPOMM_tX = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
         public double[] mPOMM_tY = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+
+        public double[] mPOMM_rX = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_rY = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_rZ = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_rTX = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_rTY = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double[] mPOMM_rTZ = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
         public bool bPseudoOMM = false;
         
         
@@ -2758,21 +2765,21 @@ namespace S2System.Vision
                 mPOMM_tX[index] = mPseudoPtsOrg[3].X;
                 mPOMM_tY[index] = mPseudoPtsOrg[3].Y;
 
-                //double[] lxyzTxTyTz = mFAL.RelativeToPheudoOMM(index, allPts, mPseudoPtsOrg, mC_pY[index], mC_pZ[index]);
-                //mPOMM_X[index] = lxyzTxTyTz[0];
-                //mPOMM_Y[index] = lxyzTxTyTz[1];
-                //mPOMM_Z[index] = lxyzTxTyTz[2];
-                //mPOMM_TX[index] = lxyzTxTyTz[3];
-                //mPOMM_TY[index] = lxyzTxTyTz[4];
-                //mPOMM_TZ[index] = lxyzTxTyTz[5];
-
-                double[] lxyzTxTyTz = mFAL.ABSPheudoOMM(index, mPseudoPtsOrg);
+                double[] lxyzTxTyTz = mFAL.RelativeToPheudoOMM(index, allPts, mPseudoPtsOrg, mC_pY[index], mC_pZ[index]);
                 mPOMM_X[index] = lxyzTxTyTz[0];
                 mPOMM_Y[index] = lxyzTxTyTz[1];
                 mPOMM_Z[index] = lxyzTxTyTz[2];
                 mPOMM_TX[index] = lxyzTxTyTz[3];
                 mPOMM_TY[index] = lxyzTxTyTz[4];
-                mPOMM_TZ[index] = lxyzTxTyTz[5];    
+                mPOMM_TZ[index] = lxyzTxTyTz[5];
+
+                double[] rlxyzTxTyTz = mFAL.ABSPheudoOMM(index, mPseudoPtsOrg);
+                mPOMM_rX[index] = rlxyzTxTyTz[0];
+                mPOMM_rY[index] = rlxyzTxTyTz[1];
+                mPOMM_rZ[index] = rlxyzTxTyTz[2];
+                mPOMM_rTX[index] = rlxyzTxTyTz[3];
+                mPOMM_rTY[index] = rlxyzTxTyTz[4];
+                mPOMM_rTZ[index] = rlxyzTxTyTz[5];    
             }
             return true;
         }
