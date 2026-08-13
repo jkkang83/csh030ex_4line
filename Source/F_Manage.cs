@@ -202,31 +202,53 @@ namespace CSH030Ex
             byte[] sRnBuf = null;
             byte[] sendBuf = null;
 
-
+            int lfrmCnt = 0;
             switch (cmd)
             {
                 case "P_S":
-                    int markID = 0;
+                    if (arry.Length > 2) lfrmCnt = int.Parse(arry[1]);
                     if (InvokeRequired)
                     {
                         BeginInvoke((MethodInvoker)delegate
                         {
                             if (!m__G.m_bHideAllGraph)
-                                AddViewLog(string.Format("P_S Recieve\r\n", markID));
+                            {
+                                AddViewLog(string.Format("P_S Recieve, Data Length :{0}\r\n", lfrmCnt));
+                            }
+                            if (lfrmCnt == 17)
+                            {
+                                MyOwner.SetPseudoOMM(true);
+                            }
+                            else
+                            {
+                                MyOwner.SetPseudoOMM(false);
+                            }
+                            UpdateCheckStates();
                         });
 
                     }
                     else
                     {
                         if (!m__G.m_bHideAllGraph)
-                            AddViewLog(string.Format("P_S Recieve, Mark ID :{0}\r\n", markID));
+                        {
+                            AddViewLog(string.Format("P_S Recieve, Data Length :{0}\r\n", lfrmCnt));
+                        }
+                        if (lfrmCnt == 17)
+                        {
+                            MyOwner.SetPseudoOMM(true);
+                        }
+                        else
+                        {
+                            MyOwner.SetPseudoOMM(false);
+                        }
+                        UpdateCheckStates();
                     }
 
                     break;
                 case "R_S": //Request Inspection
                             //Thread.Sleep(10);
                     m__G.mDoingStatus = "Triggered Measure";
-                    int lfrmCnt = int.Parse(arry[1]);
+                    lfrmCnt = int.Parse(arry[1]);
                     if (!m__G.m_bHideAllGraph) 
                         AddViewLog(string.Format("[{0}] - R_S Recieve, trg :{1}\r\n", RunNum++, lfrmCnt));
 
@@ -4697,8 +4719,12 @@ namespace CSH030Ex
 
         public void UpdateCheckStates()
         {
-            if (m__G.m_bSaveRawData) lblSaveRawData.ForeColor = Color.Black; else lblSaveRawData.ForeColor = Color.LightGray;
-            if (m__G.m_bScreenCapture) lblSaveScreen.ForeColor = Color.Black; else lblSaveScreen.ForeColor = Color.LightGray;
+            if (!m__G.m_bSaveRawData) lblSaveRawData.ForeColor = Color.LightGray; else lblSaveRawData.ForeColor = Color.Aqua;
+            if (!m__G.m_bHideAllGraph) lblHideAllGraph.ForeColor = Color.LightGray; else lblHideAllGraph.ForeColor = Color.Aqua;
+            if (!m__G.m_bSaveNgImage) lblSaveNG.ForeColor = Color.LightGray; else lblSaveNG.ForeColor = Color.Aqua;
+            if (!m__G.m_bOISOption) lblOISOption.ForeColor = Color.LightGray; else lblOISOption.ForeColor = Color.Aqua;
+            if (!m__G.m_bSaveFImage) lblSaveUserImage.ForeColor = Color.LightGray; else lblSaveUserImage.ForeColor = Color.Aqua;
+            if (!m__G.m_bPseudoOMM) lblPSeudoOmm.ForeColor = Color.LightGray; else lblPSeudoOmm.ForeColor = Color.Aqua;
         }
 
         private void btnToAdmin_Click(object sender, EventArgs e)
@@ -4966,15 +4992,6 @@ namespace CSH030Ex
             {
                 m_LastSampleNumber = -1;
                 m__G.mForcedSampleNumber = -1;
-            }
-
-            if (IsHold)
-            {
-                lblSampleCountOn.ForeColor = Color.LightGray;
-            }
-            else
-            {
-                lblSampleCountOn.ForeColor = Color.Black;
             }
         }
         public void SaveCurrentSampleNumber(int index)

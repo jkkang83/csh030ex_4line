@@ -2286,16 +2286,15 @@ namespace FAutoLearn
             ImgDest.GetArray(out q_Value2[resizeBuf]);   //  ImgDest : 1/mModelScale Compressed Image
         }
 
+        bool[] mDoneBuf = new bool[19 * 19];
+        //System.Drawing.Point[] mDonePos = new System.Drawing.Point[19 * 19];
+        System.Drawing.Point[][] mPrevPos = new System.Drawing.Point[30][];
+        long[][] mPrevConv = new long[30][];
+        public int[] mIndexInThread = new int[30];
+
         public OpenCvSharp.Point2d[] FineOMM(int iIndex, int iBuf = 0)
         {
             OpenCvSharp.Point2d[] ommres = new Point2d[6];
-
-            //  ommres[0]   : Side View 에서의 OMM 좌표
-            //  ommres[1]   : Side View 에서의 OMM Edge 방향벡터
-            //  ommres[2]   : Side View 에서의 OMM 좌표계 X 방향 Unit Vector
-            //  ommres[3]   : Top View 에서의 OMM 좌표
-            //  ommres[4]   : Top View 에서의 OMM Edge 방향벡터
-            //  ommres[5]   : Top View 에서의 OMM 좌표계 X 방향 Unit Vector
 
             //  qOMMS_Value[] 에서 양단 좌표 찾고
             //  qOMMㅆ_Value[] 에서 양단 좌표 찾아서 저장 후 리턴
@@ -2311,7 +2310,7 @@ namespace FAutoLearn
             //  OMMS
             int i0 = 451;   //  115더해야 절대좌표 565 ~ 595
             int ie = 481;
-            int j0 = 15;// 27;    //  54 ~ 142
+            int j0 = 18;// 27;    //  54 ~ 142
             int je = 60;// 71;
             int jLen = (je - j0) / 2;   //  71-27 = 44
 
@@ -2386,13 +2385,13 @@ namespace FAutoLearn
             //  OMMT
             i0 = 184;   //  520 더해야 절대좌표
             ie = 214;
-            j0 = 11;// 19;
+            j0 = 18;// 19;
             je = 92;// 95; //95-19 = 76
             jLen = (je - j0) / 2;
             //  위 영역에서  우에서 좌로 어두워지는 경계 추출
             //  수직선 검출
             xdiff = new int[jLen][];
-            Point2d[] ptT = new Point2d[jLen];
+            List<Point2d> ptTL = new List<Point2d>();
             for (int j = 0; j < jLen; j++)
             {
                 xdiff[j] = new int[ie - i0 + 1];
@@ -2403,9 +2402,21 @@ namespace FAutoLearn
                     xdiff[j][i - i0] += qOMMT_Value[iBuf][i + (j0 + 2 * j + 1) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j0 + 2 * j + 1) * mOMMTImg_Width]
                                       - qOMMT_Value[iBuf][i - 1 + (j0 + 2 * j + 1) * mOMMTImg_Width] - qOMMT_Value[iBuf][i - 2 + (j0 + 2 * j + 1) * mOMMTImg_Width];
                 }
-                ptT[j] = new Point2d(CalcPeakDiff(xdiff[j]) + i0 + 520, 2 * ((j0 + 2 * j) + 0.5 + 95)); //  Y 좌표 2배
+                ptTL.Add(new Point2d(CalcPeakDiff(xdiff[j]) + i0 + 520, 2 * ((j0 + 2 * j) + 0.5 + 95))); //  Y 좌표 2배
+            }
+            double meanX = ptTL.Average(p => p.X);
+            double meanY = ptTL.Average(p => p.Y);
+            for (int j = 0; j < ptTL.Count; j++)
+            {
+                if (Math.Abs(ptTL[j].X - meanX) > 2)
+                {
+                    ptTL.RemoveAt(j);
+                    j--;
+                }
             }
             //  xdiff[0], xdiff[0] 에서 각각 Peak 찾는다  일단 Y 축이 1/2 압축된 상태의 좌표로 확보한다.
+            Point2d[] ptT = ptTL.ToArray();
+            jLen = ptTL.Count;
             FZMath.Line2D ommTedge = mFZM.FitLinePCA(ptT);
 
 
@@ -2477,14 +2488,7 @@ namespace FAutoLearn
             //double sL = Math.Sqrt((ptSide2.X - ptSide1.X) * (ptSide2.X - ptSide1.X) + (ptSide2.Y - ptSide1.Y) * (ptSide2.Y - ptSide1.Y));
             //double tL = Math.Sqrt((ptTop2.X - ptTop1.X) * (ptTop2.X - ptTop1.X) + (ptTop2.Y - ptTop1.Y) * (ptTop2.Y - ptTop1.Y));
 
-            //  ommres[0]   : Side View 에서의 OMM 좌표
-            //  ommres[1]   : Side View 에서의 OMM Edge 방향벡터
-            //  ommres[2]   : Side View 에서의 OMM 좌표계 X 방향 Unit Vector
-            //  ommres[3]   : Top View 에서의 OMM 좌표
-            //  ommres[4]   : Top View 에서의 OMM Edge 방향벡터
-            //  ommres[5]   : Top View 에서의 OMM 좌표계 X 방향 Unit Vector
-
-            ommres[0] = new Point2d((ptSide1.X + ptSide2.X) / 2, (ptSide1.Y + ptSide2.Y) / 2);  
+            ommres[0] = new Point2d((ptSide1.X + ptSide2.X) / 2, (ptSide1.Y + ptSide2.Y) / 2);
             if (ommTedge.Direction.Y > 0)
                 ommres[1] = new Point2d(ommSedge.Direction.X, ommSedge.Direction.Y);//new Point2d((ptSide2.X - ptSide1.X) / sL, (ptSide2.Y - ptSide1.Y) / sL);  //  Unit Vector Y in Side View
             else
@@ -2520,14 +2524,17 @@ namespace FAutoLearn
             double[] resXYZTXTYTZ = new double[6];
 
             //  TZ of the Edge of OMM, radian
-            resXYZTXTYTZ[5] = Math.Atan2(ommData[4].Y, ommData[4].X ) - Math.PI / 2;   //  TZ
+            resXYZTXTYTZ[5] = Math.Atan2(ommData[4].Y, ommData[4].X) - Math.PI / 2;   //  TZ
 
             //  Top View 의 Center of FOV 기준으로하는 CSHead 좌표계에 대한 OMM 의 (X, Y) 좌표 표시 - Pixel 기준
             resXYZTXTYTZ[0] = (520 - ommData[3].X);
-            resXYZTXTYTZ[1] = ((190+135) - ommData[3].Y);   //  460 x 780 영상 기준
+            if (mSourceImg[0].Height == 450)
+                resXYZTXTYTZ[1] = ((190 + 130) - ommData[3].Y);   //  780 x 460 영상 기준 135, 780 x 450 영상 기준 130
+            else
+                resXYZTXTYTZ[1] = ((190 + 135) - ommData[3].Y);   //  780 x 460 영상 기준 135, 780 x 450 영상 기준 130
 
             //  OMM 점의 높이
-            resXYZTXTYTZ[2] = (ommData[0].Y + resXYZTXTYTZ[1]*vSin40 - 95) / vCos40;   //  pixel, 18.333333을 곱하면 um 단위로 변환됨.
+            resXYZTXTYTZ[2] = (ommData[0].Y + resXYZTXTYTZ[1] * vSin40 - 95) / vCos40;   //  pixel, 18.333333을 곱하면 um 단위로 변환됨.
 
             return resXYZTXTYTZ;
         }
@@ -2604,7 +2611,7 @@ namespace FAutoLearn
         public double RadBetween2DVector(double a1, double b1, double a2, double b2)
         {
             //  return Radian Angle
-            return Math.Acos((a1 * a2 + b1 + b2) / (Math.Sqrt(a1 * a1 + b1 * b1) * Math.Sqrt(a2 * a2 + b2 * b2)));
+            return Math.Acos((a1 * a2 + b1 * b2) / (Math.Sqrt(a1 * a1 + b1 * b1) * Math.Sqrt(a2 * a2 + b2 * b2)));
         }
 
         public double CalcPeakDiff(int[] diffs)
@@ -6213,12 +6220,6 @@ namespace FAutoLearn
             //Cv2.DestroyAllWindows();
             return id_res;
         }
-
-        bool[] mDoneBuf = new bool[19 * 19];
-        //System.Drawing.Point[] mDonePos = new System.Drawing.Point[19 * 19];
-        System.Drawing.Point[][] mPrevPos = new System.Drawing.Point[30][];
-        long[][] mPrevConv = new long[30][];
-        public int[] mIndexInThread = new int[30];
 
         public OpenCvSharp.Point[] FineCOG_ModelBase(bool IsFirst, int iIndex, ref sMarkResult[] smr, ref sMarkResult[] smr_T, ref sMarkResult[] smr_B, ref long Nfound, bool IsDebug = false, int iBuf = 0, int whichModel = -1)
         {
