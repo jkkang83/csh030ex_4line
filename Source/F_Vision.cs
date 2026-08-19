@@ -1009,7 +1009,18 @@ namespace CSH030Ex
 
         public void StartLive()
         {
-            cbContinuosMode.Checked = true;
+            if (cbContinuosMode.InvokeRequired)
+            {
+                cbContinuosMode.BeginInvoke(new Action(() =>
+                {
+                    cbContinuosMode.Checked = true;
+                }));
+            }
+            else
+            {
+                cbContinuosMode.Checked = true;
+            }
+
             Thread.Sleep(200);
 
             bHaltLive = false;

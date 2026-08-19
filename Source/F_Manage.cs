@@ -1746,62 +1746,6 @@ namespace CSH030Ex
 
                 double totalTime = (endTime - triggeredTime) / (double)(lTimerFrequency);
 
-                // 다음은 자화에서 검증완료
-                if (!m__G.m_bNoHostPC)
-                {
-                    try
-                    {
-                        ///////////////////////////////////////////////////////////////////////
-                        ///////////////////////////////////////////////////////////////////////
-                        //  Euler Angle Rotation 측정 및 적용
-                        if (mbEulerMeasureApply)
-                        {
-                            EulerMeasureApply(EffframeCount);
-                            mbEulerMeasureApply = false;
-                        }
-                        ///////////////////////////////////////////////////////////////////////
-                        ///////////////////////////////////////////////////////////////////////
-
-                        m__G.oCam[0].SetTriggeredframeCount(m__G.oCam[0].mTargetTriggerCount);
-                        if (!m__G.m_bHideAllGraph) AddViewLog("MakeSaveResult " + m__G.oCam[0].mTargetTriggerCount.ToString() + "\r\n");
-                        byte[] sDatabuffer = MyOwner.MakeSaveResult();
-                        //MyOwner.WriteResultBin(0);
-                        int framCnt = m__G.oCam[0].mTargetTriggerCount;
-
-                        //Task.Factory.StartNew(() =>
-                        //{
-                        byte[] sCmdBuf = null;
-                        byte[] sRnBuf = null;
-                        byte[] sendBuf = null;
-
-                        sCmdBuf = Encoding.ASCII.GetBytes("A_R@" + framCnt.ToString() + "@");
-                        sRnBuf = Encoding.ASCII.GetBytes("@\r\n");
-                        sendBuf = new byte[sCmdBuf.Length + sDatabuffer.Length + sRnBuf.Length];
-
-                        Array.Copy(sCmdBuf, 0, sendBuf, 0, sCmdBuf.Length);
-
-                        Array.Copy(sDatabuffer, 0, sendBuf, sCmdBuf.Length, sDatabuffer.Length);
-
-                        Array.Copy(sRnBuf, 0, sendBuf, sCmdBuf.Length + sDatabuffer.Length, sRnBuf.Length);
-
-                        Network.SendData(sendBuf);
-
-                        if (!m__G.m_bHideAllGraph)
-                        {
-                            AddViewLog(string.Format("A_R Send\r\n"));
-                        }
-
-                        //});
-                    }
-                    catch
-                    {
-                        AddViewLog("Network Error while sending A_F\r\n");
-                    }
-                }
-                /////////////////////////////////////////////////////////////////
-
-                m_LastSampleNumber--;
-
                 if (m__G.m_bSaveFImage)
                 {
                     string fileName = m__G.m_SaveDirectory + string.Format("\\Result\\RawData\\User\\Image{0}\\", m__G.oCam[0].mTargetTriggerCount);
@@ -1882,6 +1826,63 @@ namespace CSH030Ex
                         }
                     }
                 }
+                // 다음은 자화에서 검증완료
+                if (!m__G.m_bNoHostPC)
+                {
+                    try
+                    {
+                        ///////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////
+                        //  Euler Angle Rotation 측정 및 적용
+                        if (mbEulerMeasureApply)
+                        {
+                            EulerMeasureApply(EffframeCount);
+                            mbEulerMeasureApply = false;
+                        }
+                        ///////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////
+
+                        m__G.oCam[0].SetTriggeredframeCount(m__G.oCam[0].mTargetTriggerCount);
+                        if (!m__G.m_bHideAllGraph) AddViewLog("MakeSaveResult " + m__G.oCam[0].mTargetTriggerCount.ToString() + "\r\n");
+                        byte[] sDatabuffer = MyOwner.MakeSaveResult();
+                        //MyOwner.WriteResultBin(0);
+                        int framCnt = m__G.oCam[0].mTargetTriggerCount;
+
+                        //Task.Factory.StartNew(() =>
+                        //{
+                        byte[] sCmdBuf = null;
+                        byte[] sRnBuf = null;
+                        byte[] sendBuf = null;
+
+                        sCmdBuf = Encoding.ASCII.GetBytes("A_R@" + framCnt.ToString() + "@");
+                        sRnBuf = Encoding.ASCII.GetBytes("@\r\n");
+                        sendBuf = new byte[sCmdBuf.Length + sDatabuffer.Length + sRnBuf.Length];
+
+                        Array.Copy(sCmdBuf, 0, sendBuf, 0, sCmdBuf.Length);
+
+                        Array.Copy(sDatabuffer, 0, sendBuf, sCmdBuf.Length, sDatabuffer.Length);
+
+                        Array.Copy(sRnBuf, 0, sendBuf, sCmdBuf.Length + sDatabuffer.Length, sRnBuf.Length);
+
+                        Network.SendData(sendBuf);
+
+                        if (!m__G.m_bHideAllGraph)
+                        {
+                            AddViewLog(string.Format("A_R Send\r\n"));
+                        }
+
+                        //});
+                    }
+                    catch
+                    {
+                        AddViewLog("Network Error while sending A_F\r\n");
+                    }
+                }
+                /////////////////////////////////////////////////////////////////
+
+                m_LastSampleNumber--;
+
+
 
                 if (m_LastSampleNumber >= 0)
                 {
