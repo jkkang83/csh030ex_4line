@@ -1009,6 +1009,7 @@ namespace CSH030Ex
 
         public void StartLive()
         {
+            if(BaslerCam[0].Parameters[PLCamera.TriggerMode].GetValue() == "On") CameraReset(2, true);
             if (cbContinuosMode.InvokeRequired)
             {
                 cbContinuosMode.BeginInvoke(new Action(() =>
@@ -1020,7 +1021,6 @@ namespace CSH030Ex
             {
                 cbContinuosMode.Checked = true;
             }
-
             Thread.Sleep(200);
 
             bHaltLive = false;
@@ -3974,6 +3974,8 @@ namespace CSH030Ex
 
         private void btnFindMarks_Click(object sender, EventArgs e)
         {
+            if (BaslerCam[0].Parameters[PLCamera.TriggerMode].GetValue() == "On")
+                CameraReset(2, true);
             GrabToFindMark();
         }
 
@@ -8411,7 +8413,9 @@ namespace CSH030Ex
         {
             if (!bHaltLive)
                 GrabHalt();
-
+            //StartLive();
+            if (BaslerCam[0].Parameters[PLCamera.TriggerMode].GetValue() == "On") 
+                CameraReset(2, true);
             LoadScaleNTheta();
             LoadTXTYZeroOffset();
             // 241206 YLUT 적용안함.

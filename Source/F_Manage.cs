@@ -278,12 +278,16 @@ namespace CSH030Ex
                     {
                         BeginInvoke((MethodInvoker)delegate
                         {
+                            if (!m__G.fVision.bHaltLive) m__G.fVision.GrabHalt();
                             Task.Run(() => StartContinuousTest(frmCnt));
                         });
 
                     }
                     else
+                    {
+                        if (!m__G.fVision.bHaltLive) m__G.fVision.GrabHalt();
                         Task.Run(() => StartContinuousTest(frmCnt));
+                    }
                     break;
                 case "R_D": //Remote Manual Test 
                     //if (!m__G.m_bHideAllGraph) AddViewLog(string.Format("R_D Recieve==\r\n"));
