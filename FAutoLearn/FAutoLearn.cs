@@ -10864,7 +10864,7 @@ namespace FAutoLearn
                         //if (aVline[i][k] < lastPeak - 20 && aVline[i][k + 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
                         //    afterValley = true;
                         if (aVline[i][k] < lastPeak - valleyThreshold && aVline[i][k + 1] >= aVline[i][k] && aVline[i][k - 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
-                            if (aVline[i][k] < minPeak/*lastPeak - 15*/) //  Valley 는 minPeak 보다 어두워야 한다.
+                            if (aVline[i][k] < minPeak && aVline[i][k] < 100/*lastPeak - 15*/) //  Valley 는 minPeak 보다 어두워야 한다.
                             {
                                 lastValley = aVline[i][k];
                                 if (k - lastValleyIndex > 6 && peakCount > 4 && !afterValley)   //   Valley와 Valley 간 간격이 너무 넓으면 이전 Peak 는 잘못된 Peak임
