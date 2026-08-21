@@ -1752,7 +1752,9 @@ namespace CSH030Ex
 
                 if (m__G.m_bSaveFImage)
                 {
-                    string fileName = m__G.m_SaveDirectory + string.Format("\\Result\\RawData\\User\\Image{0}\\", m__G.oCam[0].mTargetTriggerCount);
+                    string sDate = DateTime.Now.ToString("yyMMddHHmmss");
+                    string fileName = m__G.m_SaveDirectory + string.Format("\\Result\\RawData\\User\\{0}_Image{1}\\", sDate, m__G.oCam[0].mTargetTriggerCount);
+
                     if (!Directory.Exists(fileName))
                         Directory.CreateDirectory(fileName);
 
