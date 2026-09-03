@@ -4334,7 +4334,6 @@ namespace CSH030Ex
             string sFilePath = Path.GetFullPath(m__G.m_RootDirectory + "\\Result\\RawData");
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.DefaultExt = "bmp";
-            openFile.InitialDirectory = sFilePath;
             openFile.Multiselect = true;
 
             openFile.Filter = "BMP(*.bmp)|*.bmp";

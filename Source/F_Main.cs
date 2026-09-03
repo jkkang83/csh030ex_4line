@@ -2084,9 +2084,9 @@ namespace CSH030Ex
                             //sResult.pOmmTY[0] += m__G.oCam[0].mPOMM_TY[i] * minscale / 5; //  min
                             sResult.pOmmTZ[0] += m__G.oCam[0].mPOMM_TZ[i] * minscale / 5; //  min
                             //==
-                            sResult.pOmmrX[0] += m__G.oCam[0].mPOMM_rX[i] * minscale / 5; //  min
-                            sResult.pOmmrY[0] += m__G.oCam[0].mPOMM_rY[i] * minscale / 5; //  min
-                            sResult.pOmmrZ[0] += m__G.oCam[0].mPOMM_rZ[i] * minscale / 5; //  min
+                            sResult.pOmmrX[0] += m__G.oCam[0].mPOMM_rX[i] * umscale / 5; //  min
+                            sResult.pOmmrY[0] += m__G.oCam[0].mPOMM_rY[i] * umscale / 5; //  min
+                            sResult.pOmmrZ[0] += m__G.oCam[0].mPOMM_rZ[i] * umscale / 5; //  min
                             sResult.pOmmrTZ[0] += m__G.oCam[0].mPOMM_rTZ[i] * minscale / 5; //  min
                         }
                     }
@@ -2112,12 +2112,12 @@ namespace CSH030Ex
                             sResult.pOmmZ[i] += m__G.oCam[0].mPOMM_Z[i] * umscale;  //  um
                             //sResult.pOmmTX[i] += m__G.oCam[0].mPOMM_TX[i] * minscale ; //  min
                             //sResult.pOmmTY[i] += m__G.oCam[0].mPOMM_TY[i] * minscale ; //  min
-                            sResult.pOmmTZ[i] += m__G.oCam[0].mPOMM_TZ[i] * minscale ; //  min
+                            sResult.pOmmTZ[i] += m__G.oCam[0].mPOMM_TZ[i] * minscale; //  min
                             //==
-                            sResult.pOmmrX[0] += m__G.oCam[0].mPOMM_rX[i] * minscale; //  min
-                            sResult.pOmmrY[0] += m__G.oCam[0].mPOMM_rY[i] * minscale; //  min
-                            sResult.pOmmrZ[0] += m__G.oCam[0].mPOMM_rZ[i] * minscale; //  min
-                            sResult.pOmmrTZ[0] += m__G.oCam[0].mPOMM_rTZ[i] * minscale; //  min
+                            sResult.pOmmrX[i] += m__G.oCam[0].mPOMM_rX[i] * umscale; //  min
+                            sResult.pOmmrY[i] += m__G.oCam[0].mPOMM_rY[i] * umscale; //  min
+                            sResult.pOmmrZ[i] += m__G.oCam[0].mPOMM_rZ[i] * umscale; //  min
+                            sResult.pOmmrTZ[i] += m__G.oCam[0].mPOMM_rTZ[i] * minscale; //  min
                         }
                     }
                 }
@@ -2146,10 +2146,10 @@ namespace CSH030Ex
                             //sResult.pOmmTY[i] += m__G.oCam[0].mPOMM_TY[i] * minscale; //  min
                             sResult.pOmmTZ[i] += m__G.oCam[0].mPOMM_TZ[i] * minscale; //  min
                             //==
-                            sResult.pOmmrX[0] += m__G.oCam[0].mPOMM_rX[i] * minscale; //  min
-                            sResult.pOmmrY[0] += m__G.oCam[0].mPOMM_rY[i] * minscale; //  min
-                            sResult.pOmmrZ[0] += m__G.oCam[0].mPOMM_rZ[i] * minscale; //  min
-                            sResult.pOmmrTZ[0] += m__G.oCam[0].mPOMM_rTZ[i] * minscale; //  min
+                            sResult.pOmmrX[i] += m__G.oCam[0].mPOMM_rX[i] * umscale; //  min
+                            sResult.pOmmrY[i] += m__G.oCam[0].mPOMM_rY[i] * umscale; //  min
+                            sResult.pOmmrZ[i] += m__G.oCam[0].mPOMM_rZ[i] * umscale; //  min
+                            sResult.pOmmrTZ[i] += m__G.oCam[0].mPOMM_rTZ[i] * minscale; //  min
                         }
                     }
                 }
@@ -2177,10 +2177,10 @@ namespace CSH030Ex
                         //sResult.pOmmTY[i] += m__G.oCam[0].mPOMM_TY[i] * minscale; //  min
                         sResult.pOmmTZ[i] += m__G.oCam[0].mPOMM_TZ[i] * minscale; //  min
                                                                                   //==
-                        sResult.pOmmrX[0] += m__G.oCam[0].mPOMM_rX[i] * minscale; //  min
-                        sResult.pOmmrY[0] += m__G.oCam[0].mPOMM_rY[i] * minscale; //  min
-                        sResult.pOmmrZ[0] += m__G.oCam[0].mPOMM_rZ[i] * minscale; //  min
-                        sResult.pOmmrTZ[0] += m__G.oCam[0].mPOMM_rTZ[i] * minscale; //  min
+                        sResult.pOmmrX[i] += m__G.oCam[0].mPOMM_rX[i] * umscale; //  min
+                        sResult.pOmmrY[i] += m__G.oCam[0].mPOMM_rY[i] * umscale; //  min
+                        sResult.pOmmrZ[i] += m__G.oCam[0].mPOMM_rZ[i] * umscale; //  min
+                        sResult.pOmmrTZ[i] += m__G.oCam[0].mPOMM_rTZ[i] * minscale; //  min
                     }
                 }
             }
