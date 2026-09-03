@@ -3559,6 +3559,42 @@ namespace FAutoLearn
             p2nd.c = A[2] - A[1] * A[1] / (4 * A[0]);  //  Minimum Y
         }
 
+        public void mcLMS2ndPoly(Point2d[] wp, int length, ref Poly2nd p2nd)
+        {
+            //  Poly2nd.a, Poly2nd.b, Poly2nd.c =>
+            //  y = a( x - b )^2 + c
+            double[,] XXTinv = new double[3, 3];
+            double[] XTA = new double[3];
+            double[] A = new double[3];
+            double XX = 0;
+
+            for (int i = 0; i < length; i++)
+            {
+                XX = wp[i].X * wp[i].X;
+                XXTinv[0, 0] += XX * XX;
+                XXTinv[0, 1] += XX * wp[i].X;
+                XXTinv[0, 2] += XX;
+
+                XXTinv[1, 0] += XX * wp[i].X;
+                XXTinv[1, 1] += XX;
+                XXTinv[1, 2] += wp[i].X;
+
+                XXTinv[2, 0] += XX;
+                XXTinv[2, 1] += wp[i].X;
+                XXTinv[2, 2]++;
+
+                XTA[0] += wp[i].Y * XX;
+                XTA[1] += wp[i].Y * wp[i].X;
+                XTA[2] += wp[i].Y;
+            }
+            InverseU(ref XXTinv, 3);
+            MatrixCross(ref XXTinv, ref XTA, ref A, 3);
+            //  y = A[0] x^2 + A[1] + A[2];
+            //  y = a( x - b )^2 + c
+            p2nd.a = A[0];
+            p2nd.b = -A[1] / (2 * A[0]); //  Center of X
+            p2nd.c = A[2] - A[1] * A[1] / (4 * A[0]);  //  Minimum Y
+        }
         public void mcLMS2ndPoly(Point2D[] wp, int length, ref double[] A)
         {
             //  Poly2nd.a, Poly2nd.b, Poly2nd.c =>
@@ -4199,6 +4235,34 @@ namespace FAutoLearn
         }
 
         public void mcLMS1stPoly(Point2D[] wp, int length, ref double a, ref double b, int istart = 0, int count = -1)
+        {
+            //  y = a x + b
+            double[,] XXTinv = new double[2, 2];
+            double[] XTA = new double[2];
+            double[] A = new double[2];
+
+            int iEnd = length;
+            if (count > 0)
+                iEnd = istart + count;
+
+            for (int i = istart; i < iEnd; i++)
+            {
+                XXTinv[0, 0] += wp[i].X * wp[i].X;
+                XXTinv[0, 1] += wp[i].X;
+
+                XXTinv[1, 0] += wp[i].X;
+                XXTinv[1, 1]++;
+
+                XTA[0] += wp[i].Y * wp[i].X;
+                XTA[1] += wp[i].Y;
+            }
+            InverseU(ref XXTinv, 2);
+            MatrixCross(ref XXTinv, ref XTA, ref A, 2);
+            a = A[0];
+            b = A[1];
+        }
+
+        public void mcLMS1stPoly(Point2d[] wp, int length, ref double a, ref double b, int istart = 0, int count = -1)
         {
             //  y = a x + b
             double[,] XXTinv = new double[2, 2];
@@ -6674,6 +6738,364 @@ namespace FAutoLearn
             return resEdge;
         }
 
+        public double[] ConvergePeakX3Monte(int si, ref int[] Xidiffsrc, int width, int height, double xia, double yia, double xW, double yH, ref int peaktype, int iIndex = 0)
+        {
+            //  원본 영상의 크기 width, height 로서 ROI 범위의 조각영상인 것을 전제로 한다.
+            //  xi0 : 경계가 있을 것으로 예상되는 BOX 영역의 좌상단 X 좌표
+            //  yi0 : 경계가 있을 것으로 예상되는 BOX 영역의 좌상단 Y 좌표
+            //  xW  : BOX 영역의 폭
+            //  yH  : BOX 영역의 높이
+            //
+            //  계산된 경계좌표를 중심으로 BOX 영역의 위치를 재설정하고 재설정된 BOX 영역에서 다시 경계좌표를 계산하기를 반복한다.
+            //  반복하여, 직전 반복결과와 비교하여 결과의 변화가 0.001 이하이면 반복 종료, 최대반복은 5회까지 허용
+            double res1st = 0;
+
+            int xi0 = (int)xia;
+            double xi0_r = xia - xi0;
+            int yi0 = (int)yia;
+            double yi0_r = yia - yi0;
+
+            int fxi0 = xi0;
+            double oldf = fxi0;
+            double sumXY = 0;
+            double sumY = 0;
+            double sumXY2 = 0;
+            double sumY2 = 0;
+
+            int kLength = (int)(width - xia);
+
+            double[] roughPeak = new double[kLength + 6];
+            double[] roughPeakBk = new double[kLength + 6];
+            int[] peakIndex = new int[kLength + 6];
+            double[] effPeak = new double[kLength];
+            int[] effIndex = new int[kLength];
+            double[] intgPeak = new double[kLength + 6];
+
+            //double[] ratio = new double[xW];
+
+            //double[] sumxx = new double[kLength];
+            //double[] sumx = new double[kLength];
+
+            //int debug = 0;
+            int i = 0;
+            if (xi0 < 0) xi0 = 0;
+            if (yi0 < 0) yi0 = 0;
+            int potentialType = 0;
+            double ry = yia - yi0;
+            int xi0_i = 0;
+            int pIndex = 0;
+            double peak = -99999;
+
+            int npIndex = 0;
+            double npeak = 99999;
+
+            int incCnt = 0;
+            int repeatCnt = 0;
+
+            //bool negPeak = false;
+            int maxLength = 0;
+            bool firstPeakFound = false;
+
+
+            //if (peaktype % 100 == 2)
+            //    negPeak = true;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //  반복성향상 전후 비교검토용
+            //if ( edgeDir > 1) //   향상 전 기준치
+            //    yH = yH / 2;
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            try
+            {
+                //  Iteration 하기 전에 절대 Peak 위치를 찾아서 거기서부터 출발해야 한다. 안그러면 Peak 가 초기 검색범위에 없어서 실패할 수 있다.
+                //  Y 방향은 첫번째 + Peak 를 찾으면 됨.
+                //  X 방향은 좌측은 + Peak
+                //  X 방향은 우측은 - Peak 
+
+                while (repeatCnt < 6)
+                {
+                    for (i = 0; i < kLength; i++)
+                    {
+                        xi0_i = (int)(xi0 + i);
+                        peakIndex[i] = xi0_i;
+                        double weight = 1;
+                        if (i == 0)
+                        {
+                            weight = 1 - xi0_r;
+                        }
+                        else if (i == kLength - 1)
+                        {
+                            weight = xi0_r;
+                        }
+
+                        for (uint j = 0; j < yH; j++)
+                        {
+                            if (j + yi0 >= height - 1)
+                                break;
+
+                            roughPeak[i] += (1 - ry) * Xidiffsrc[xi0_i + (j + yi0) * width] + ry * Xidiffsrc[xi0_i + (j + yi0 + 1) * width];
+                        }
+                        roughPeak[i] = weight * roughPeak[i];
+
+                        //  Y 방향은 한번에 8개의 peak 를 찾을 것이므로 첫번째 + peak 만 찾으면 된다.
+                        //   따라서 inversion 은 사용하지 않는다.
+                        roughPeakBk[i] = roughPeak[i];
+
+                        if (!firstPeakFound)
+                        {
+                            if (peak < roughPeakBk[i])  //   첫번쨰 Peak 는 항상 양수이어야 한다.
+                            {
+                                pIndex = i;
+                                peak = roughPeakBk[i];
+                            }
+                            if (pIndex > 0 && peak > 5000 && roughPeakBk[i] < -5000)
+                            {
+                                firstPeakFound = true;
+                            }
+                        }
+                        else
+                        {
+                            if (3 * peak < roughPeakBk[i - 1] && (roughPeakBk[i - 1] >= roughPeakBk[i - 2] && roughPeakBk[i - 1] >= roughPeakBk[i]))
+                            {
+                                pIndex = i - 1;
+                                peak = roughPeakBk[i - 1];
+                            }
+                        }
+                    }
+
+                    if (pIndex > kLength - 4 && incCnt < 6)
+                    {
+                        //  첫번째 Peak Index 가 상당히 뒤쪽인 경우 1 pixel 씩 뒤쪽으로 이동해서 재검사, 반복은 최대 6회까지만 즉 6 pixel 까지만 뒤로 이동해본다.
+                        kLength++;
+                        incCnt++;
+                    }
+                    if (pIndex < 5)
+                    {
+                        if (xi0 == 0)
+                            break;
+
+                        //  첫번째 Peak Index 가 5 이하인 경우 1 pixel 앞쪽으로 이동해서 재검사, 반복은 최대 6회까지만 즉 6 pixel 까지만 앞으로 이동해본다.
+                        xi0--;
+                        repeatCnt++;
+                        peak = -99999;
+                        roughPeak = new double[kLength + 6];
+                        roughPeakBk = new double[kLength + 6];
+                        peakIndex = new int[kLength + 6];
+                        firstPeakFound = false;
+
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                fxi0 = pIndex;
+            }
+            catch (Exception e)
+            {
+                //MessageBox.Show("ConvergePeakX() 1>> \r\n" + e.ToString());
+                //return fxi0;
+            }
+
+            //  xW 의 자동조정은, xW 를 조절할 수 있는 분해능이 매우 낮아서 오히려 역효과 발생.
+            //  상황에 따라 고정값 적용이 적합. 즉 Focusing 수준에 따라서 2가지 또는 3가지 값중 선택하는 방식은 가능할 것 같음.
+            //  실험적으로 xW = 7 일때 반복성이 가장 좋은 것으로 나타남.
+
+            int icur = 0;
+            sumXY = 0;
+            sumY = 0;
+            int newi = 0;
+            double ratioXroughPeak = 0;
+            maxLength = roughPeakBk.Length - 1;
+            for (newi = -3; newi < 4; newi++)
+            {
+                icur = newi + fxi0;// - (int)xi0;
+                if (icur < 0) continue;
+                if (icur >= maxLength) break;
+                //ratioXroughPeak = ratio[newi - i0] * roughPeakBk[icur];
+                ratioXroughPeak = roughPeakBk[icur];
+                sumXY += ratioXroughPeak * (newi + fxi0);
+                sumY += ratioXroughPeak;
+            }
+            res1st = sumXY / (double)sumY;
+
+            if (res1st - xi0 < 0) //  극히 비정상인 경우 두번째 Peak 를 활용한다.
+                res1st = peakIndex[kLength - 2]; //  Peak 좌표
+
+            double oldres = res1st;
+            double pY = 0;
+            double err = 999;
+            double err_1 = 999;
+
+            uint itr = 0;
+            double[] errMem = new double[10];
+            int errMemCnt = 0;
+            double roughpeak_icur = 0;
+            double pY_05 = 0;
+            double roughPeak_icur_1 = 0;
+            double pY_15 = 0;
+            double roughPeak_icur_2 = 0;
+            int edgeFound = 0;
+            double[] resEdge = new double[9];
+            int slopeDir = 1;
+            double[] maxSlope = new double[8];
+            double lshift = 0;
+
+            try
+            {
+                while (edgeFound < 1)
+                {
+                    if (edgeFound % 2 == 0)
+                        slopeDir = 1;
+                    else
+                        slopeDir = -1;
+
+                    err = 999;
+                    err_1 = 999;
+
+                    for (itr = 0; itr < 25; itr++)
+                    {
+                        int irx = (int)res1st;
+                        double rx = res1st - irx;
+                        sumXY = 0;
+                        sumY = 0;
+                        sumXY2 = 0;
+                        sumY2 = 0;
+                        lshift = 0;
+                        for (newi = -3; newi < 4; newi++)
+                        {
+                            //if (newi == 0)
+                            //    continue;
+
+                            icur = newi + irx;// - (int)xi0;
+                            if (icur < 0) continue;
+                            if (icur >= kLength) continue;
+
+                            roughpeak_icur = slopeDir * roughPeakBk[icur];
+                            roughPeak_icur_1 = slopeDir * roughPeakBk[icur + 1];
+                            //roughPeak_icur_2 = slopeDir * roughPeakBk[icur + 2];
+
+                            //if (rx > 0.5)
+                            //{
+                            //    roughpeak_icur = slopeDir * roughPeakBk[icur];
+                            //    roughPeak_icur_1 = slopeDir * roughPeakBk[icur + 1];
+                            //    if (icur + 1 - (int)xi0 < kLength)
+                            //        roughPeak_icur_2 = slopeDir * roughPeakBk[icur + 2];
+                            //    else
+                            //        roughPeak_icur_2 = roughPeak_icur_1;
+                            //}
+                            //else
+                            //{
+                            //    roughpeak_icur = slopeDir * roughPeakBk[icur - 1];
+                            //    roughPeak_icur_1 = slopeDir * roughPeakBk[icur];
+                            //    roughPeak_icur_2 = slopeDir * roughPeakBk[icur + 1];
+                            //}
+
+                            if (roughpeak_icur < 0)
+                                roughpeak_icur = roughpeak_icur / 4;
+                            if (roughPeak_icur_1 < 0)
+                                roughPeak_icur_1 = roughPeak_icur_1 / 4;
+                            //if (roughPeak_icur_2 < 0)
+                            //    roughPeak_icur_2 = roughPeak_icur_2 / 5;
+
+                            pY_05 = 0;
+                            if (rx > 0)
+                            {
+                                if (icur + 1 - (int)xi0 < kLength)
+                                {
+                                    pY = (1 - rx) * roughpeak_icur + rx * roughPeak_icur_1;
+
+                                    //////  2차보간과  1차보간의 평균치 활용 -> 악화됨
+                                    //if (rx > 0.5)
+                                    //    pY = (((1 - rx) * roughpeak_icur + rx * roughPeak_icur_1) * 9 + EstimateFrom3Pts(rx, 0, roughpeak_icur, 1, roughPeak_icur_1, 2, roughPeak_icur_2)) / 10;
+                                    //else
+                                    //    pY = (((1 - rx) * roughPeak_icur_1 + rx * roughPeak_icur_2) * 9 + EstimateFrom3Pts(1 + rx, 0, roughpeak_icur, 1, roughPeak_icur_1, 2, roughPeak_icur_2)) / 10;
+                                }
+                                else
+                                {
+                                    pY = roughpeak_icur;   //  다음 값이 없으면 같은 값으로 가정.
+                                    //pY_05 = roughpeak_icur;
+                                }
+
+                            }
+                            else
+                            {
+                                pY = roughpeak_icur;
+                            }
+
+                            if (newi == 0)
+                                pY = 1.15 * pY;      //  1보다 0.9 가 나빠짐, 1.1 해볼 필요 있음
+
+                            else if (newi == -1 || newi == 1)
+                                pY = 1.1 * pY;      //  1보다 0.9 가 나빠짐, 1.1 해볼 필요 있음
+
+                            else if (newi == -2 || newi == 2)
+                                pY = 1.05 * pY;      //  1보다 0.9 가 나빠짐, 1.1 해볼 필요 있음
+
+                            sumXY += (newi + res1st) * pY;
+
+                            sumY += pY;
+                        }
+                        //lshift = lshift / (sumY);    //  2, 10, 50 시도해보기
+                        res1st = sumXY / (double)sumY;
+                        if (sumY == 0)
+                        {
+                            res1st = fxi0;
+                            break;
+                        }
+                        err = oldres - res1st;
+                        err = err < 0 ? -err : err;
+                        if (err < 0.00012)   //  0.0001 일때 반복성 더 나쁘다.
+                        {
+                            //maxSlope[edgeFound] = Math.Abs((1 - rx) * roughPeakBk[irx] + rx * roughPeakBk[irx + 1]);
+                            break;
+                        }
+
+                        if (err > 5 * err_1)    //  오차가 직전 오차보다 오히려 5배이상 커지면 직전을 최종 값으로 선택한다.
+                        {
+                            res1st = errMem[(errMemCnt - 1) % 6];
+                            break;
+                        }
+                        res1st = res1st + (res1st - oldres) / 4;// 3.5 ; //  최대한 빨리 수렴하도록 접근속도를 변경함. 평균적으로 가장 빠르게 수렴시키는 최적값이 정확히 얼마인지는 알 수 없음.
+                        err_1 = err;
+                        oldres = res1st;
+                        errMem[errMemCnt] = res1st;
+                        errMemCnt = (errMemCnt + 1) % 6;
+                    }
+                    if (itr == 25)
+                    {
+                        res1st = 0;
+                        int emiCnt = 0;
+                        for (int emi = 0; emi < 6; emi++)
+                        {
+                            if (errMem[emi] == 0)
+                                break;
+                            res1st += errMem[emi];
+                            emiCnt++;
+                        }
+                        res1st = res1st / emiCnt;
+                    }
+                    resEdge[edgeFound++] = res1st + xi0;// + lshift;
+
+                    //  아래는 다음 경계추출을 위한 준비
+                    if (si < 3)
+                        res1st += 5.7;
+                    else
+                        res1st += 6.33;
+                    oldres = res1st;
+                }
+            }
+            catch (Exception e)
+            {
+                //MessageBox.Show("ConvergePeakX() 2>>\r\n" + e.ToString());
+                //return simpleRes;
+            }
+            return resEdge;
+        }
         //  Estimate Gradient with 3Point Quadratic formula
         private double EstimateFrom3Pts(
                 double xq,
@@ -8981,6 +9403,39 @@ namespace FAutoLearn
                 y1 + t * dy1
             );
 
+            return true;
+        }
+
+
+        public bool TryIntersect(Line2D A, double[] B, out Point2d intersection)
+        {
+            intersection = new Point2d();
+
+            double m = A.Direction.X / A.Direction.Y;
+            double n = A.Point.X - A.Point.Y * m;
+
+            double a = B[0];
+            double b = B[1];
+            double c = B[2];
+
+            double _A = a * m * m;
+            double _B = (2 * a * m * n + b * m - 1);
+            double _C = a * n * n + b * n + c;
+            double sqrtPart = Math.Sqrt( _B * _B - 4 * _A * _C);
+            double y1 = (-_B + sqrtPart ) / (2 * _A);
+            double y2 = (-_B - sqrtPart ) / (2 * _A);
+            double x = 0;
+
+            if (y1 > 0 && y1 < 800)
+            {
+                x = (m*y1 + n);
+                intersection = new Point2d(x, y1);
+            }
+            else
+            {
+                x = (m*y2 + n);
+                intersection = new Point2d(x, y2);
+            }
             return true;
         }
         public class CenterLineResult

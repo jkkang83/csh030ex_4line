@@ -38,6 +38,8 @@ namespace FAutoLearn
         public Mat[] mSourceImg2 = new Mat[30];
         public Mat[] mOMMSImg = new Mat[30];
         public Mat[] mOMMTImg = new Mat[30];
+        //public Mat[] mOMMSImg1X = new Mat[30];
+        //public Mat[] mOMMTImg1X = new Mat[30];
         public Mat mCustomImg = null;
         public Mat mCustomImg2 = null;
 
@@ -250,6 +252,8 @@ namespace FAutoLearn
 
         public byte[][] qOMMS_Value = new byte[30][];   //  축소이미지
         public byte[][] qOMMT_Value = new byte[30][];   //  축소이미지
+        public byte[][] qOMMS1X_Value = new byte[30][];   //  축소이미지
+        public byte[][] qOMMT1X_Value = new byte[30][];   //  축소이미지
 
         public byte[][] q_Value = new byte[30][];   //  축소이미지
         public byte[][] q_Value2 = new byte[30][];   //  축소이미지
@@ -2265,9 +2269,11 @@ namespace FAutoLearn
 
             if (m_bPseudoResize)
             {
+                mOMMSImg[srcBuf].GetArray(out qOMMS1X_Value[resizeBuf]);   //  OMM 용 Side 세로 1/2 축소
                 Cv2.Resize(mOMMSImg[srcBuf], ImgDest, new OpenCvSharp.Size(mOMMSImg[srcBuf].Width, mOMMSImg[srcBuf].Height / 2.0), 1.0, 1.0 / 2.0, InterpolationFlags.Area);  //  1/mModelScale 축소
                 ImgDest.GetArray(out qOMMS_Value[resizeBuf]);   //  OMM 용 Side 세로 1/2 축소
 
+                mOMMTImg[srcBuf].GetArray(out qOMMT1X_Value[resizeBuf]);   //  OMM 용 Side 세로 1/3 축소
                 Cv2.Resize(mOMMTImg[srcBuf], ImgDest, new OpenCvSharp.Size(mOMMTImg[srcBuf].Width, mOMMTImg[srcBuf].Height / 2.0), 1.0, 1.0 / 2.0, InterpolationFlags.Area);  //  1/mModelScale 축소
                 ImgDest.GetArray(out qOMMT_Value[resizeBuf]);   //  OMM 용 Side 세로 1/3 축소
             }
@@ -2297,13 +2303,19 @@ namespace FAutoLearn
             OpenCvSharp.Point2d[] ommres = new Point2d[6];
 
             //  qOMMS_Value[] 에서 양단 좌표 찾고
-            //  qOMMㅆ_Value[] 에서 양단 좌표 찾아서 저장 후 리턴
+            //  qOMMT_Value[] 에서 양단 좌표 찾아서 저장 후 리턴
 
             int mOMMSImg_Height = mOMMSImg[iBuf].Height / 2;
             int mOMMSImg_Width = mOMMSImg[iBuf].Width;
 
             int mOMMTImg_Height = mOMMTImg[iBuf].Height / 2;
             int mOMMTImg_Width = mOMMTImg[iBuf].Width;
+
+            //int mOMMSImg_Height = mOMMSImg[iBuf].Height;
+            //int mOMMSImg_Width = mOMMSImg[iBuf].Width;
+
+            //int mOMMTImg_Height = mOMMTImg[iBuf].Height;
+            //int mOMMTImg_Width = mOMMTImg[iBuf].Width;
 
 
             //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2312,7 +2324,7 @@ namespace FAutoLearn
             int ie = 481;
             int j0 = 18;// 27;    //  54 ~ 142
             int je = 60;// 71;
-            int jLen = (je - j0) / 2;   //  71-27 = 44
+            int jLen = (je - j0) / 2; // (je - j0) / 2;   //  71-27 = 44
 
             //  위 영역에서  우에서 좌로 어두워지는 첫번째경계 추출
             //  수직선 검출
@@ -2361,10 +2373,10 @@ namespace FAutoLearn
             ////FZMath.Line2D ommSedgeTop = mFZM.FitLinePCA(ptSH1);
 
             //  아래쪽 수평선검출
-            int HscanLen = 13;
+            int HscanLen = 12;
             Point2d[] ptSH2 = new Point2d[HscanLen];
             int[][] ydiffB = new int[HscanLen][];
-            x = (int)(ptS[jLen - 1].X + 3 - 115);
+            x = (int)(ptS[jLen - 1].X + 2 - 115);
             int jstart = 58;
             for (int i = x; i < x + HscanLen; i++)
             {
@@ -2377,7 +2389,9 @@ namespace FAutoLearn
                 }
                 ptSH2[i - x] = new Point2d(115 + i + 0.5, 2 * (CalcPeakDiff(ydiffB[i - x]) + jstart)); //  Y 좌표 2배 해준다.
             }
-            FZMath.Line2D ommSedgeBtm = mFZM.FitLinePCA(ptSH2);
+            //FZMath.Line2D ommSedgeBtm = mFZM.FitLinePCA(ptSH2);
+            double[] ommSedgeBtmPoly2nd = new double[3];
+            mFZM.mcLMS2ndPoly(ptSH2, ptSH2.Length, ref ommSedgeBtmPoly2nd);
 
             //  a0, b0 - a1,b1 간 교점,   a0, b0 - a2,b2 간 교점 구한다.
 
@@ -2414,6 +2428,12 @@ namespace FAutoLearn
                     j--;
                 }
             }
+            if (ptTL == null || ptTL.Count < 2 )
+            {
+                for (int i = 0; i < 6; i++)
+                    ommres[i] = new Point2d(0, 0);
+                return ommres;
+            }
             //  xdiff[0], xdiff[0] 에서 각각 Peak 찾는다  일단 Y 축이 1/2 압축된 상태의 좌표로 확보한다.
             Point2d[] ptT = ptTL.ToArray();
             jLen = ptTL.Count;
@@ -2442,7 +2462,7 @@ namespace FAutoLearn
             ////FZMath.Line2D ommTedgeTop = mFZM.FitLinePCA(ptTH1);
 
             //  아래쪽 수평선검출
-            HscanLen = 11;
+            HscanLen = 10;
             Point2d[] ptTH2 = new Point2d[HscanLen];
             ydiffB = new int[HscanLen][];
             x = (int)(ptT[jLen - 1].X + 3 - 520);
@@ -2459,17 +2479,21 @@ namespace FAutoLearn
                 ptTH2[i - x] = new Point2d(i + 0.5 + 520, 2 * (CalcPeakDiff(ydiffB[i - x]) + 95 + jstart));   //  Y 좌표 2배
             }
             FZMath.Line2D ommTedgeBtm = mFZM.FitLinePCA(ptTH2);
+            //double[] ommTedgeBtmPoly2nd = new double[3];
+            //mFZM.mcLMS2ndPoly(ptTH2, ptTH2.Length, ref ommTedgeBtmPoly2nd);
 
             //  a0, b0 - a1,b1 간 교점,   a0, b0 - a2,b2 간 교점 구한다.
             Point2d ptSide1 = new Point2d();
-            //mFZM.TryIntersect(ommSedge, ommSedgeTop, out ptSide1);
+            ////////mFZM.TryIntersect(ommSedge, ommSedgeTop, out ptSide1);
             Point2d ptSide2 = new Point2d();
-            mFZM.TryIntersect(ommSedge, ommSedgeBtm, out ptSide2);
+            //mFZM.TryIntersect(ommSedge, ommSedgeBtm, out ptSide2);
+            mFZM.TryIntersect(ommSedge, ommSedgeBtmPoly2nd, out ptSide2);
 
             Point2d ptTop1 = new Point2d();
-            //mFZM.TryIntersect(ommTedge, ommTedgeTop, out ptTop1);
+            ////////mFZM.TryIntersect(ommTedge, ommTedgeTop, out ptTop1);
             Point2d ptTop2 = new Point2d();
             mFZM.TryIntersect(ommTedge, ommTedgeBtm, out ptTop2);
+            //mFZM.TryIntersect(ommTedge, ommTedgeBtmPoly2nd, out ptTop2);
 
             //  Y 방향으로 2배 다시 확대하여 Y 스케일 원상복귀
             //ptSide1.Y = ptSide1.Y * 2;
@@ -2510,6 +2534,231 @@ namespace FAutoLearn
             return ommres;
         }
 
+        public OpenCvSharp.Point2d[] FineOMM1X(int iIndex, int iBuf = 0)
+        {
+            OpenCvSharp.Point2d[] ommres = new Point2d[6];
+
+            //  qOMMS_Value[] 에서 양단 좌표 찾고
+            //  qOMMT_Value[] 에서 양단 좌표 찾아서 저장 후 리턴
+
+            int mOMMSImg_Height = mOMMSImg[iBuf].Height;
+            int mOMMSImg_Width = mOMMSImg[iBuf].Width;
+
+            int mOMMTImg_Height = mOMMTImg[iBuf].Height;
+            int mOMMTImg_Width = mOMMTImg[iBuf].Width;
+
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //  OMMS
+            int i0 = 451;   //  115더해야 절대좌표 565 ~ 595
+            int ie = 481;
+            int j0 = 2 * 18;// 27;    //  54 ~ 142
+            int je = 2 * 60;// 71;
+            int jLen = (je - j0) / 2;   //  71-27 = 44
+
+            //  위 영역에서  우에서 좌로 어두워지는 첫번째경계 추출
+            //  수직선 검출
+            int[][] xdiff = new int[jLen][];
+            Point2d[] ptS = new Point2d[jLen];
+
+            xdiff[0] = new int[ie - i0 + 1];
+            xdiff[1] = new int[ie - i0 + 1];
+            for (int j = 0; j < jLen; j++)
+            {
+                xdiff[j] = new int[ie - i0 + 1];
+                for (int i = i0; i < ie; i++)
+                {
+                    xdiff[j][i - i0] = qOMMS1X_Value[iBuf][i + (j0 + 2 * j) * mOMMSImg_Width]           + qOMMS1X_Value[iBuf][i + 1 + (j0 + 2 * j) * mOMMSImg_Width]
+                                     - qOMMS1X_Value[iBuf][i - 1 + (j0 + 2 * j) * mOMMSImg_Width]       - qOMMS1X_Value[iBuf][i - 2 + (j0 + 2 * j) * mOMMSImg_Width];
+                    xdiff[j][i - i0] += qOMMS1X_Value[iBuf][i + (j0 + 2 * j + 1) * mOMMSImg_Width]      + qOMMS1X_Value[iBuf][i + 1 + (j0 + 2 * j + 1) * mOMMSImg_Width]
+                                      - qOMMS1X_Value[iBuf][i - 1 + (j0 + 2 * j + 1) * mOMMSImg_Width]  - qOMMS1X_Value[iBuf][i - 2 + (j0 + 2 * j + 1) * mOMMSImg_Width];
+                }
+                ptS[j] = new Point2d(CalcPeakDiff(xdiff[j]) + i0 + 115, ((j0 + 2 * j) + 0.5));    //  Y 좌표는 1배 해준다
+
+            }
+            //  xdiff[0], xdiff[0] 에서 각각 Peak 찾는다. 일단 Y 축이 1/2 압축된 상태의 좌표로 확보한다.
+            //  X만 우선 절대 좌표계로 변환
+            FZMath.Line2D ommSedge = mFZM.FitLinePCA(ptS);
+
+
+            // 얻어진 pt0.X 좌표 + 2 ~ 27 의 범위에서 Y=0 -> +Scan
+            // 얻어진 pt1.X 좌표 + 2 ~ 27 의 범위에서 Y=95 -> -Scan
+            //  각각 X step 을 2 로 하여 모든 Peak 를 구한 다음 LMS 직선을 구한다.
+
+            //////  위쪽 수평선검출
+            int VLen = 2 * 25;
+            Point2d[] ptSH1 = new Point2d[VLen];
+            int[][] ydiff = new int[VLen][];
+            int x = (int)(ptS[0].X + 4 - 115);
+            ////for (int i = x; i < x+25; i++)
+            ////{
+            ////    //  i 는 가로방향, j 는 세로방향이 된다.
+            ////    ydiff[i-x] = new int[25];
+            ////    for (int j = 2; j < 24; j++)
+            ////    {
+            ////        ydiff[i-x][j-2] = qOMMS_Value[iBuf][i + j * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + j * mOMMSImg_Width] - (qOMMS_Value[iBuf][i + (j - 1) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j - 1) * mOMMSImg_Width])
+            ////                      + qOMMS_Value[iBuf][i + (j + 1) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j + 1) * mOMMSImg_Width] - (qOMMS_Value[iBuf][i + (j - 2) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j - 2) * mOMMSImg_Width]);
+            ////    }
+            ////    ptSH1[i - x] = new Point2d(115 + i, CalcPeakDiff(ydiff[i - x]) + 2);
+            ////}
+            ////FZMath.Line2D ommSedgeTop = mFZM.FitLinePCA(ptSH1);
+
+            //  아래쪽 수평선검출
+            int HscanLen = 14;
+            Point2d[] ptSH2 = new Point2d[HscanLen];
+            int[][] ydiffB = new int[HscanLen][];
+            x = (int)(ptS[jLen - 1].X + 2 - 115);
+            int jstart = 2 * 58;
+            for (int i = x; i < x + HscanLen; i++)
+            {
+                //  i 는 가로방향, j 는 세로방향이 된다.
+                ydiffB[i - x] = new int[VLen];
+                for (int j = jstart; j < jstart + VLen; j++)
+                {
+                    ydiffB[i - x][j - jstart] = -(qOMMS1X_Value[iBuf][i + j * mOMMSImg_Width] + qOMMS1X_Value[iBuf][i + 1 + j * mOMMSImg_Width] - (qOMMS1X_Value[iBuf][i + (j - 1) * mOMMSImg_Width] + qOMMS1X_Value[iBuf][i + 1 + (j - 1) * mOMMSImg_Width])
+                                   + qOMMS1X_Value[iBuf][i + (j + 1) * mOMMSImg_Width] + qOMMS1X_Value[iBuf][i + 1 + (j + 1) * mOMMSImg_Width] - (qOMMS1X_Value[iBuf][i + (j - 2) * mOMMSImg_Width] + qOMMS1X_Value[iBuf][i + 1 + (j - 2) * mOMMSImg_Width]));
+                }
+                ptSH2[i - x] = new Point2d(115 + i + 0.5, (CalcPeakDiff(ydiffB[i - x]) + jstart)); //  Y 좌표 1배 해준다.
+            }
+            //FZMath.Line2D ommSedgeBtm = mFZM.FitLinePCA(ptSH2);
+            double[] ommSedgeBtmPoly2nd = new double[3];
+            mFZM.mcLMS2ndPoly(ptSH2, ptSH2.Length, ref ommSedgeBtmPoly2nd);
+
+            //  a0, b0 - a1,b1 간 교점,   a0, b0 - a2,b2 간 교점 구한다.
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //  OMMT
+            i0 = 184;   //  520 더해야 절대좌표
+            ie = 214;
+            j0 = 2 * 18;// 19;
+            je = 2 * 92;// 95; //95-19 = 76
+            jLen = (je - j0) / 2;
+            //  위 영역에서  우에서 좌로 어두워지는 경계 추출
+            //  수직선 검출
+            xdiff = new int[jLen][];
+            List<Point2d> ptTL = new List<Point2d>();
+            for (int j = 0; j < jLen; j++)
+            {
+                xdiff[j] = new int[ie - i0 + 1];
+                for (int i = i0; i < ie; i++)
+                {
+                    xdiff[j][i - i0] =  qOMMT1X_Value[iBuf][i + (j0 + 2 * j) * mOMMTImg_Width]            + qOMMT1X_Value[iBuf][i + 1 + (j0 + 2 * j) * mOMMTImg_Width]
+                                     -  qOMMT1X_Value[iBuf][i - 1 + (j0 + 2 * j) * mOMMTImg_Width]        - qOMMT1X_Value[iBuf][i - 2 + (j0 + 2 * j) * mOMMTImg_Width];
+                    xdiff[j][i - i0] += qOMMT1X_Value[iBuf][i + (j0 + 2 * j + 1) * mOMMTImg_Width]        + qOMMT1X_Value[iBuf][i + 1 + (j0 + 2 * j + 1) * mOMMTImg_Width]
+                                      - qOMMT1X_Value[iBuf][i - 1 + (j0 + 2 * j + 1) * mOMMTImg_Width]    - qOMMT1X_Value[iBuf][i - 2 + (j0 + 2 * j + 1) * mOMMTImg_Width];
+                }
+                ptTL.Add(new Point2d(CalcPeakDiff(xdiff[j]) + i0 + 520, ((j0 + 2 * j) + 0.5 + 190))); //  Y 좌표 1배
+            }
+            double meanX = ptTL.Average(p => p.X);
+            double meanY = ptTL.Average(p => p.Y);
+            for (int j = 0; j < ptTL.Count; j++)
+            {
+                if (Math.Abs(ptTL[j].X - meanX) > 2)
+                {
+                    ptTL.RemoveAt(j);
+                    j--;
+                }
+            }
+            //  xdiff[0], xdiff[0] 에서 각각 Peak 찾는다  일단 Y 축이 1/2 압축된 상태의 좌표로 확보한다.
+            Point2d[] ptT = ptTL.ToArray();
+            jLen = ptTL.Count;
+            FZMath.Line2D ommTedge = mFZM.FitLinePCA(ptT);
+
+
+            //  위쪽 수평선검출
+            // 얻어진 pt0.X 좌표 + 2 ~ 27 의 범위에서 Y=0 -> +Scan
+            // 얻어진 pt1.X 좌표 + 2 ~ 27 의 범위에서 Y=95 -> -Scan
+            //  각각 X step 을 2 로 하여 모든 Peak 를 구한 다음 LMS 직선을 구한다.
+
+            //////  위쪽 수평선검출
+            ////Point2d[] ptTH1 = new Point2d[16];
+            ////x = (int)(ptT[0].X + 4 - 520);
+            ////for (int i = x; i < x + 16; i++)
+            ////{
+            ////    //  i 는 가로방향, j 는 세로방향이 된다.
+            ////    ydiff[i - x] = new int[25];
+            ////    for (int j = 2; j < 25; j++)
+            ////    {
+            ////        ydiff[i - x][j-2] = qOMMT_Value[iBuf][i + j * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + j * mOMMTImg_Width] - (qOMMT_Value[iBuf][i + (j - 1) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j - 1) * mOMMTImg_Width])
+            ////                      + qOMMT_Value[iBuf][i + (j + 1) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j + 1) * mOMMTImg_Width] - (qOMMT_Value[iBuf][i + (j - 2) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j - 2) * mOMMTImg_Width]);
+            ////    }
+            ////    ptTH1[i - x] = new Point2d(i + 0.5 + 520, CalcPeakDiff(ydiff[i - x]) + 97);
+            ////}
+            ////FZMath.Line2D ommTedgeTop = mFZM.FitLinePCA(ptTH1);
+
+            //  아래쪽 수평선검출
+            VLen = 2 * 35;
+            HscanLen = 12;
+            Point2d[] ptTH2 = new Point2d[HscanLen];
+            ydiffB = new int[HscanLen][];
+            x = (int)(ptT[jLen - 1].X + 2 - 520);
+            jstart = 2 * 85;
+            for (int i = x; i < x + HscanLen; i++)
+            {
+                //  i 는 가로방향, j 는 세로방향이 된다.
+                ydiffB[i - x] = new int[VLen];
+                for (int j = jstart; j < jstart + VLen; j++)
+                {
+                    ydiffB[i - x][j - jstart] = -(qOMMT1X_Value[iBuf][i + j * mOMMTImg_Width] + qOMMT1X_Value[iBuf][i + 1 + j * mOMMTImg_Width] - (qOMMT1X_Value[iBuf][i + (j - 1) * mOMMTImg_Width] + qOMMT1X_Value[iBuf][i + 1 + (j - 1) * mOMMTImg_Width])
+                                   + qOMMT1X_Value[iBuf][i + (j + 1) * mOMMTImg_Width] + qOMMT1X_Value[iBuf][i + 1 + (j + 1) * mOMMTImg_Width] - (qOMMT1X_Value[iBuf][i + (j - 2) * mOMMTImg_Width] + qOMMT1X_Value[iBuf][i + 1 + (j - 2) * mOMMTImg_Width]));
+                }
+                ptTH2[i - x] = new Point2d(i + 0.5 + 520, (CalcPeakDiff(ydiffB[i - x]) + 190 + jstart));   //  Y 좌표 1배
+            }
+            //FZMath.Line2D ommTedgeBtm = mFZM.FitLinePCA(ptTH2);
+            double[] ommTedgeBtmPoly2nd = new double[3];
+            mFZM.mcLMS2ndPoly(ptTH2, ptTH2.Length, ref ommTedgeBtmPoly2nd);
+
+            //  a0, b0 - a1,b1 간 교점,   a0, b0 - a2,b2 간 교점 구한다.
+            Point2d ptSide1 = new Point2d();
+            ////////mFZM.TryIntersect(ommSedge, ommSedgeTop, out ptSide1);
+            Point2d ptSide2 = new Point2d();
+            //mFZM.TryIntersect(ommSedge, ommSedgeBtm, out ptSide2);
+            mFZM.TryIntersect(ommSedge, ommSedgeBtmPoly2nd, out ptSide2);
+
+            Point2d ptTop1 = new Point2d();
+            ////////mFZM.TryIntersect(ommTedge, ommTedgeTop, out ptTop1);
+            Point2d ptTop2 = new Point2d();
+            //mFZM.TryIntersect(ommTedge, ommTedgeBtm, out ptTop2);
+            mFZM.TryIntersect(ommTedge, ommTedgeBtmPoly2nd, out ptTop2);
+
+            //  Y 방향으로 2배 다시 확대하여 Y 스케일 원상복귀
+            //ptSide1.Y = ptSide1.Y * 2;
+            //ptSide2.Y = ptSide2.Y * 2;
+            //ptTop1.Y = ptTop1.Y * 2;
+            //ptTop2.Y = ptTop2.Y * 2;
+            if (ptSide1.Y == 0)
+            {
+                ptSide1.X = ptSide2.X;
+                ptSide1.Y = ptSide2.Y;
+
+                ptTop1.X = ptTop2.X;
+                ptTop1.Y = ptTop2.Y;
+            }
+
+            //double sL = Math.Sqrt((ptSide2.X - ptSide1.X) * (ptSide2.X - ptSide1.X) + (ptSide2.Y - ptSide1.Y) * (ptSide2.Y - ptSide1.Y));
+            //double tL = Math.Sqrt((ptTop2.X - ptTop1.X) * (ptTop2.X - ptTop1.X) + (ptTop2.Y - ptTop1.Y) * (ptTop2.Y - ptTop1.Y));
+
+            ommres[0] = new Point2d((ptSide1.X + ptSide2.X) / 2, (ptSide1.Y + ptSide2.Y) / 2);
+            if (ommTedge.Direction.Y > 0)
+                ommres[1] = new Point2d(ommSedge.Direction.X, ommSedge.Direction.Y);//new Point2d((ptSide2.X - ptSide1.X) / sL, (ptSide2.Y - ptSide1.Y) / sL);  //  Unit Vector Y in Side View
+            else
+                ommres[1] = new Point2d(-ommSedge.Direction.X, -ommSedge.Direction.Y);//new Point2d((ptSide2.X - ptSide1.X) / sL, (ptSide2.Y - ptSide1.Y) / sL);  //  Unit Vector Y in Side View
+
+            ommres[2] = new Point2d(ommres[1].Y / vSin40, -ommres[1].X * vSin40);  //  Unit Vector X in Side View
+            double sXL = Math.Sqrt(ommres[2].X * ommres[2].X + ommres[2].Y * ommres[2].Y);
+            ommres[2].X = ommres[2].X / sXL;
+            ommres[2].Y = ommres[2].Y / sXL;
+
+            ommres[3] = new Point2d((ptTop1.X + ptTop2.X) / 2, (ptTop1.Y + ptTop2.Y) / 2);
+            if (ommTedge.Direction.Y > 0)
+                ommres[4] = new Point2d(ommTedge.Direction.X, ommTedge.Direction.Y);//new Point2d((ptTop2.X - ptTop1.X) / tL    , (ptTop2.Y - ptTop1.Y) / tL);    // Unit Vector Y in Top View
+            else
+                ommres[4] = new Point2d(-ommTedge.Direction.X, -ommTedge.Direction.Y);//new Point2d((ptTop2.X - ptTop1.X) / tL    , (ptTop2.Y - ptTop1.Y) / tL);    // Unit Vector Y in Top View
+
+            ommres[5] = new Point2d(ommres[4].Y, -ommres[4].X);                                     // Unit Vector X in Top View
+
+            return ommres;
+        }
         public double[] mInitialPheudoOMM_XYZTXTYTZ = new double[6];
         private double mInitialZrelativetoPseudoOMM = 0;
         public double[] ABSPheudoOMM(int iIndex, Point2d[] ommData)
@@ -2614,7 +2863,7 @@ namespace FAutoLearn
             return Math.Acos((a1 * a2 + b1 * b2) / (Math.Sqrt(a1 * a1 + b1 * b1) * Math.Sqrt(a2 * a2 + b2 * b2)));
         }
 
-        public double CalcPeakDiff(int[] diffs)
+        public double CalcPeakDiff(int[] diffs, int width = 3)
         {
             double res = 0;
 
@@ -2739,7 +2988,7 @@ namespace FAutoLearn
                     double rx = res1st - irx;
                     sumXY = 0;
                     sumY = 0;
-                    for (newi = -3; newi < 4; newi++)
+                    for (newi = -width; newi < width+1; newi++)
                     {
                         icur = newi + irx;// - (int)xi0;
                         if (icur < 0) continue;
@@ -2749,9 +2998,9 @@ namespace FAutoLearn
                         roughPeak_icur_1 = slopeDir * roughPeakBk[icur + 1];
 
                         if (roughpeak_icur < 0)
-                            roughpeak_icur = roughpeak_icur / 5;
+                            roughpeak_icur = roughpeak_icur / 4;
                         if (roughPeak_icur_1 < 0)
-                            roughPeak_icur_1 = roughPeak_icur_1 / 5;
+                            roughPeak_icur_1 = roughPeak_icur_1 / 4;
 
                         if (rx > 0)
                         {
@@ -2768,6 +3017,15 @@ namespace FAutoLearn
                         {
                             pY = roughpeak_icur;
                         }
+
+                        if (newi == 0)
+                            pY = 1.15 * pY;      //  1보다 0.9 가 나빠짐, 1.1 해볼 필요 있음
+
+                        else if (newi == -1 || newi == 1)
+                            pY = 1.1 * pY;      //  1보다 0.9 가 나빠짐, 1.1 해볼 필요 있음
+
+                        else if (newi == -2 || newi == 2)
+                            pY = 1.05 * pY;      //  1보다 0.9 가 나빠짐, 1.1 해볼 필요 있음
 
                         sumXY += (newi + res1st) * pY;
 

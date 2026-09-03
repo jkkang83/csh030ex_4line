@@ -2456,6 +2456,7 @@ namespace S2System.Vision
         public OpenCvSharp.Point[][] mDetectedMarkPos = new Point[30][];
         public OpenCvSharp.Point2d[][] mDetectedOMMPos = new Point2d[30][];
         public OpenCvSharp.Point2d[] mPseudoPtsOrg = null;
+        public OpenCvSharp.Point2d[] mPseudoPtsOrg1X = null;
         public double mNewTX = 0;
 
         public bool FineCOG(bool IsFirst, int index, int iBuf, bool IsShowBox = false, bool need6D = true, bool needLEDavg = false, bool IsFile = false)
@@ -2483,9 +2484,13 @@ namespace S2System.Vision
                     mFAL.mSourceImg2[i] = new Mat(420, 550, MatType.CV_8UC1);
                     mFAL.mOMMSImg[i] = new Mat(190, 550, MatType.CV_8UC1);
                     mFAL.mOMMTImg[i] = new Mat(270, 260, MatType.CV_8UC1);
+                    //mFAL.mOMMSImg1X[i] = new Mat(190, 550, MatType.CV_8UC1);
+                    //mFAL.mOMMTImg1X[i] = new Mat(270, 260, MatType.CV_8UC1);
                     mFAL.q_Value[i] = new byte[(Global.mMergeImgWidth / lModelScale) * (Global.mMergeImgHeight / lModelScale)];
                     mFAL.qOMMS_Value[i] = new byte[550 * 95];
                     mFAL.qOMMT_Value[i] = new byte[260 * 135];  //  260 x (270/2)
+                    mFAL.qOMMS1X_Value[i] = new byte[550 * 190];
+                    mFAL.qOMMT1X_Value[i] = new byte[260 * 270];  //  260 x (270/2)
                 }
                 mFAL.m_bPseudoResize = bPseudoOMM;
             }
@@ -2756,10 +2761,11 @@ namespace S2System.Vision
             }
             if (bPseudoOMM)
             {
-                if (index == 0)
-                {
-                    mPseudoPtsOrg = mFAL.FineOMM(index, iBuf);
-                }
+                //if (index == 0)
+                //{
+                mPseudoPtsOrg = mFAL.FineOMM(index, iBuf);
+                //mPseudoPtsOrg = mFAL.FineOMM1X(index, iBuf);
+                //}
                 mPOMM_sX[index] = mPseudoPtsOrg[0].X;
                 mPOMM_sY[index] = mPseudoPtsOrg[0].Y;
                 mPOMM_tX[index] = mPseudoPtsOrg[3].X;
