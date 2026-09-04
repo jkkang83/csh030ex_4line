@@ -20,6 +20,9 @@ using OpenCvSharp.Flann;
 using S2System.Vision;
 using Dln;
 using static MotorizedStage_SK_PI.F_Motion_SK_PI;
+using OpenCvSharp;
+using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
 
 namespace CSH030Ex
 {
@@ -1777,6 +1780,57 @@ namespace CSH030Ex
                             {
                                 string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
                                 m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
+                            }
+                        }
+                    }
+                    if (m__G.m_bSaveVideo)
+                    {
+                        string videoFile = fileName + "Result.mp4";
+
+                        string firstImageFile = fileName + "Ana0.bmp";
+
+                        if (File.Exists(firstImageFile))
+                        {
+                            using (Mat firstImage = Cv2.ImRead(firstImageFile, ImreadModes.Color))
+                            {
+                                if (!firstImage.Empty())
+                                {
+                                    int width = firstImage.Width;
+                                    int height = firstImage.Height;
+
+                                    double fps = 60.0;   // 원하는 FPS
+
+                                    using (VideoWriter writer = new VideoWriter(
+                                        videoFile,
+                                        FourCC.FromString("mp4v"),
+                                        fps,
+                                        new OpenCvSharp.Size(width, height)))
+                                    {
+                                        if (!writer.IsOpened())
+                                        {
+                                            MessageBox.Show("VideoWriter Open Fail");
+                                        }
+                                        else
+                                        {
+                                            for (int imgIndex = 0;
+                                                 imgIndex < m__G.oCam[0].mTargetTriggerCount;
+                                                 imgIndex++)
+                                            {
+                                                string imageFile =
+                                                    fileName + "Ana" + imgIndex.ToString() + ".bmp";
+
+                                                if (!File.Exists(imageFile))
+                                                    continue;
+
+                                                using (Mat img = Cv2.ImRead(imageFile, ImreadModes.Color))
+                                                {
+                                                    if (!img.Empty())
+                                                        writer.Write(img);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -4732,6 +4786,7 @@ namespace CSH030Ex
             if (!m__G.m_bOISOption) lblOISOption.ForeColor = Color.LightGray; else lblOISOption.ForeColor = Color.Aqua;
             if (!m__G.m_bSaveFImage) lblSaveUserImage.ForeColor = Color.LightGray; else lblSaveUserImage.ForeColor = Color.Aqua;
             if (!m__G.m_bPseudoOMM) lblPSeudoOmm.ForeColor = Color.LightGray; else lblPSeudoOmm.ForeColor = Color.Aqua;
+            if (!m__G.m_bSaveVideo) lblSaveVideo.ForeColor = Color.LightGray; else lblSaveVideo.ForeColor = Color.Aqua;
         }
 
         private void btnToAdmin_Click(object sender, EventArgs e)

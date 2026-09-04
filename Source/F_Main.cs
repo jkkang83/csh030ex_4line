@@ -1108,6 +1108,17 @@ namespace CSH030Ex
                 cbPseudoOMM.Checked = false;
                 m__G.m_bPseudoOMM = false;
             }
+            IsChecked = rows[i++];
+            if (IsChecked.Contains("t") || IsChecked.Contains("T"))
+            {
+                chSaveVideo.Checked = true;
+                m__G.m_bSaveVideo = true;
+            }
+            else
+            {
+                chSaveVideo.Checked = false;
+                m__G.m_bSaveVideo = false;
+            }
             return true;
 
         }
@@ -1145,6 +1156,7 @@ namespace CSH030Ex
             sr.WriteLine(chOISOption.Checked.ToString());
             sr.WriteLine(chSaveUserImage.Checked.ToString());
             sr.WriteLine(cbPseudoOMM.Checked.ToString());
+            sr.WriteLine(chSaveVideo.Checked.ToString());
             sr.Close();
             if (MachineType == (int)CSH030Ex.MachineType.Master)
                 SendParameterState = SendParameterState + "," + cb_ScreenCapture.Checked + "," + cbSaveRawData.Checked + "," + cbPassword.Checked + "," +
@@ -6416,6 +6428,15 @@ namespace CSH030Ex
 
             m__G.m_bPseudoOMM = enable;
             m__G.oCam[0].bPseudoOMM = enable;
+        }
+
+        private void chSaveVideo_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox ch = (sender as CheckBox);
+            if (ch.Checked)
+                m__G.m_bSaveVideo = true;
+            else
+                m__G.m_bSaveVideo = false;
         }
     }
 }

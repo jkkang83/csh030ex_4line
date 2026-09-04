@@ -29,8 +29,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(F_Main));
             this.panel5 = new System.Windows.Forms.Panel();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
@@ -123,6 +123,7 @@
             this.cbSaveImage = new System.Windows.Forms.CheckBox();
             this.txtSaveImage = new System.Windows.Forms.TextBox();
             this.lblSaveImage = new System.Windows.Forms.Label();
+            this.chSaveVideo = new System.Windows.Forms.CheckBox();
             this.panel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.panel1.SuspendLayout();
@@ -149,14 +150,14 @@
             this.dataGridView2.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(132)))));
             this.dataGridView2.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView2.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView2.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView2.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView2.Location = new System.Drawing.Point(0, 0);
             this.dataGridView2.Name = "dataGridView2";
@@ -197,14 +198,14 @@
             this.dataGridView1.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(132)))));
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
@@ -403,6 +404,7 @@
             // groupBox1
             // 
             this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(96)))), ((int)(((byte)(100)))));
+            this.groupBox1.Controls.Add(this.chSaveVideo);
             this.groupBox1.Controls.Add(this.cbPseudoOMM);
             this.groupBox1.Controls.Add(this.chSaveUserImage);
             this.groupBox1.Controls.Add(this.chOISOption);
@@ -454,7 +456,7 @@
             this.cbPseudoOMM.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbPseudoOMM.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbPseudoOMM.ForeColor = System.Drawing.Color.Aqua;
-            this.cbPseudoOMM.Location = new System.Drawing.Point(346, 526);
+            this.cbPseudoOMM.Location = new System.Drawing.Point(346, 560);
             this.cbPseudoOMM.Name = "cbPseudoOMM";
             this.cbPseudoOMM.Size = new System.Drawing.Size(124, 25);
             this.cbPseudoOMM.TabIndex = 203;
@@ -571,7 +573,7 @@
             // 
             this.lblDefaultModel.AutoSize = true;
             this.lblDefaultModel.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.lblDefaultModel.Location = new System.Drawing.Point(4, 690);
+            this.lblDefaultModel.Location = new System.Drawing.Point(4, 745);
             this.lblDefaultModel.Name = "lblDefaultModel";
             this.lblDefaultModel.Size = new System.Drawing.Size(126, 17);
             this.lblDefaultModel.TabIndex = 190;
@@ -677,7 +679,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.label1.Location = new System.Drawing.Point(89, 747);
+            this.label1.Location = new System.Drawing.Point(89, 802);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(325, 17);
             this.label1.TabIndex = 182;
@@ -690,7 +692,7 @@
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button2.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold);
             this.button2.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.button2.Location = new System.Drawing.Point(420, 740);
+            this.button2.Location = new System.Drawing.Point(420, 795);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(161, 28);
             this.button2.TabIndex = 181;
@@ -709,7 +711,7 @@
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button1.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold);
             this.button1.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.button1.Location = new System.Drawing.Point(4, 529);
+            this.button1.Location = new System.Drawing.Point(4, 584);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(200, 28);
             this.button1.TabIndex = 180;
@@ -727,7 +729,7 @@
             this.lbxModelFiles.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbxModelFiles.FormattingEnabled = true;
             this.lbxModelFiles.ItemHeight = 15;
-            this.lbxModelFiles.Location = new System.Drawing.Point(4, 563);
+            this.lbxModelFiles.Location = new System.Drawing.Point(4, 618);
             this.lbxModelFiles.Name = "lbxModelFiles";
             this.lbxModelFiles.Size = new System.Drawing.Size(582, 124);
             this.lbxModelFiles.TabIndex = 179;
@@ -786,6 +788,7 @@
             this.groupBox2.TabIndex = 173;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Handler Interface Port Setting";
+            this.groupBox2.Visible = false;
             // 
             // btnSendTCP
             // 
@@ -1483,6 +1486,21 @@
             this.lblSaveImage.TabIndex = 194;
             this.lblSaveImage.Text = "count";
             // 
+            // chSaveVideo
+            // 
+            this.chSaveVideo.AutoSize = true;
+            this.chSaveVideo.BackColor = System.Drawing.Color.Transparent;
+            this.chSaveVideo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.chSaveVideo.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.chSaveVideo.ForeColor = System.Drawing.Color.Black;
+            this.chSaveVideo.Location = new System.Drawing.Point(346, 529);
+            this.chSaveVideo.Name = "chSaveVideo";
+            this.chSaveVideo.Size = new System.Drawing.Size(112, 25);
+            this.chSaveVideo.TabIndex = 204;
+            this.chSaveVideo.Text = "Save Video";
+            this.chSaveVideo.UseVisualStyleBackColor = false;
+            this.chSaveVideo.CheckedChanged += new System.EventHandler(this.chSaveVideo_CheckedChanged);
+            // 
             // F_Main
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1519,7 +1537,7 @@
             this.Name = "F_Main";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "CSH030Ex 4Line Mark 26090401";
+            this.Text = "CSH030Ex 4Line Mark 26090402";
             this.TransparencyKey = System.Drawing.Color.Gray;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.F_Main_FormClosing);
@@ -1637,6 +1655,7 @@
         private System.Windows.Forms.CheckBox chOISOption;
         private System.Windows.Forms.CheckBox cbSaveNGImage;
         private System.Windows.Forms.CheckBox cbTestStage;
+        private System.Windows.Forms.CheckBox chSaveVideo;
     }
 }
 

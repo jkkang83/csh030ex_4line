@@ -90,6 +90,7 @@ namespace CSH030Ex
         public bool m_bSaveFImage = false;
         public bool m_bPseudoOMM = false;
         public bool m_bcb3Line = false;
+        public bool m_bSaveVideo = false;
 
         public string mCamID0 = "";
         public string mCamID1 = "";

@@ -132,6 +132,7 @@
             this.lblSaveUserImage = new System.Windows.Forms.Label();
             this.lblOISOption = new System.Windows.Forms.Label();
             this.lblSaveNG = new System.Windows.Forms.Label();
+            this.lblSaveVideo = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart3)).BeginInit();
@@ -1244,6 +1245,16 @@
             this.lblSaveNG.TabIndex = 514;
             this.lblSaveNG.Text = "Save NG Image";
             // 
+            // lblSaveVideo
+            // 
+            this.lblSaveVideo.AutoSize = true;
+            this.lblSaveVideo.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSaveVideo.Location = new System.Drawing.Point(1695, 23);
+            this.lblSaveVideo.Name = "lblSaveVideo";
+            this.lblSaveVideo.Size = new System.Drawing.Size(80, 16);
+            this.lblSaveVideo.TabIndex = 520;
+            this.lblSaveVideo.Text = "Save Video";
+            // 
             // FManage
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1252,6 +1263,7 @@
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(1920, 1080);
             this.ControlBox = false;
+            this.Controls.Add(this.lblSaveVideo);
             this.Controls.Add(this.lblHideAllGraph);
             this.Controls.Add(this.lblPSeudoOmm);
             this.Controls.Add(this.lblSaveRawData);
@@ -1380,5 +1392,6 @@
         private System.Windows.Forms.Label lblSaveUserImage;
         private System.Windows.Forms.Label lblOISOption;
         private System.Windows.Forms.Label lblSaveNG;
+        private System.Windows.Forms.Label lblSaveVideo;
     }
 }
