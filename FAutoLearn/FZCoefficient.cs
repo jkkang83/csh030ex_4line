@@ -7896,8 +7896,7 @@ namespace FAutoLearn
             TY = TY / mMinToRad;  //  Convert Radian to min
 
 
-            TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);
-
+            //TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);  //  260904 이전
 
             psi = (mScaleTZ[0] * psi * psi + mScaleTZ[1] * psi + mScaleTZ[2]) * mMinToRad;
             TX = (mScaleTX[0] * TX * TX + mScaleTX[1] * TX + mScaleTX[2]) * mMinToRad; // Convert min to radian
@@ -7915,6 +7914,7 @@ namespace FAutoLearn
             T.Y -= T.X * T.X * mXtoYst[0] * mPixelToUm + T.X * mXtoYst[1];// + mXtoYst[2] / mPixelToUm;
 
 
+            TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);  //  260904 에 이쪽으로 옮김
             TY -= (signTY > 0 ? mOffsetTY : -mOffsetTY);
 
 
