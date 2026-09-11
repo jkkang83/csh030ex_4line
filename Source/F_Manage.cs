@@ -309,6 +309,7 @@ namespace CSH030Ex
                         //AnosisRemoteData();
                     }
                     break;
+
                 case "R_I": //Remote Manual Test 
 
                     if (InvokeRequired)
@@ -414,28 +415,50 @@ namespace CSH030Ex
                     break;
                 case "R_R": //Request Result
                     break;
-                case "R_V": //Request Vision
-                    if (InvokeRequired)
+                case "R_V":
                     {
-                        index = int.Parse(arry[1]);
+                        if (arry.Length < 5)
+                        {
+                            AddViewLog("R_V Receive Error : Invalid Parameter\r\n");
+                            break;
+                        }
 
-                        sCmdBuf = Encoding.ASCII.GetBytes("A_V@");
-                        string imgPath = "Fimg0_00.bmp";
-                        MemoryStream mMemoryStream = new MemoryStream();
-                        Bitmap iImage = new Bitmap(imgPath);
-                        iImage.Save(mMemoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                        int startIndex;
+                        int endIndex;
 
-                        sDataBuff = mMemoryStream.ToArray();
-                        sRnBuf = Encoding.ASCII.GetBytes("@\r\n");
-                        sendBuf = new byte[sCmdBuf.Length + sDataBuff.Length + sRnBuf.Length];
+                        if (!int.TryParse(arry[1], out startIndex) ||
+                            !int.TryParse(arry[2], out endIndex))
+                        {
+                            AddViewLog("R_V Receive Error : Invalid Index\r\n");
+                            break;
+                        }
 
-                        Array.Copy(sCmdBuf, 0, sendBuf, 0, sCmdBuf.Length);
-                        Array.Copy(sDataBuff, 0, sendBuf, sCmdBuf.Length, sDataBuff.Length);
-                        Array.Copy(sRnBuf, 0, sendBuf, sCmdBuf.Length + sDataBuff.Length, sRnBuf.Length);
+                        string barcode = arry[3].Trim();
+                        string sweepName = arry[4].Trim();
 
-                        Network.SendData(sendBuf);
+                        AddViewLog(string.Format(
+                            "R_V Receive, Start:{0}, End:{1}, Barcode:{2}, Sweep:{3}\r\n",
+                            startIndex,
+                            endIndex,
+                            barcode,
+                            sweepName));
+
+                        Task.Run(() =>
+                        {
+                            bool result = SaveSweepImages(startIndex, endIndex, barcode, sweepName);
+
+                            if (result)
+                            {
+                                sendBuf = Encoding.ASCII.GetBytes("A_V@\r\n");
+
+                                Network.SendData(sendBuf);
+
+                                AddViewLog("A_V Send\r\n");
+                            }
+                        });
+
+                        break;
                     }
-                    break;
                 case "R_P": //Request Program Restart
                     //Application.Exit();
                     //Thread.Sleep(5000);
@@ -660,6 +683,52 @@ namespace CSH030Ex
                         });
                     }
                     break;
+            }
+        }
+        private bool SaveSweepImages(int startIndex, int endIndex, string barcode, string sweepName)
+        {
+            try
+            {
+                string fileName = m__G.m_RootDirectory +
+                    string.Format("\\Result\\RawData\\Sweep\\{0}\\{1}\\",
+                    barcode,
+                    sweepName);
+
+                if (!Directory.Exists(fileName))
+                    Directory.CreateDirectory(fileName);
+
+                int saveStart = Math.Max(0, startIndex);
+                int saveEnd = Math.Min(endIndex, m__G.oCam[0].mTargetTriggerCount - 1);
+
+                if (saveStart > saveEnd)
+                {
+                    AddViewLog(string.Format(
+                        "R_V Invalid Image Range : {0} ~ {1}\r\n",
+                        startIndex,
+                        endIndex));
+
+                    return false;
+                }
+
+                for (int imgIndex = saveStart; imgIndex <= saveEnd; imgIndex++)
+                {
+                    string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
+
+                    m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
+                }
+
+                AddViewLog(string.Format(
+                    "R_V Image Save Complete : {0} ~ {1}\r\n",
+                    saveStart,
+                    saveEnd));
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                AddViewLog("R_V Image Save Error : " + ex.Message + "\r\n");
+
+                return false;
             }
         }
         public void AnosisRemoteData()
@@ -1752,116 +1821,15 @@ namespace CSH030Ex
                 double ltime = (endTime - startTime) / (double)(lTimerFrequency);
 
                 double totalTime = (endTime - triggeredTime) / (double)(lTimerFrequency);
-
-                if (m__G.m_bSaveFImage)
-                {
-                    string sDate = DateTime.Now.ToString("yyMMddHHmmss");
-                    string fileName = m__G.m_SaveDirectory + string.Format("\\Result\\RawData\\User\\{0}_Image{1}\\", sDate, m__G.oCam[0].mTargetTriggerCount);
-
-                    if (!Directory.Exists(fileName))
-                        Directory.CreateDirectory(fileName);
-
-                    DriveInfo drive = new DriveInfo(Path.GetPathRoot(fileName));
-                    if (drive.IsReady)
-                    {
-                        if (drive.AvailableFreeSpace <= mlimit)
-                        {
-                            double freeGB = drive.AvailableFreeSpace / (double)GB;
-
-                            MessageBox.Show(
-                                $"남은 용량 : {freeGB:F1} GB\n불필요한 파일을 삭제해 주세요.",
-                                "용량 부족",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Warning);
-                        }
-                        else
-                        {
-                            for (int imgIndex = 0; imgIndex < m__G.oCam[0].mTargetTriggerCount; imgIndex++)
-                            {
-                                string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
-                                m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
-                            }
-                        }
-                    }
-                    if (m__G.m_bSaveVideo)
-                    {
-                        string videoFile = fileName + "Result.mp4";
-
-                        string firstImageFile = fileName + "Ana0.bmp";
-
-                        if (File.Exists(firstImageFile))
-                        {
-                            using (Mat firstImage = Cv2.ImRead(firstImageFile, ImreadModes.Color))
-                            {
-                                if (!firstImage.Empty())
-                                {
-                                    int width = firstImage.Width;
-                                    int height = firstImage.Height;
-
-                                    double fps = 60.0;   // 원하는 FPS
-
-                                    using (VideoWriter writer = new VideoWriter(
-                                        videoFile,
-                                        FourCC.FromString("mp4v"),
-                                        fps,
-                                        new OpenCvSharp.Size(width, height)))
-                                    {
-                                        if (!writer.IsOpened())
-                                        {
-                                            MessageBox.Show("VideoWriter Open Fail");
-                                        }
-                                        else
-                                        {
-                                            for (int imgIndex = 0;
-                                                 imgIndex < m__G.oCam[0].mTargetTriggerCount;
-                                                 imgIndex++)
-                                            {
-                                                string imageFile =
-                                                    fileName + "Ana" + imgIndex.ToString() + ".bmp";
-
-                                                if (!File.Exists(imageFile))
-                                                    continue;
-
-                                                using (Mat img = Cv2.ImRead(imageFile, ImreadModes.Color))
-                                                {
-                                                    if (!img.Empty())
-                                                        writer.Write(img);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (m__G.m_bSaveNgImage)
-                {
-                    bool NeedToSaveImage = false;
-                    double min = 9999;
-                    double max = -9999;
-                    for (int pi = 0; pi < m__G.oCam[0].mTargetTriggerCount; pi++)
-                    {
-                        if (m__G.oCam[0].mC_pY[pi] < min)
-                            min = m__G.oCam[0].mC_pY[pi];
-                        if (m__G.oCam[0].mC_pY[pi] > max)
-                            max = m__G.oCam[0].mC_pY[pi];
-
-                    }
-                    if ((max - min) * (5.5 / Global.LensMag) > 100.0)  //  300msec ~ 330msec 에서 최대최소의 변위차가 5um 이상인 경우 영상 저장 필요. 정상적인 경우 변위 1um 이하
-                        NeedToSaveImage = true;
-                    for (int pi = 0; pi < m__G.oCam[0].mTargetTriggerCount; pi++)
-                    {
-                        if (m__G.oCam[0].mC_pY[pi] == 0)
-                            NeedToSaveImage = true;
-                    }
-                    if (NeedToSaveImage)
+                Task.Factory.StartNew(() => {
+                    if (m__G.m_bSaveFImage)
                     {
                         string sDate = DateTime.Now.ToString("yyMMddHHmmss");
-                        string fileName = m__G.m_SaveDirectory + string.Format("\\Result\\RawData\\NG\\{0}\\Image{1}\\", sDate, m__G.oCam[0].mTargetTriggerCount);
+                        string fileName = m__G.m_RootDirectory + string.Format("\\Result\\RawData\\User\\{0}_Image{1}\\", sDate, m__G.oCam[0].mTargetTriggerCount);
+
                         if (!Directory.Exists(fileName))
                             Directory.CreateDirectory(fileName);
-                        // 저장 경로의 드라이브 정보
+
                         DriveInfo drive = new DriveInfo(Path.GetPathRoot(fileName));
                         if (drive.IsReady)
                         {
@@ -1884,8 +1852,111 @@ namespace CSH030Ex
                                 }
                             }
                         }
+                        if (m__G.m_bSaveVideo)
+                        {
+                            string videoFile = fileName + "Result.mp4";
+
+                            string firstImageFile = fileName + "Ana0.bmp";
+
+                            if (File.Exists(firstImageFile))
+                            {
+                                using (Mat firstImage = Cv2.ImRead(firstImageFile, ImreadModes.Color))
+                                {
+                                    if (!firstImage.Empty())
+                                    {
+                                        int width = firstImage.Width;
+                                        int height = firstImage.Height;
+
+                                        double fps = 60.0;   // 원하는 FPS
+
+                                        using (VideoWriter writer = new VideoWriter(
+                                            videoFile,
+                                            FourCC.FromString("mp4v"),
+                                            fps,
+                                            new OpenCvSharp.Size(width, height)))
+                                        {
+                                            if (!writer.IsOpened())
+                                            {
+                                                MessageBox.Show("VideoWriter Open Fail");
+                                            }
+                                            else
+                                            {
+                                                for (int imgIndex = 0;
+                                                     imgIndex < m__G.oCam[0].mTargetTriggerCount;
+                                                     imgIndex++)
+                                                {
+                                                    string imageFile =
+                                                        fileName + "Ana" + imgIndex.ToString() + ".bmp";
+
+                                                    if (!File.Exists(imageFile))
+                                                        continue;
+
+                                                    using (Mat img = Cv2.ImRead(imageFile, ImreadModes.Color))
+                                                    {
+                                                        if (!img.Empty())
+                                                            writer.Write(img);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                }
+                    if (m__G.m_bSaveNgImage)
+                    {
+                        bool NeedToSaveImage = false;
+                        double min = 9999;
+                        double max = -9999;
+                        for (int pi = 0; pi < m__G.oCam[0].mTargetTriggerCount; pi++)
+                        {
+                            if (m__G.oCam[0].mC_pY[pi] < min)
+                                min = m__G.oCam[0].mC_pY[pi];
+                            if (m__G.oCam[0].mC_pY[pi] > max)
+                                max = m__G.oCam[0].mC_pY[pi];
+
+                        }
+                        if ((max - min) * (5.5 / Global.LensMag) > 100.0)  //  300msec ~ 330msec 에서 최대최소의 변위차가 5um 이상인 경우 영상 저장 필요. 정상적인 경우 변위 1um 이하
+                            NeedToSaveImage = true;
+                        for (int pi = 0; pi < m__G.oCam[0].mTargetTriggerCount; pi++)
+                        {
+                            if (m__G.oCam[0].mC_pY[pi] == 0)
+                                NeedToSaveImage = true;
+                        }
+                        if (NeedToSaveImage)
+                        {
+                            string sDate = DateTime.Now.ToString("yyMMddHHmmss");
+                            string fileName = m__G.m_RootDirectory + string.Format("\\Result\\RawData\\NG\\{0}\\Image{1}\\", sDate, m__G.oCam[0].mTargetTriggerCount);
+                            if (!Directory.Exists(fileName))
+                                Directory.CreateDirectory(fileName);
+                            // 저장 경로의 드라이브 정보
+                            DriveInfo drive = new DriveInfo(Path.GetPathRoot(fileName));
+                            if (drive.IsReady)
+                            {
+                                if (drive.AvailableFreeSpace <= mlimit)
+                                {
+                                    double freeGB = drive.AvailableFreeSpace / (double)GB;
+
+                                    MessageBox.Show(
+                                        $"남은 용량 : {freeGB:F1} GB\n불필요한 파일을 삭제해 주세요.",
+                                        "용량 부족",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Warning);
+                                }
+                                else
+                                {
+                                    for (int imgIndex = 0; imgIndex < m__G.oCam[0].mTargetTriggerCount; imgIndex++)
+                                    {
+                                        string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
+                                        m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
                 // 다음은 자화에서 검증완료
                 if (!m__G.m_bNoHostPC)
                 {

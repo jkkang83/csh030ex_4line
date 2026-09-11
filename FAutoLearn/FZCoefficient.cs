@@ -7389,11 +7389,11 @@ namespace FAutoLearn
                     continue;
 
                 tx[i] = spAfter[i].X - RotatedPS[i].X;  //  Z 회전성분을 소거
-                resT.X += 2 * tx[i];                    //  Side View 로부터의 X 변동량은 오차가 클 수 있으니 1/2 의 비중을 적용한다.
+                //resT.X += 2 * tx[i];                    //  Side View 로부터의 X 변동량은 오차가 클 수 있으니 1/2 의 비중을 적용한다.
             }
             //  East Mark 에서 회전성분을 제거한 나머지 부분
             //resT.X = resT.X / (tpBefore_Length + 2);  //  Side View 로부터의 X 변동량은 오차가 클 수 있으니 1/2 의 비중을 적용한다. -> 현재는 1:1 -> 1:0.65 으로 변경 필요
-            resT.X = resT.X / 10;  //   1:0.667 으로 변경함.
+            resT.X = resT.X / 6;  //   1:0.667 으로 변경함.
             resT.Y = resT.Y / tpBefore_Length;
 
             return resT;
