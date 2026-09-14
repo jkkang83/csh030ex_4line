@@ -2510,7 +2510,8 @@ namespace S2System.Vision
 
             long Nfound = 0;
             Rect rcSideN = new Rect(115, 0, 550, 190);
-            Rect rcTopN = new Rect(520, 190, 260, 270);
+            //Rect rcTopN = new Rect(520, 190, 260, 270);   //  Right OMM
+            Rect rcTopN = new Rect(0, 190, 260, 270); //  Left OMM
 
 
             if (index == 0)
@@ -2763,19 +2764,20 @@ namespace S2System.Vision
             }
             if (bPseudoOMM)
             {
-                //if (index == 0)
-                //{
-                mPseudoPtsOrg = mFAL.FineOMM(index, iBuf);
-                //mPseudoPtsOrg = mFAL.FineOMM1X(index, iBuf);
-                //}
+                mPseudoPtsOrg = mFAL.FineLeftOMM(index, iBuf);
+
                 mPOMM_sX[index] = mPseudoPtsOrg[0].X;
                 mPOMM_sY[index] = mPseudoPtsOrg[0].Y;
                 mPOMM_tX[index] = mPseudoPtsOrg[3].X;
                 mPOMM_tY[index] = mPseudoPtsOrg[3].Y;
 
+                double[] lxyzTxTyTz = mFAL.RelativeToPheudoOMM(
+                    index,
+                    allPts,
+                    mPseudoPtsOrg,
+                    mC_pY[index],
+                    mC_pZ[index]);
 
-
-                double[] lxyzTxTyTz = mFAL.RelativeToPheudoOMM(index, allPts, mPseudoPtsOrg, mC_pY[index], mC_pZ[index]);
                 mPOMM_X[index] = lxyzTxTyTz[0];
                 mPOMM_Y[index] = lxyzTxTyTz[1];
                 mPOMM_Z[index] = lxyzTxTyTz[2];
@@ -2784,61 +2786,98 @@ namespace S2System.Vision
                 mPOMM_TZ[index] = lxyzTxTyTz[5];
 
                 double[] rlxyzTxTyTz = mFAL.ABSPheudoOMM(index, mPseudoPtsOrg);
-                mPOMM_rX[index] = rlxyzTxTyTz[0];
-                mPOMM_rY[index] = rlxyzTxTyTz[1];
-                mPOMM_rZ[index] = rlxyzTxTyTz[2];
+
+                mPOMM_rX[index] = 18.3333 * rlxyzTxTyTz[0] * mFAL.mFZM.mScaleX[1];
+                mPOMM_rY[index] = 18.3333 * rlxyzTxTyTz[1] * mFAL.mFZM.mScaleY[1];
+                mPOMM_rZ[index] = 18.3333 * rlxyzTxTyTz[2] * mFAL.mFZM.mScaleZ[1];
+
                 mPOMM_rTX[index] = rlxyzTxTyTz[3];
                 mPOMM_rTY[index] = rlxyzTxTyTz[4];
                 mPOMM_rTZ[index] = rlxyzTxTyTz[5];
 
-                if(bScaveOMMimage)  //  
+                // OMM Result Image 생성
+                Mat resImg = new Mat();
+
+                Cv2.CvtColor(
+                    mFAL.mSourceImg[iBuf],
+                    resImg,
+                    ColorConversionCodes.GRAY2BGR);
+
+                int sx = (int)Math.Round(mPOMM_sX[index]);
+                int sy = (int)Math.Round(mPOMM_sY[index]);
+
+                Cv2.Line(resImg, new Point(sx - 3, sy), new Point(sx + 3, sy), Scalar.White, 1);
+                Cv2.Line(resImg, new Point(sx, sy - 3), new Point(sx, sy + 3), Scalar.White, 1);
+
+                int tx = (int)Math.Round(mPOMM_tX[index]);
+                int ty = (int)Math.Round(mPOMM_tY[index]);
+
+                Cv2.Line(resImg, new Point(tx - 3, ty), new Point(tx + 3, ty), Scalar.White, 1);
+                Cv2.Line(resImg, new Point(tx, ty - 3), new Point(tx, ty + 3), Scalar.White, 1);
+
+                double cfx = (sMR[0].pos.X + sMR[1].pos.X) / 2;
+                double cfy = (sMR[0].pos.Y + sMR[1].pos.Y) / 2;
+
+                int fx = (int)Math.Round(cfx);
+                int fy = (int)Math.Round(cfy);
+
+                Cv2.Line(resImg, new Point(fx - 3, fy), new Point(fx + 3, fy), Scalar.White, 1);
+                Cv2.Line(resImg, new Point(fx, fy - 3), new Point(fx, fy + 3), Scalar.White, 1);
+
+                string text = string.Format(
+                    "(X,Y)_side : ( {0:F3} , {1:F3} )px",
+                    mPOMM_sX[index],
+                    mPOMM_sY[index]);
+
+                string text2 = string.Format(
+                    "(X,Y)_top : ( {0:F3} , {1:F3} )px",
+                    mPOMM_tX[index],
+                    mPOMM_tY[index]);
+
+                string text3 = string.Format(
+                    "(X,Y)_fid : ( {0:F3} , {1:F3} )px",
+                    cfx,
+                    cfy);
+
+                string text4 = string.Format(
+                    "(X,Y,Z)_omm : ( {0:F3} , {1:F3} , {2:F3} )um",
+                    mPOMM_rX[index],
+                    mPOMM_rY[index],
+                    mPOMM_rZ[index]);
+
+                Cv2.PutText(resImg, text, new Point(5, 16), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
+                Cv2.PutText(resImg, text2, new Point(5, 32), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
+                Cv2.PutText(resImg, text3, new Point(5, 48), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
+                Cv2.PutText(resImg, text4, new Point(5, 64), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
+
+                Cv2.CvtColor(resImg, resImg, ColorConversionCodes.BGR2GRAY);
+
+                // 기존 Frame 영상이 있으면 제거
+                if (mOMMResultImg[index] != null)
                 {
-                    Mat resImg = new Mat();
-                    Cv2.CvtColor(mFAL.mSourceImg[iBuf], resImg, ColorConversionCodes.GRAY2BGR);
-                    int sx = (int)Math.Round(mPOMM_sX[index]);
-                    int sy = (int)Math.Round(mPOMM_sY[index]);
-                    Cv2.Line(resImg, new Point(sx - 3, sy), new Point(sx + 3, sy), Scalar.White, 1);
-                    Cv2.Line(resImg, new Point(sx, sy - 3), new Point(sx, sy + 3), Scalar.White, 1);
-
-                    int tx = (int)Math.Round(mPOMM_tX[index]);
-                    int ty = (int)Math.Round(mPOMM_tY[index]);
-                    Cv2.Line(resImg, new Point(tx - 3, ty), new Point(tx + 3, ty), Scalar.White, 1);
-                    Cv2.Line(resImg, new Point(tx, ty - 3), new Point(tx, ty + 3), Scalar.White, 1);
-
-                    double cfx = (sMR[0].pos.X + sMR[1].pos.X) / 2;
-                    double cfy = (sMR[0].pos.Y + sMR[1].pos.Y) / 2;
-
-                    int fx = (int)Math.Round(cfx);
-                    int fy = (int)Math.Round(cfy);
-                    Cv2.Line(resImg, new Point(fx - 3, fy), new Point(fx + 3, fy), Scalar.White, 1);
-                    Cv2.Line(resImg, new Point(fx, fy - 3), new Point(fx, fy + 3), Scalar.White, 1);
-
-                    string text = string.Format("(X,Y)_side : ( {0:F3} , {1:F3} )px", mPOMM_sX[index], mPOMM_sY[index]);
-                    string text2 = string.Format("(X,Y)_top : ( {0:F3} , {1:F3} )px", mPOMM_tX[index], mPOMM_tY[index]);
-                    string text3 = string.Format("(X,Y)_fid : ( {0:F3} , {1:F3} )px", cfx, cfy);
-                    string text4 = string.Format("(X,Y,Z)_omm : ( {0:F3} , {1:F3} , {1:F3} )um", mPOMM_rX[index], mPOMM_rY[index], mPOMM_rZ[index]);// mPOMM_rTX[index], mPOMM_rTY[index], mPOMM_rTZ[index]);
-                    Cv2.PutText(resImg, text, new Point(5, 16), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
-                    Cv2.PutText(resImg, text2, new Point(5, 32), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
-                    Cv2.PutText(resImg, text3, new Point(5, 48), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
-                    Cv2.PutText(resImg, text4, new Point(5, 64), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
-
-                    // 저장
-                    try
-                    {
-                        Cv2.CvtColor(resImg, resImg, ColorConversionCodes.BGR2GRAY);
-                        Cv2.ImWrite("D:\\OMMImg\\omm.bmp", resImg);
-                    }
-                    catch (Exception e)
-                    {
-                        ;
-                    }
-                    resImg.Dispose();
+                    mOMMResultImg[index].Dispose();
+                    mOMMResultImg[index] = null;
                 }
 
+                // 파일 저장하지 않고 메모리에 보관
+                mOMMResultImg[index] = resImg.Clone();
+
+                resImg.Dispose();
             }
             return true;
         }
-
+        public Mat[] mOMMResultImg = new Mat[10000];
+        public void ClearOMMResultImages()
+        {
+            for (int i = 0; i < mOMMResultImg.Length; i++)
+            {
+                if (mOMMResultImg[i] != null)
+                {
+                    mOMMResultImg[i].Dispose();
+                    mOMMResultImg[i] = null;
+                }
+            }
+        }
         public FAutoLearn.FZMath.Point2D[][] mMarkPosRes = new FAutoLearn.FZMath.Point2D[5][];
 
         bool bSaveLostMarkFrame = false;

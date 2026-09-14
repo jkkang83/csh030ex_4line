@@ -689,20 +689,28 @@ namespace CSH030Ex
         {
             try
             {
-                string fileName = m__G.m_RootDirectory +
+                string sweepDir = m__G.m_RootDirectory +
                     string.Format("\\Result\\RawData\\Sweep\\{0}\\{1}\\",
                     barcode,
                     sweepName);
 
-                if (!Directory.Exists(fileName))
-                    Directory.CreateDirectory(fileName);
+                string ommDir = m__G.m_RootDirectory +
+                    string.Format("\\Result\\RawData\\Omm\\{0}\\{1}\\",
+                    barcode,
+                    sweepName);
+
+                if (!Directory.Exists(sweepDir))
+                    Directory.CreateDirectory(sweepDir);
+
+                if (!Directory.Exists(ommDir))
+                    Directory.CreateDirectory(ommDir);
 
                 int saveStart = Math.Max(0, startIndex);
                 int saveEnd = Math.Min(endIndex, m__G.oCam[0].mTargetTriggerCount - 1);
 
                 if (saveStart > saveEnd)
                 {
-                    AddViewLog(string.Format(
+                    if (!m__G.m_bHideAllGraph) AddViewLog(string.Format(
                         "R_V Invalid Image Range : {0} ~ {1}\r\n",
                         startIndex,
                         endIndex));
@@ -712,21 +720,57 @@ namespace CSH030Ex
 
                 for (int imgIndex = saveStart; imgIndex <= saveEnd; imgIndex++)
                 {
-                    string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
+                    // =====================================================
+                    // Sweep Original Image
+                    // =====================================================
 
-                    m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
+                    string sweepFileName =
+                        sweepDir +
+                        "Ana" +
+                        imgIndex.ToString() +
+                        ".bmp";
+
+                    m__G.oCam[0].SaveGrabbedImage(
+                        imgIndex,
+                        sweepFileName);
+
+
+                    // =====================================================
+                    // OMM Result Image
+                    // =====================================================
+
+                    if (m__G.oCam[0].mOMMResultImg != null &&
+                        imgIndex < m__G.oCam[0].mOMMResultImg.Length &&
+                        m__G.oCam[0].mOMMResultImg[imgIndex] != null &&
+                        !m__G.oCam[0].mOMMResultImg[imgIndex].Empty())
+                    {
+                        string ommFileName =
+                            ommDir +
+                            "Omm" +
+                            imgIndex.ToString() +
+                            ".bmp";
+
+                        Cv2.ImWrite(
+                            ommFileName,
+                            m__G.oCam[0].mOMMResultImg[imgIndex]);
+                    }
                 }
 
-                AddViewLog(string.Format(
-                    "R_V Image Save Complete : {0} ~ {1}\r\n",
+                if (!m__G.m_bHideAllGraph) AddViewLog(string.Format(
+                    "R_V Image Save Complete : {0} ~ {1}, Barcode:{2}, Sweep:{3}\r\n",
                     saveStart,
-                    saveEnd));
+                    saveEnd,
+                    barcode,
+                    sweepName));
 
                 return true;
             }
             catch (Exception ex)
             {
-                AddViewLog("R_V Image Save Error : " + ex.Message + "\r\n");
+                if(!m__G.m_bHideAllGraph) AddViewLog(
+                    "R_V Image Save Error : " +
+                    ex.Message +
+                    "\r\n");
 
                 return false;
             }

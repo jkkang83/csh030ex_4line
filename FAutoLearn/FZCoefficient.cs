@@ -6485,6 +6485,9 @@ namespace FAutoLearn
                         //   따라서 inversion 은 사용하지 않는다.
                         roughPeakBk[i] = roughPeak[i];
 
+                        if (i < 2)  //  추가 20260914
+                            continue;
+
                         if (!firstPeakFound)
                         {
                             if (peak < roughPeakBk[i])  //   첫번쨰 Peak 는 항상 양수이어야 한다.
@@ -6498,7 +6501,8 @@ namespace FAutoLearn
                             }
                         }else
                         {
-                            if (3*peak< roughPeakBk[i-1] && (roughPeakBk[i-1] >= roughPeakBk[i-2] && roughPeakBk[i-1]>= roughPeakBk[i]))
+                            //  3.0 -> 2.9 로 변경 20260914
+                            if (2.9*peak< roughPeakBk[i-1] && (roughPeakBk[i-1] >= roughPeakBk[i-2] && roughPeakBk[i-1]>= roughPeakBk[i]))
                             {
                                 pIndex = i-1;
                                 peak = roughPeakBk[i-1];
