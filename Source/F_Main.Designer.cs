@@ -50,6 +50,7 @@
             this.tb_CurrResult = new System.Windows.Forms.TextBox();
             this.P_Sub = new System.Windows.Forms.Panel();
             this.groupBox1 = new System.Windows.Forms.Panel();
+            this.chReverseCamera = new System.Windows.Forms.CheckBox();
             this.chSaveVideo = new System.Windows.Forms.CheckBox();
             this.cbPseudoOMM = new System.Windows.Forms.CheckBox();
             this.chSaveUserImage = new System.Windows.Forms.CheckBox();
@@ -404,6 +405,7 @@
             // groupBox1
             // 
             this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(96)))), ((int)(((byte)(100)))));
+            this.groupBox1.Controls.Add(this.chReverseCamera);
             this.groupBox1.Controls.Add(this.chSaveVideo);
             this.groupBox1.Controls.Add(this.cbPseudoOMM);
             this.groupBox1.Controls.Add(this.chSaveUserImage);
@@ -448,6 +450,21 @@
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(593, 962);
             this.groupBox1.TabIndex = 200;
+            // 
+            // chReverseCamera
+            // 
+            this.chReverseCamera.AutoSize = true;
+            this.chReverseCamera.BackColor = System.Drawing.Color.Transparent;
+            this.chReverseCamera.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.chReverseCamera.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.chReverseCamera.ForeColor = System.Drawing.Color.Black;
+            this.chReverseCamera.Location = new System.Drawing.Point(345, 591);
+            this.chReverseCamera.Name = "chReverseCamera";
+            this.chReverseCamera.Size = new System.Drawing.Size(149, 25);
+            this.chReverseCamera.TabIndex = 205;
+            this.chReverseCamera.Text = "Reverse Camera";
+            this.chReverseCamera.UseVisualStyleBackColor = false;
+            this.chReverseCamera.CheckedChanged += new System.EventHandler(this.chReverseCamera_CheckedChanged);
             // 
             // chSaveVideo
             // 
@@ -1537,7 +1554,7 @@
             this.Name = "F_Main";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "CSH030Ex 4Line Mark 26091401";
+            this.Text = "CSH030Ex 4Line Mark 26091501";
             this.TransparencyKey = System.Drawing.Color.Gray;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.F_Main_FormClosing);
@@ -1656,6 +1673,7 @@
         private System.Windows.Forms.CheckBox cbSaveNGImage;
         private System.Windows.Forms.CheckBox cbTestStage;
         private System.Windows.Forms.CheckBox chSaveVideo;
+        private System.Windows.Forms.CheckBox chReverseCamera;
     }
 }
 
