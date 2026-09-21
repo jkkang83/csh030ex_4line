@@ -5885,7 +5885,7 @@ namespace FAutoLearn
 
         public int[] mPeakOrder = new int[24];   //                mPeakOrder[i] = new int[24]; // 6 *  [ 0 - 1 - 2 - 3 : L - R - T - B ]
 
-        public double[] ConvergePeakX2(int id, ref int[] Xidiffsrc, int width, int height, double xia, double yia, double xW_, double yH_, ref int peaktype, int iIndex = 0)
+        public double[] ConvergePeakX2(int id, ref int[] Xidiffsrc, int width, int height, double xia, double yia, double xW_, double yH_, ref int peaktype, int iIndex = 0, double[] prevRes=null)
         {
             //  오직 X 방향 Edge 추출에만 활용한다.
 
@@ -5911,8 +5911,6 @@ namespace FAutoLearn
             double oldf = fxi0;
             double sumXY = 0;
             double sumY = 0;
-            double sumXY2 = 0;
-            double sumY2 = 0;
 
             int kLength = (int)(width / 3 + 1);
 
@@ -5937,26 +5935,29 @@ namespace FAutoLearn
             if (yH > height - 1)
                 yH = height - 1;
 
-            int potentialType = 0;
             double ry = (yia - yi0) - (int)(yia - yi0);
             int xi0_i = 0;
             int pIndex = 0;
             double peak = -99999;
 
-            int npIndex = 0;
-            double npeak = 99999;
+            double pY = 0;
+            double err = 999;
+            double err_1 = 999;
 
+            uint itr = 0;
+            double[] errMem = new double[10];
+            int errMemCnt = 0;
+            double roughpeak_icur = 0;
+            double roughPeak_icur_1 = 0;
             int incCnt = 0;
             int repeatCnt = 0;
 
-            //bool negPeak = false;
             int maxLength = 0;
 
-
-            //if (peaktype % 100 == 2)    
-            //    negPeak = true;
-
             int inversion = (width + 1) / 2;
+            int icur = 0;
+            int newi = 0;
+            double ratioXroughPeak = 0;
 
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -5969,10 +5970,76 @@ namespace FAutoLearn
 
             try
             {
-                //  Iteration 하기 전에 절대 Peak 위치를 찾아서 거기서부터 출발해야 한다. 안그러면 Peak 가 초기 검색범위에 없어서 실패할 수 있다.
-                while (repeatCnt < 6)
+                if (prevRes==null)
                 {
-                    //  앞쪽 Edge 만 찾는다, X peak 를 찾는게 목적이다.
+                    //  Iteration 하기 전에 절대 Peak 위치를 찾아서 거기서부터 출발해야 한다. 안그러면 Peak 가 초기 검색범위에 없어서 실패할 수 있다.
+                    while (repeatCnt < 6)
+                    {
+                        //  앞쪽 Edge 만 찾는다, X peak 를 찾는게 목적이다.
+                        for (i = 0; i < kLength; i++)
+                        {
+                            xi0_i = (int)(xi0 + i);
+                            double weight = 1;
+                            if (i == 0)
+                                weight = 1 - xi0_r;
+                            else if (i == kLength - 1)
+                                weight = xi0_r;
+
+                            peakIndex[i] = i;
+                            for (int j = yi0; j < yi0 + yH; j++)
+                                roughPeak[i] += (1 - ry) * Xidiffsrc[xi0_i + j * width] + ry * Xidiffsrc[xi0_i + (j + 1) * width];
+
+                            roughPeak[i] = weight * roughPeak[i];
+                            //  좌측 찾고 우측 이어서 찾을 것이므로 부호 불필요
+                            //  첫번째 + peak 찾으면 됨.
+                            roughPeakBk[i] = roughPeak[i];
+                            if (peak < roughPeakBk[i])
+                            {
+                                pIndex = i;
+                                peak = roughPeakBk[i];
+                            }
+                        }
+
+                        if (pIndex > kLength - 4 && incCnt < 6)
+                        {
+                            //  Edge 가 너무 뒤에 있으면 뒤쪽으로 이동해서 다시찾기
+                            kLength++;
+                            incCnt++;
+                        }
+                        if (pIndex < 5)
+                        {
+                            if (xi0 == 0)
+                                break;
+
+                            //  Edge 가 너무 앞에 있으면 앞쪽으로 이동해서 다시찾기
+                            xi0--;
+                            repeatCnt++;
+                            peak = -99999;
+                            roughPeak = new double[kLength + 6];
+                            roughPeakBk = new double[kLength + 6];
+                            peakIndex = new int[kLength + 6];
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    //int iFrom = (pIndex - 5 < 0 ? 0 : pIndex - 5);
+                    //int iTo = (kLength - pIndex < 6 ? kLength - 1 : pIndex + 5);
+                    //int effLength = iTo - iFrom + 1;
+                    //effPeak = new double[effLength];
+                    //effIndex = new int[effLength];
+
+                    ////  Potential Peak 앞뒤로 최대 11 개만 이용하도록 복사
+                    //Array.Copy(roughPeakBk, iFrom, effPeak, 0, effLength);
+                    //Array.Copy(peakIndex,   iFrom, effIndex, 0, effLength);
+                    //Array.Sort(effPeak, effIndex);  //  더 빠른 함수로 변경 필요  231116
+                    //fxi0 = effIndex[effIndex.Length - 1];
+                    fxi0 = pIndex;
+                }
+                else
+                {
                     for (i = 0; i < kLength; i++)
                     {
                         xi0_i = (int)(xi0 + i);
@@ -5981,59 +6048,15 @@ namespace FAutoLearn
                             weight = 1 - xi0_r;
                         else if (i == kLength - 1)
                             weight = xi0_r;
-                        
+
                         peakIndex[i] = i;
                         for (int j = yi0; j < yi0 + yH; j++)
                             roughPeak[i] += (1 - ry) * Xidiffsrc[xi0_i + j * width] + ry * Xidiffsrc[xi0_i + (j + 1) * width];
 
                         roughPeak[i] = weight * roughPeak[i];
-                        //  좌측 찾고 우측 이어서 찾을 것이므로 부호 불필요
-                        //  첫번째 + peak 찾으면 됨.
                         roughPeakBk[i] = roughPeak[i];
-                        if (peak < roughPeakBk[i])
-                        {
-                            pIndex = i;
-                            peak = roughPeakBk[i];
-                        }
-                    }
-
-                    if (pIndex > kLength - 4 && incCnt < 6)
-                    {
-                        //  Edge 가 너무 뒤에 있으면 뒤쪽으로 이동해서 다시찾기
-                        kLength++;
-                        incCnt++;
-                    }
-                    if (pIndex < 5)
-                    {
-                        if (xi0 == 0)
-                            break;
-
-                        //  Edge 가 너무 앞에 있으면 앞쪽으로 이동해서 다시찾기
-                        xi0--;
-                        repeatCnt++;
-                        peak = -99999;
-                        roughPeak = new double[kLength + 6];
-                        roughPeakBk = new double[kLength + 6];
-                        peakIndex = new int[kLength + 6];
-                    }
-                    else
-                    {
-                        break;
                     }
                 }
-
-                //int iFrom = (pIndex - 5 < 0 ? 0 : pIndex - 5);
-                //int iTo = (kLength - pIndex < 6 ? kLength - 1 : pIndex + 5);
-                //int effLength = iTo - iFrom + 1;
-                //effPeak = new double[effLength];
-                //effIndex = new int[effLength];
-
-                ////  Potential Peak 앞뒤로 최대 11 개만 이용하도록 복사
-                //Array.Copy(roughPeakBk, iFrom, effPeak, 0, effLength);
-                //Array.Copy(peakIndex,   iFrom, effIndex, 0, effLength);
-                //Array.Sort(effPeak, effIndex);  //  더 빠른 함수로 변경 필요  231116
-                //fxi0 = effIndex[effIndex.Length - 1];
-                fxi0 = pIndex;
             }
             catch (Exception e)
             {
@@ -6045,44 +6068,41 @@ namespace FAutoLearn
             //  상황에 따라 고정값 적용이 적합. 즉 Focusing 수준에 따라서 2가지 또는 3가지 값중 선택하는 방식은 가능할 것 같음.
             //  실험적으로 xW = 7 일때 반복성이 가장 좋은 것으로 나타남.
 
-            int icur = 0;
             sumXY = 0;
             sumY = 0;
 
-            int newi = 0;
-            double ratioXroughPeak = 0;
             maxLength = roughPeakBk.Length - 1;
 
-            //  X축은 -4 ~ 4 범위에서 Max Gradient Point 계산
-            for (newi = -2; newi < 3; newi++)
+            if ( prevRes == null)
             {
-                icur = newi + fxi0;// - (int)xi0;  //  xi0 는 나중에 Offset 으로 넣으면 된다.
-                if (icur < 0) continue;
-                if (icur >= maxLength) break;
-                //ratioXroughPeak = ratio[newi - i0] * roughPeakBk[icur];
-                ratioXroughPeak = roughPeakBk[icur];
-                if (ratioXroughPeak < 0)
-                    ratioXroughPeak = ratioXroughPeak / 5;
+                //  X축은 -4 ~ 4 범위에서 Max Gradient Point 계산
+                for (newi = -2; newi < 3; newi++)
+                {
+                    icur = newi + fxi0;// - (int)xi0;  //  xi0 는 나중에 Offset 으로 넣으면 된다.
+                    if (icur < 0) continue;
+                    if (icur >= maxLength) break;
+                    //ratioXroughPeak = ratio[newi - i0] * roughPeakBk[icur];
+                    ratioXroughPeak = roughPeakBk[icur];
+                    if (ratioXroughPeak < 0)
+                        ratioXroughPeak = ratioXroughPeak / 5;
 
-                sumXY += ratioXroughPeak * (newi + fxi0);
-                sumY += ratioXroughPeak;
+                    sumXY += ratioXroughPeak * (newi + fxi0);
+                    sumY += ratioXroughPeak;
+                }
+                res1st = sumXY / (double)sumY;
+
+                if (res1st < 0) //  극히 비정상인 경우 두번째 Peak 를 활용한다.
+                    res1st = 5; //  Peak 좌표 , 단지 불량인지확인할 수 있도록 최소조치만 한다.
+
             }
-            res1st = sumXY / (double)sumY;
-
-            if (res1st < 0) //  극히 비정상인 경우 두번째 Peak 를 활용한다.
-                res1st = 5; //  Peak 좌표 , 단지 불량인지확인할 수 있도록 최소조치만 한다.
+            else
+            {
+                res1st = prevRes[0] - xi0;
+            }
 
             double simpleRes = res1st;
             double oldres = res1st;
-            double pY = 0;
-            double err = 999;
-            double err_1 = 999;
 
-            uint itr = 0;
-            double[] errMem = new double[10];
-            int errMemCnt = 0;
-            double roughpeak_icur = 0;
-            double roughPeak_icur_1 = 0;
 
             try
             {
@@ -6092,8 +6112,6 @@ namespace FAutoLearn
                     double rx = res1st - irx;
                     sumXY = 0;
                     sumY = 0;
-                    sumXY2 = 0;
-                    sumY2 = 0;
                     for (newi = -3; newi < 4; newi++)   //  -4 ~ 4 보다 -3 ~ +3 이 더 정확함
                     {
                         icur = newi + irx;// - (int)xi0;
@@ -6186,10 +6204,69 @@ namespace FAutoLearn
 
             try
             {
-                //  Iteration 하기 전에 절대 Peak 위치를 찾아서 거기서부터 출발해야 한다. 안그러면 Peak 가 초기 검색범위에 없어서 실패할 수 있다.
-                while (repeatCnt < 6)
+                if ( prevRes==null)
                 {
-                    //  뒤쪽 Edge 만 찾는다.
+                    //  Iteration 하기 전에 절대 Peak 위치를 찾아서 거기서부터 출발해야 한다. 안그러면 Peak 가 초기 검색범위에 없어서 실패할 수 있다.
+                    while (repeatCnt < 6)
+                    {
+                        //  뒤쪽 Edge 만 찾는다.
+                        for (i = 0; i < res1st + 10; i++)
+                        {
+                            xi0_i = (int)(xi0 + i);
+                            peakIndex[i] = i;
+                            for (int j = yi0; j < yi0 + yH; j++)
+                                roughPeak[i] -= ((1 - ry) * Xidiffsrc[xi0_i + j * width] + ry * Xidiffsrc[xi0_i + (j + 1) * width]);
+
+                            //  우측 찾기 부호반전함.
+
+                            //  첫번째 + peak 찾으면 됨.
+                            roughPeakBk[i] = roughPeak[i];
+                            if (peak < roughPeakBk[i])
+                            {
+                                pIndex = i;
+                                peak = roughPeakBk[i];
+                            }
+                        }
+
+                        if (pIndex > res1st + 5 && incCnt < 6)
+                        {
+                            //  Edge 가 너무 뒤에 있으면 더이상 뒤로 이동은 불가능. 버퍼에 데이터가 없음
+                            ;
+                        }
+                        if (pIndex < 5)
+                        {
+                            if (xi0 == 0)
+                                break;
+
+                            //  Edge 가 너무 앞에 있으면 앞쪽으로 이동해서 다시찾기
+                            xi0--;
+                            repeatCnt++;
+                            peak = -99999;
+                            roughPeak = new double[kLength + 6];
+                            roughPeakBk = new double[kLength + 6];
+                            peakIndex = new int[kLength + 6];
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    //int iFrom = (pIndex - 5 < 0 ? 0 : pIndex - 5);
+                    //int iTo = (kLength - pIndex < 6 ? kLength - 1 : pIndex + 5);
+                    //int effLength = iTo - iFrom + 1;
+                    //effPeak = new double[effLength];
+                    //effIndex = new int[effLength];
+
+                    ////  Potential Peak 앞뒤로 최대 11 개만 이용하도록 복사
+                    //Array.Copy(roughPeakBk, iFrom, effPeak, 0, effLength);
+                    //Array.Copy(peakIndex, iFrom, effIndex, 0, effLength);
+                    //Array.Sort(effPeak, effIndex);  //  더 빠른 함수로 변경 필요  231116
+                    //fxi0 = effIndex[effIndex.Length - 1];
+                    fxi0 = pIndex;
+                }
+                else
+                {
                     for (i = 0; i < res1st + 10; i++)
                     {
                         xi0_i = (int)(xi0 + i);
@@ -6207,43 +6284,7 @@ namespace FAutoLearn
                             peak = roughPeakBk[i];
                         }
                     }
-
-                    if (pIndex > res1st + 5 && incCnt < 6)
-                    {
-                        //  Edge 가 너무 뒤에 있으면 더이상 뒤로 이동은 불가능. 버퍼에 데이터가 없음
-                        ;
-                    }
-                    if (pIndex < 5)
-                    {
-                        if (xi0 == 0)
-                            break;
-
-                        //  Edge 가 너무 앞에 있으면 앞쪽으로 이동해서 다시찾기
-                        xi0--;
-                        repeatCnt++;
-                        peak = -99999;
-                        roughPeak = new double[kLength + 6];
-                        roughPeakBk = new double[kLength + 6];
-                        peakIndex = new int[kLength + 6];
-                    }
-                    else
-                    {
-                        break;
-                    }
                 }
-
-                //int iFrom = (pIndex - 5 < 0 ? 0 : pIndex - 5);
-                //int iTo = (kLength - pIndex < 6 ? kLength - 1 : pIndex + 5);
-                //int effLength = iTo - iFrom + 1;
-                //effPeak = new double[effLength];
-                //effIndex = new int[effLength];
-
-                ////  Potential Peak 앞뒤로 최대 11 개만 이용하도록 복사
-                //Array.Copy(roughPeakBk, iFrom, effPeak, 0, effLength);
-                //Array.Copy(peakIndex, iFrom, effIndex, 0, effLength);
-                //Array.Sort(effPeak, effIndex);  //  더 빠른 함수로 변경 필요  231116
-                //fxi0 = effIndex[effIndex.Length - 1];
-                fxi0 = pIndex;
             }
             catch (Exception e)
             {
@@ -6258,20 +6299,28 @@ namespace FAutoLearn
             newi = 0;
             ratioXroughPeak = 0;
             maxLength = roughPeakBk.Length - 1;
-            for (newi = -3; newi < 4; newi++)
+            if (prevRes == null)
             {
-                icur = newi + fxi0;// - (int)xi0;
-                if (icur < 0) continue;
-                if (icur >= maxLength) break;
-                //ratioXroughPeak = ratio[newi - i0] * roughPeakBk[icur];
-                ratioXroughPeak = roughPeakBk[icur];
-                sumXY += ratioXroughPeak * (newi + fxi0);
-                sumY += ratioXroughPeak;
-            }
-            res2nd = sumXY / (double)sumY;
+                for (newi = -3; newi < 4; newi++)
+                {
+                    icur = newi + fxi0;// - (int)xi0;
+                    if (icur < 0) continue;
+                    if (icur >= maxLength) break;
+                    //ratioXroughPeak = ratio[newi - i0] * roughPeakBk[icur];
+                    ratioXroughPeak = roughPeakBk[icur];
+                    sumXY += ratioXroughPeak * (newi + fxi0);
+                    sumY += ratioXroughPeak;
+                }
+                res2nd = sumXY / (double)sumY;
 
-            if (res2nd < 0) //  극히 비정상인 경우 두번째 Peak 를 활용한다.
-                res2nd = 5; //  Peak 좌표
+                if (res2nd < 0) //  극히 비정상인 경우 두번째 Peak 를 활용한다.
+                    res2nd = 5; //  Peak 좌표
+            }
+            else
+            {
+                res2nd = prevRes[1] - xi0;
+            }
+
                             //
                             //  simpleRes = res2nd;
             oldres = res2nd;
@@ -6293,8 +6342,6 @@ namespace FAutoLearn
                     double rx = res2nd - irx;
                     sumXY = 0;
                     sumY = 0;
-                    sumXY2 = 0;
-                    sumY2 = 0;
                     for (newi = -3; newi < 4; newi++)   //  -4 ~ 4 보다 -3 ~ +3 이 더 정확함
                     {
                         icur = newi + irx;// - (int)xi0;
@@ -6379,7 +6426,7 @@ namespace FAutoLearn
         }
 
 
-        public double[] ConvergePeakX3(int si, ref int[] Xidiffsrc, int width, int height, double xia, double yia, double xW, double yH, ref int peaktype, int iIndex = 0)
+        public double[] ConvergePeakX3(int si, ref int[] Xidiffsrc, int width, int height, double xia, double yia, double xW, double yH, ref int peaktype, int iIndex = 0, double[] prevRes=null)
         {
             //  원본 영상의 크기 width, height 로서 ROI 범위의 조각영상인 것을 전제로 한다.
             //  xi0 : 경계가 있을 것으로 예상되는 BOX 영역의 좌상단 X 좌표
@@ -6400,8 +6447,6 @@ namespace FAutoLearn
             double oldf = fxi0;
             double sumXY = 0;
             double sumY = 0;
-            double sumXY2 = 0;
-            double sumY2 = 0;
 
             int kLength = (int)(width - xia);
 
@@ -6412,30 +6457,36 @@ namespace FAutoLearn
             int[] effIndex = new int[kLength];
             double[] intgPeak = new double[kLength + 6];
 
-            //double[] ratio = new double[xW];
-
-            //double[] sumxx = new double[kLength];
-            //double[] sumx = new double[kLength];
-
-            //int debug = 0;
             int i = 0;
             if (xi0 < 0) xi0 = 0;
             if (yi0 < 0) yi0 = 0;
-            int potentialType = 0;
             double ry = yia - yi0;
             int xi0_i = 0;
             int pIndex = 0;
+            int pIndex2 = 0;
             double peak = -99999;
-
-            int npIndex = 0;
-            double npeak = 99999;
 
             int incCnt = 0;
             int repeatCnt = 0;
 
-            //bool negPeak = false;
             int maxLength = 0;
             bool firstPeakFound = false;
+            int icur = 0;
+            int newi = 0;
+            double ratioXroughPeak = 0;
+            double pY = 0;
+            double err = 999;
+            double err_1 = 999;
+
+            uint itr = 0;
+            double[] errMem = new double[10];
+            int errMemCnt = 0;
+            double roughpeak_icur = 0;
+            double roughPeak_icur_1 = 0;
+            int edgeFound = 0;
+            double[] resEdge = new double[9];
+            int slopeDir = 1;
+            double[] maxSlope = new double[8];
 
 
             //if (peaktype % 100 == 2)
@@ -6455,8 +6506,102 @@ namespace FAutoLearn
                 //  Y 방향은 첫번째 + Peak 를 찾으면 됨.
                 //  X 방향은 좌측은 + Peak
                 //  X 방향은 우측은 - Peak 
+                if (prevRes == null)
+                {
+                    while (repeatCnt < 6)
+                    {
+                        for (i = 0; i < kLength; i++)
+                        {
+                            xi0_i = (int)(xi0 + i);
+                            peakIndex[i] = xi0_i;
+                            double weight = 1;
+                            if (i == 0)
+                            {
+                                weight = 1 - xi0_r;
+                            }
+                            else if (i == kLength - 1)
+                            {
+                                weight = xi0_r;
+                            }
 
-                while (repeatCnt < 6)
+                            for (uint j = 0; j < yH; j++)
+                            {
+                                if (j + yi0 >= height - 1)
+                                    break;
+
+                                roughPeak[i] += (1 - ry) * Xidiffsrc[xi0_i + (j + yi0) * width] + ry * Xidiffsrc[xi0_i + (j + yi0 + 1) * width];
+                            }
+                            roughPeak[i] = weight * roughPeak[i];
+
+                            //  Y 방향은 한번에 8개의 peak 를 찾을 것이므로 첫번째 + peak 만 찾으면 된다.
+                            //   따라서 inversion 은 사용하지 않는다.
+                            roughPeakBk[i] = roughPeak[i];
+
+                            if (i < 2)  //  추가 20260914
+                                continue;
+
+                            if (!firstPeakFound)
+                            {
+                                if (peak < roughPeakBk[i])  //   첫번쨰 Peak 는 항상 양수이어야 한다.
+                                {
+                                    pIndex = i;
+                                    peak = roughPeakBk[i];
+                                }
+                                if (pIndex > 0 && peak > 5000 && roughPeakBk[i] < -5000)
+                                {
+                                    firstPeakFound = true;
+                                }
+                            }
+                            else
+                            {
+                                //  3.0 -> 2.9 로 변경 20260914
+                                if (2.5 * peak < roughPeakBk[i - 1] && (roughPeakBk[i - 1] >= roughPeakBk[i - 2] && roughPeakBk[i - 1] >= roughPeakBk[i]))
+                                {
+                                    pIndex = i - 1;
+                                    peak = roughPeakBk[i - 1];
+                                }else if ((roughPeakBk[i - 1] >= roughPeakBk[i - 2] && roughPeakBk[i - 1] >= roughPeakBk[i]))
+                                {
+                                    if (i - 1 - pIndex < 9 && pIndex2==0)
+                                    {
+                                        pIndex = i - 1;
+                                        peak = roughPeakBk[i - 1];
+                                    }
+                                    else
+                                        pIndex2 = i - 1;
+                                }
+                            }
+                        }
+
+                        if (pIndex > kLength - 4 && incCnt < 6)
+                        {
+                            //  첫번째 Peak Index 가 상당히 뒤쪽인 경우 1 pixel 씩 뒤쪽으로 이동해서 재검사, 반복은 최대 6회까지만 즉 6 pixel 까지만 뒤로 이동해본다.
+                            kLength++;
+                            incCnt++;
+                        }
+                        if (pIndex < 5)
+                        {
+                            if (xi0 == 0)
+                                break;
+
+                            //  첫번째 Peak Index 가 5 이하인 경우 1 pixel 앞쪽으로 이동해서 재검사, 반복은 최대 6회까지만 즉 6 pixel 까지만 앞으로 이동해본다.
+                            xi0--;
+                            repeatCnt++;
+                            peak = -99999;
+                            roughPeak = new double[kLength + 6];
+                            roughPeakBk = new double[kLength + 6];
+                            peakIndex = new int[kLength + 6];
+                            firstPeakFound = false;
+
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    fxi0 = pIndex;
+                }
+                else
                 {
                     for (i = 0; i < kLength; i++)
                     {
@@ -6480,64 +6625,11 @@ namespace FAutoLearn
                             roughPeak[i] += (1 - ry) * Xidiffsrc[xi0_i + (j + yi0) * width] + ry * Xidiffsrc[xi0_i + (j + yi0 + 1) * width];
                         }
                         roughPeak[i] = weight * roughPeak[i];
-                        
-                        //  Y 방향은 한번에 8개의 peak 를 찾을 것이므로 첫번째 + peak 만 찾으면 된다.
-                        //   따라서 inversion 은 사용하지 않는다.
                         roughPeakBk[i] = roughPeak[i];
 
-                        if (i < 2)  //  추가 20260914
-                            continue;
-
-                        if (!firstPeakFound)
-                        {
-                            if (peak < roughPeakBk[i])  //   첫번쨰 Peak 는 항상 양수이어야 한다.
-                            {
-                                pIndex = i;
-                                peak = roughPeakBk[i];
-                            }
-                            if (pIndex > 0 && peak > 5000 && roughPeakBk[i] < -5000)
-                            {
-                                firstPeakFound = true;
-                            }
-                        }else
-                        {
-                            //  3.0 -> 2.9 로 변경 20260914
-                            if (2.9*peak< roughPeakBk[i-1] && (roughPeakBk[i-1] >= roughPeakBk[i-2] && roughPeakBk[i-1]>= roughPeakBk[i]))
-                            {
-                                pIndex = i-1;
-                                peak = roughPeakBk[i-1];
-                            }
-                        }
-                    }
-
-                    if (pIndex > kLength - 4 && incCnt < 6)
-                    {
-                        //  첫번째 Peak Index 가 상당히 뒤쪽인 경우 1 pixel 씩 뒤쪽으로 이동해서 재검사, 반복은 최대 6회까지만 즉 6 pixel 까지만 뒤로 이동해본다.
-                        kLength++;
-                        incCnt++;
-                    }
-                    if (pIndex < 5)
-                    {
-                        if (xi0 == 0)
-                            break;
-
-                        //  첫번째 Peak Index 가 5 이하인 경우 1 pixel 앞쪽으로 이동해서 재검사, 반복은 최대 6회까지만 즉 6 pixel 까지만 앞으로 이동해본다.
-                        xi0--;
-                        repeatCnt++;
-                        peak = -99999;
-                        roughPeak = new double[kLength + 6];
-                        roughPeakBk = new double[kLength + 6];
-                        peakIndex = new int[kLength + 6];
-                        firstPeakFound = false;
-
-                    }
-                    else
-                    {
-                        break;
                     }
                 }
-
-                fxi0 = pIndex;
+                   
             }
             catch (Exception e)
             {
@@ -6549,45 +6641,35 @@ namespace FAutoLearn
             //  상황에 따라 고정값 적용이 적합. 즉 Focusing 수준에 따라서 2가지 또는 3가지 값중 선택하는 방식은 가능할 것 같음.
             //  실험적으로 xW = 7 일때 반복성이 가장 좋은 것으로 나타남.
 
-            int icur = 0;
-            sumXY = 0;
-            sumY = 0;
-            int newi = 0;
-            double ratioXroughPeak = 0;
-            maxLength = roughPeakBk.Length - 1;
-            for (newi = -3; newi < 4; newi++)
+            if (prevRes == null)
             {
-                icur = newi + fxi0;// - (int)xi0;
-                if (icur < 0) continue;
-                if (icur >= maxLength) break;
-                //ratioXroughPeak = ratio[newi - i0] * roughPeakBk[icur];
-                ratioXroughPeak = roughPeakBk[icur];
-                sumXY += ratioXroughPeak * (newi + fxi0);
-                sumY += ratioXroughPeak;
-            }
-            res1st = sumXY / (double)sumY;
+                sumXY = 0;
+                sumY = 0;
 
-            if (res1st - xi0 < 0) //  극히 비정상인 경우 두번째 Peak 를 활용한다.
-                res1st = peakIndex[kLength - 2]; //  Peak 좌표
+                maxLength = roughPeakBk.Length - 1;
+                for (newi = -3; newi < 4; newi++)
+                {
+                    icur = newi + fxi0;// - (int)xi0;
+                    if (icur < 0) continue;
+                    if (icur >= maxLength) break;
+                    //ratioXroughPeak = ratio[newi - i0] * roughPeakBk[icur];
+                    ratioXroughPeak = roughPeakBk[icur];
+                    sumXY += ratioXroughPeak * (newi + fxi0);
+                    sumY += ratioXroughPeak;
+                }
+                res1st = sumXY / (double)sumY;
+
+                if (res1st - xi0 < 0) //  극히 비정상인 경우 두번째 Peak 를 활용한다.
+                    res1st = peakIndex[kLength - 2]; //  Peak 좌표
+            }
+            else
+            {
+                res1st = prevRes[0] - xi0;
+            }
+
 
             double oldres = res1st;
-            double pY = 0;
-            double err = 999;
-            double err_1 = 999;
 
-            uint itr = 0;
-            double[] errMem = new double[10];
-            int errMemCnt = 0;
-            double roughpeak_icur = 0;
-            double pY_05 = 0;
-            double roughPeak_icur_1 = 0;
-            double pY_15 = 0;
-            double roughPeak_icur_2 = 0;
-            int edgeFound = 0;
-            double[] resEdge = new double[9];
-            int slopeDir = 1;
-            double[] maxSlope = new double[8];
-            double lshift = 0;
 
             try
             {
@@ -6607,9 +6689,6 @@ namespace FAutoLearn
                         double rx = res1st - irx;
                         sumXY = 0;
                         sumY = 0;
-                        sumXY2 = 0;
-                        sumY2 = 0;
-                        lshift = 0;
                         for (newi = -3; newi < 4; newi++)
                         {
                             //if (newi == 0)
@@ -6646,7 +6725,6 @@ namespace FAutoLearn
                             //if (roughPeak_icur_2 < 0)
                             //    roughPeak_icur_2 = roughPeak_icur_2 / 5;
 
-                            pY_05 = 0;
                             if (rx > 0)
                             {
                                 if (icur + 1 - (int)xi0 < kLength)
@@ -6726,10 +6804,17 @@ namespace FAutoLearn
                     resEdge[edgeFound++] = res1st + xi0;// + lshift;
 
                     //  아래는 다음 경계추출을 위한 준비
-                    if (si < 3)
-                        res1st += 5.7;
+                    if ( prevRes == null)
+                    {
+                        if (si < 3)
+                            res1st += 5.7;
+                        else
+                            res1st += 6.33;
+                    }
                     else
-                        res1st += 6.33;
+                    {
+                        res1st = prevRes[edgeFound] - xi0;
+                    }
                     oldres = res1st;
                 }
             }
@@ -7393,11 +7478,11 @@ namespace FAutoLearn
                     continue;
 
                 tx[i] = spAfter[i].X - RotatedPS[i].X;  //  Z 회전성분을 소거
-                //resT.X += 2 * tx[i];                    //  Side View 로부터의 X 변동량은 오차가 클 수 있으니 1/2 의 비중을 적용한다.
+                resT.X += 2 * tx[i];                    //  Side View 로부터의 X 변동량은 오차가 클 수 있으니 1/2 의 비중을 적용한다.
             }
             //  East Mark 에서 회전성분을 제거한 나머지 부분
             //resT.X = resT.X / (tpBefore_Length + 2);  //  Side View 로부터의 X 변동량은 오차가 클 수 있으니 1/2 의 비중을 적용한다. -> 현재는 1:1 -> 1:0.65 으로 변경 필요
-            resT.X = resT.X / 6;  //   1:0.667 으로 변경함.
+            resT.X = resT.X / 10;  //   1:0.667 으로 변경함.
             resT.Y = resT.Y / tpBefore_Length;
 
             return resT;

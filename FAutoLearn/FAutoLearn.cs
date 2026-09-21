@@ -2284,6 +2284,7 @@ namespace FAutoLearn
         }
 
         public bool mIsFile = false;
+
         public void ResizeSourceImg2(int srcBuf, int resizeBuf)
         {
             //mSourceImg[srcBuf].GetArray(out p_Value[resizeBuf]);
@@ -9042,7 +9043,7 @@ namespace FAutoLearn
 
                     int y_tWidth = 0;
                     int y_tWidth_1 = 0;
-
+                    int tmpValue = 0;
                     for (int y = 0; y < tHeight; y++)
                     {
                         y_tWidth = y * tWidth;
@@ -9050,14 +9051,15 @@ namespace FAutoLearn
                         y_tWidth_1 = y * tWidth_1;
                         for (int x = 1; x < tWidth_1; x++)
                         {
-                            xDiffimg[x + y_tWidth_1] = 5 * ((int)tgtBuf[x + y_tWidth] - tgtBuf[x - 1 + y_tWidth]);// - LUTBgNoise[subLeft + x + 1] + LUTBgNoise[subLeft + x - 1]);
+                            tmpValue = ((int)tgtBuf[x + y_tWidth] - tgtBuf[x - 1 + y_tWidth]);// - LUTBgNoise[subLeft + x + 1] + LUTBgNoise[subLeft + x - 1]);
 
                             if (x > 1 && x < tWidth_2)
-                                xDiffimg[x + y_tWidth_1] += 5 * ((int)tgtBuf[x + 1 + y_tWidth] - tgtBuf[x - 2 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
+                                tmpValue += ((int)tgtBuf[x + 1 + y_tWidth] - tgtBuf[x - 2 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
 
                             if (x > 2 && x < tWidth_2 - 1)
-                                xDiffimg[x + y_tWidth_1] += 5 * ((int)tgtBuf[x + 2 + y_tWidth] - tgtBuf[x - 3 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
+                                tmpValue += ((int)tgtBuf[x + 2 + y_tWidth] - tgtBuf[x - 3 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
 
+                            xDiffimg[x + y_tWidth_1] = 5 * tmpValue;
                         }
                     }
                     int x_tHeight_1 = 0;
@@ -9066,14 +9068,16 @@ namespace FAutoLearn
                         x_tHeight_1 = x * tHeight_1;
                         for (int y = 1; y < tHeight_1; y++)
                         {
-                            yDiffimg[y + x_tHeight_1] = 5 * ((int)tgtBuf[x + (y) * tWidth] - tgtBuf[x + (y - 1) * tWidth]);// - LUTBgNoiseY[subTop + y + 1] + LUTBgNoiseY[subTop + y - 1];
+                            tmpValue = ((int)tgtBuf[x + (y) * tWidth] - tgtBuf[x + (y - 1) * tWidth]);// - LUTBgNoiseY[subTop + y + 1] + LUTBgNoiseY[subTop + y - 1];
 
                             if (y > 1 && y < tHeight_2)
-                                yDiffimg[y + x_tHeight_1] += 5 * ((int)tgtBuf[x + (y + 1) * tWidth] - tgtBuf[x + (y - 2) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
+                                tmpValue += ((int)tgtBuf[x + (y + 1) * tWidth] - tgtBuf[x + (y - 2) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
 
                             if (y > 2 && y < tHeight_2 - 1)
-                                yDiffimg[y + x_tHeight_1] += 5 * ((int)tgtBuf[x + (y + 2) * tWidth] - tgtBuf[x + (y - 3) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
-                        }
+                                tmpValue += ((int)tgtBuf[x + (y + 2) * tWidth] - tgtBuf[x + (y - 3) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
+
+                            yDiffimg[y + x_tHeight_1] = 5 * tmpValue;
+                        }
                     }
 
                     //Diff 영상 저장용.지우지 말것.
@@ -9274,7 +9278,7 @@ namespace FAutoLearn
 
                     if (lfMark.xPosType == 0)    //  Left Harf & Right Half
                     {
-                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
+                        xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex, xL);
 
                         gapX = (int)xL[0] + ((int)((tWidth - 1) - xL[1])) / 100.0;
                         if ((int)((tWidth - 1) - xL[1]) < 6)
@@ -9322,7 +9326,7 @@ namespace FAutoLearn
                         lupdown = GetCurUpDown(2, mUpDown[smr[si].Azimuth]);
                         /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
                         //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
-                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                        yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex, yT);
 
                         gapY = (int)(yT[7] - yT[0]) / 100.0;
                         if ((int)((tHeight - 1) - yT[7]) < 6 && !EOY)
@@ -9534,6 +9538,7 @@ namespace FAutoLearn
 
                         int y_tWidth = 0;
                         int y_tWidth_1 = 0;
+                        int tmpValue = 0;
 
                         for (int y = 0; y < tHeight; y++)
                         {
@@ -9542,14 +9547,15 @@ namespace FAutoLearn
                             y_tWidth_1 = y * tWidth_1;
                             for (int x = 1; x < tWidth_1; x++)
                             {
-                                xDiffimg[x + y_tWidth_1] = 5 * ((int)tgtBuf[x + y_tWidth] - tgtBuf[x - 1 + y_tWidth]);// - LUTBgNoise[subLeft + x + 1] + LUTBgNoise[subLeft + x - 1]);
+                                tmpValue = ((int)tgtBuf[x + y_tWidth] - tgtBuf[x - 1 + y_tWidth]);// - LUTBgNoise[subLeft + x + 1] + LUTBgNoise[subLeft + x - 1]);
 
                                 if (x > 1 && x < tWidth_2)
-                                    xDiffimg[x + y_tWidth_1] += 5 * ((int)tgtBuf[x + 1 + y_tWidth] - tgtBuf[x - 2 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
+                                    tmpValue += ((int)tgtBuf[x + 1 + y_tWidth] - tgtBuf[x - 2 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
 
                                 if (x > 2 && x < tWidth_2 - 1)
-                                    xDiffimg[x + y_tWidth_1] += 5 * ((int)tgtBuf[x + 2 + y_tWidth] - tgtBuf[x - 3 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
+                                    tmpValue += ((int)tgtBuf[x + 2 + y_tWidth] - tgtBuf[x - 3 + y_tWidth]);// - LUTBgNoise[subLeft + x + 2] + LUTBgNoise[subLeft + x - 2])/2;
 
+                                xDiffimg[x + y_tWidth_1] = 5 * tmpValue;
                             }
                         }
                         int x_tHeight_1 = 0;
@@ -9558,13 +9564,15 @@ namespace FAutoLearn
                             x_tHeight_1 = x * tHeight_1;
                             for (int y = 1; y < tHeight_1; y++)
                             {
-                                yDiffimg[y + x_tHeight_1] = 5 * ((int)tgtBuf[x + (y) * tWidth] - tgtBuf[x + (y - 1) * tWidth]);// - LUTBgNoiseY[subTop + y + 1] + LUTBgNoiseY[subTop + y - 1];
+                                tmpValue = ((int)tgtBuf[x + (y) * tWidth] - tgtBuf[x + (y - 1) * tWidth]);// - LUTBgNoiseY[subTop + y + 1] + LUTBgNoiseY[subTop + y - 1];
 
                                 if (y > 1 && y < tHeight_2)
-                                    yDiffimg[y + x_tHeight_1] += 5 * ((int)tgtBuf[x + (y + 1) * tWidth] - tgtBuf[x + (y - 2) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
+                                    tmpValue += ((int)tgtBuf[x + (y + 1) * tWidth] - tgtBuf[x + (y - 2) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
 
                                 if (y > 2 && y < tHeight_2 - 1)
-                                    yDiffimg[y + x_tHeight_1] += 5 * ((int)tgtBuf[x + (y + 2) * tWidth] - tgtBuf[x + (y - 3) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
+                                    tmpValue += ((int)tgtBuf[x + (y + 2) * tWidth] - tgtBuf[x + (y - 3) * tWidth]);// - LUTBgNoiseY[subTop + y + 2] + LUTBgNoiseY[subTop + y - 2])/2;
+
+                                yDiffimg[y + x_tHeight_1] = 5 * tmpValue;
                             }
                         }
 
@@ -9748,7 +9756,7 @@ namespace FAutoLearn
                         if (lfMark.xPosType == 0)    //  Left Harf & Right Half
                         {
                             // 경계를 x = 2 부터 찾아간다.
-                            xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex);
+                            xL = mFZM.ConvergePeakX2(4 * si, ref xDiffimg, tWidth - 1, tHeight, 1, yT[0], mCalcEffBand, (yT[7] - yT[0]), ref mPeakType[smr[si].Azimuth].type[0], iIndex, xL);
 
                             gapX = (int)xL[0] + ((int)((tWidth - 1) - xL[1])) / 100.0;
                             if ((int)((tWidth - 1) - xL[1]) < 6)
@@ -9788,7 +9796,7 @@ namespace FAutoLearn
                         {
                             /////////////////////////////// Band 좁혀보기 //////////////////////////////////////
                             //yT = mFZM.ConvergePeakX(4 * si + 2, ref yDiffimg, tHeight - 1, tWidth, 2, xL - 2, mCalcEffBand, (int)(xR - xL + 4), ref lupdown, ref mPeakType[smr[si].Azimuth].type[2], iIndex);
-                            yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex);
+                            yT = mFZM.ConvergePeakX3(si, ref yDiffimg, tHeight - 1, tWidth, 2, xL[0] - 2, mCalcEffBand, (xL[1] - xL[0] + 4), ref mPeakType[smr[si].Azimuth].type[2], iIndex, yT);
 
                             gapY = (int)(yT[7] - yT[0]) / 100.0;
                             if ((int)((tHeight - 1) - yT[7]) < 6 && !EOY)
@@ -10940,14 +10948,15 @@ namespace FAutoLearn
             return res;
         }
         //public long mCalcConv(byte[] srcData, ref sFiducialMark lfmark)   //  srcData 는 정확히 관심영역
+        private int[] searchHline = new int[5] { 390 / 3 - 3, 130 / 3 - 3, 260 / 3, 520 / 3, 0 };
 
         public OpenCvSharp.Point CalcConv4line(int si, ref sFiducialMark lfmark, int iBuf, int initialX = -1)
         {
             OpenCvSharp.Point res = new OpenCvSharp.Point();
             Rect[] searchVline = new Rect[5];
-            int[] searchHline = new int[5] { 390 / 3 - 3, 130 / 3 - 3, 260 / 3, 520 / 3, 0 };
+            //int[] searchHline = new int[5] { 390 / 3 - 3, 130 / 3 - 3, 260 / 3, 520 / 3, 0 };
             int[][] resVline = new int[5][];    //  
-            int[][] resHline = new int[5][];
+            int[] resHline = new int[86];
 
             // use 1/3 image
             //                        Typical Center of X
@@ -11003,24 +11012,25 @@ namespace FAutoLearn
                 while (k < vLen - 2)
                 {
                     //if (aVline[i][k] > 35 && aVline[i][k + 1] < aVline[i][k])   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
+                    int aVline_i_k = aVline[i][k] ;
                     if (si < 3 && peakCount == 0)
-                        if (aVline[i][k - 2] + 10 > aVline[i][k])
+                        if (aVline[i][k - 2] + 10 > aVline_i_k)
                         {
                             k++;
                             continue;
                         }
 
-                    if (aVline[i][k] > 30 && aVline[i][k + 1] < aVline[i][k] && aVline[i][k - 1] <= aVline[i][k] && aVline[i][k] < 252 && aVline[i][k - 1] < 252)   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
+                    if (aVline_i_k > 30 && aVline[i][k + 1] < aVline_i_k && aVline[i][k - 1] <= aVline_i_k && aVline_i_k < 252 && aVline[i][k - 1] < 252)   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
                     {
                         if (peakCount == 10)
                             break;
-                        if ((lastValley + 20 < aVline[i][k] && afterValley) || (lastPeak + 50) < aVline[i][k] )
+                        if ((lastValley + 20 < aVline_i_k && afterValley) || (lastPeak + 50) < aVline_i_k)
                         {
                             if (peakCount == 1)
                             {
                                 //  첫번쨰 Peak는 가짜 peak 일 수 있는데 가짜인 경우 valley보다 어두울 수도있다.
                                 //  따라서 첫번쨰 Peak가 가짜 Peak 인 경우는 제거해야한다.
-                                if (/*peakIndex[0] < k - 6 || */ lastPeak < aVline[i][k] / 2)
+                                if (/*peakIndex[0] < k - 6 || */ lastPeak < aVline_i_k / 2)
                                 {
                                     peakCount--;
                                     minPeak = 9999;
@@ -11028,9 +11038,9 @@ namespace FAutoLearn
                             }
                             if ( si<3)
                             {
-                                if (aVline[i][k + 1] < aVline[i][k] - 4 || aVline[i][k + 2] < aVline[i][k] - 4)
+                                if (aVline[i][k + 1] < aVline_i_k - 4 || aVline[i][k + 2] < aVline_i_k - 4)
                                 {
-                                    lastPeak = aVline[i][k];
+                                    lastPeak = aVline_i_k;
                                     peakIndex[peakCount] = k;
                                     peakEach[peakCount] = lastPeak;
                                     peakCount++;
@@ -11041,9 +11051,9 @@ namespace FAutoLearn
                             }
                             else
                             {
-                                if (aVline[i][k + 1] < aVline[i][k] || aVline[i][k + 2] < aVline[i][k])
+                                if (aVline[i][k + 1] < aVline_i_k || aVline[i][k + 2] < aVline_i_k)
                                 {
-                                    lastPeak = aVline[i][k];
+                                    lastPeak = aVline_i_k;
                                     peakIndex[peakCount] = k;
                                     peakEach[peakCount] = lastPeak;
                                     peakCount++;
@@ -11061,17 +11071,20 @@ namespace FAutoLearn
                             //if (minPeak > lastPeak)
                             //    minPeak = lastPeak;
                         }
+                        if ((minPeak > lastPeak) || peakCount == 1)
+                            minPeak = lastPeak;
+
                     }
                     else if (peakCount > 0)
                     {
                         //if (aVline[i][k] < lastPeak - 20 && aVline[i][k + 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
                         //    afterValley = true;
-                        if (aVline[i][k]<100)
+                        if (aVline_i_k < 100)
                         {
-                            if (aVline[i][k] < lastPeak - 12 && aVline[i][k + 1] >= aVline[i][k] && aVline[i][k - 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
-                                if (aVline[i][k] < minPeak) //  Valley 는 minPeak 보다 어두워야 한다.
+                            if (aVline_i_k < lastPeak - 12 && aVline[i][k + 1] >= aVline_i_k && aVline[i][k - 1] >= aVline_i_k)    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
+                                if (aVline_i_k < minPeak) //  Valley 는 minPeak 보다 어두워야 한다.
                                 {
-                                    lastValley = aVline[i][k];
+                                    lastValley = aVline_i_k;
                                     if (peakCount<4)
                                         if (k - lastValleyIndex > 6 && peakCount > 4 && !afterValley)   //   Valley와 Valley 간 간격이 너무 넓으면 이전 Peak 는 잘못된 Peak임
                                             peakCount--;
@@ -11083,9 +11096,9 @@ namespace FAutoLearn
                     }
                     else
                     {
-                        if (lastValley > aVline[i][k])
+                        if (lastValley > aVline_i_k)
                         {
-                            lastValley = aVline[i][k];
+                            lastValley = aVline_i_k;
                             lastValleyIndex = k;
                         }
                     }
@@ -11105,8 +11118,9 @@ namespace FAutoLearn
                                     int gap01 = peakIndex[1] - peakIndex[0];
                                     int gap12 = peakIndex[2] - peakIndex[1];
                                     int gap23 = peakIndex[3] - peakIndex[2];
-                                    int gap45 = peakIndex[4] - peakIndex[3];
-                                    if (gap01 > gap12+1 && gap01 > gap23+1)
+                                    int gap34 = peakIndex[4] - peakIndex[3];
+                                    if ( ((gap01 > gap12+1 && gap01 > gap23+1) || (gap01 < gap12 && gap01 < gap23))
+                                        && (Math.Abs(2 * gap34 - (gap12 + gap23)) < Math.Abs(2 * gap01 - (gap12 + gap23))))
                                     {
                                         resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
                                         foundMark = true;
@@ -11204,27 +11218,35 @@ namespace FAutoLearn
             int rightFinalSlope = 0;
 
             //  각 마크위치 정보에 따라 마크별 0, 3번째 Line 가로방향데이터 합산
-            resHline[si] = new int[86];  //  260/3 = 86.67 -> 86 -> 여기서 마크 X 길이만큼 빼줘야 한다. 따라서 86-18 = 68
+            resHline = new int[86];  //  260/3 = 86.67 -> 86 -> 여기서 마크 X 길이만큼 빼줘야 한다. 따라서 86-18 = 68
             int HbufLength = 86;
             if (si < 2)
             {
                 HbufLength = 89;
-                resHline[si] = new int[HbufLength];  //  260/3 = 86.67 -> 86 -> 여기서 마크 X 길이만큼 빼줘야 한다. 따라서 86-18 = 68
+                resHline = new int[HbufLength];  //  260/3 = 86.67 -> 86 -> 여기서 마크 X 길이만큼 빼줘야 한다. 따라서 86-18 = 68
             }
 
             if (resVline[si][0] > 0)
             {
+                int xxi = 0;
+                int xxi2 = 0;
+                int vlqw1 = resVline[si][1] * quaterWidth;
+                int vlqw2 = resVline[si][2] * quaterWidth;
                 for (int xi = 0; xi < HbufLength; xi++)
                 {
                     if (xi + searchHline[si] < resVline[si][0] - 24)
                     {
-                        resHline[si][xi] = 6 * 255;
+                        resHline[xi] = 6 * 255;
                         continue;
                     }
-
-                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + resVline[si][1] * quaterWidth] + q_ValueImg[xi + searchHline[si] + resVline[si][2] * quaterWidth];
-                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] + 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] + 1) * quaterWidth];
-                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] - 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] - 1) * quaterWidth];
+                    xxi = xi + searchHline[si] + vlqw1;
+                    xxi2 = xi + searchHline[si] + vlqw2;
+                    //resHline[si][xi] += q_ValueImg[xi + searchHline[si] + resVline[si][1] * quaterWidth]       + q_ValueImg[xi + searchHline[si] + resVline[si][2] * quaterWidth];
+                    //resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] + 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] + 1) * quaterWidth];
+                    //resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] - 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] - 1) * quaterWidth];
+                    resHline[xi] += q_ValueImg[xxi ] + q_ValueImg[xxi2];
+                    resHline[xi] += q_ValueImg[xxi + quaterWidth] + q_ValueImg[xxi2 + quaterWidth];
+                    resHline[xi] += q_ValueImg[xxi - quaterWidth] + q_ValueImg[xxi2 - quaterWidth];
                 }
                 //  횡방향 기울기 최대점/최소점 x 위치 기록
                 int slopeMax = 127;
@@ -11233,18 +11255,20 @@ namespace FAutoLearn
                 //  관찰된 x 위치에서 앞뒤로 17.333pixel(52pixel) 만 확인하면 됨.
                 for (int xi = 1; xi < HbufLength - 2; xi++)
                 {
-                    curSlope = resHline[si][xi + 1] + resHline[si][xi + 2] - resHline[si][xi] - resHline[si][xi - 1];
+                    int resHline_si_xi = resHline[xi];
+
+                    curSlope = resHline[xi + 1] + resHline[xi + 2] - resHline_si_xi - resHline[xi - 1];
                     if (curSlope > slopeMax && xi < HbufLength - 16)
                     {
                         //  상승엣지는 260/3 - 18 까지에서만 찾아야 한다.
                         //slopeMax = curSlope;
                         //left[si] = xi + searchHline[si];
-                        if ((resHline[si][xi + 4] + resHline[si][xi + 6]) >= 1.6*resHline[si][xi + 2])
-                            if (resHline[si][xi] < resHline[si][xi + 2] && resHline[si][xi] < resHline[si][xi + 3] && resHline[si][xi] < resHline[si][xi + 4])
+                        if ((resHline[xi + 4] + resHline[xi + 6]) >= 1.6*resHline[xi + 2])
+                            if (resHline_si_xi < resHline[xi + 2] && resHline_si_xi < resHline[xi + 3] && resHline_si_xi < resHline[xi + 4])
                             {
                                 slopeMax = curSlope;
                                 left[si] = xi;
-                                rightsideofLeftEdge = (resHline[si][xi + 4] + resHline[si][xi + 6]) / 2;
+                                rightsideofLeftEdge = (resHline[xi + 4] + resHline[xi + 6]) / 2;
                                 leftFInalSlope = curSlope;
                             }
                     }
@@ -11277,6 +11301,8 @@ namespace FAutoLearn
             }
             return res;
         }
+
+        public int[] searchHline2 = new int[3] { 225 / 3, 0, 145 / 3, };
         public OpenCvSharp.Point CalcConv4line2(int si, ref sFiducialMark lfmark, int iBuf, int initialX = -1)
         {
             if (mIsFile)
@@ -11284,9 +11310,9 @@ namespace FAutoLearn
 
             OpenCvSharp.Point res = new OpenCvSharp.Point();
             Rect[] searchVline = new Rect[3];
-            int[] searchHline = new int[3] { 225 / 3, 0, 145 / 3, };
+            int[] searchHline2 = new int[3] { 225 / 3, 0, 145 / 3, };
             int[][] resVline = new int[3][];    //  
-            int[][] resHline = new int[3][];
+            int[] resHline = new int[89];
 
             // use 1/3 image
             //                        Typical Center of X
@@ -11344,35 +11370,36 @@ namespace FAutoLearn
                 while (k < vLen - 1)
                 {
                     //if (aVline[i][k] > 35 && aVline[i][k + 1] < aVline[i][k])   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
+                    int aVline_i_k = aVline[i][k];
                     if (si < 3 && peakCount == 0)
-                        if (aVline[i][k - 2] + 10 > aVline[i][k])
+                        if (aVline[i][k - 2] + 10 > aVline_i_k)
                         {
                             k++;
                             continue;
                         }
 
-                    if (aVline[i][k] > peakThreshold && aVline[i][k + 1] < aVline[i][k] && aVline[i][k - 1] <= aVline[i][k] )   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
+                    if (aVline_i_k > peakThreshold && aVline[i][k + 1] < aVline_i_k && aVline[i][k - 1] <= aVline_i_k)   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
                     {
                         if (peakCount == 10)
                             break;
-                        if ((lastValley + valleyThreshold < aVline[i][k] && afterValley) || (lastPeak + 50) < aVline[i][k])
+                        if ((lastValley + valleyThreshold < aVline_i_k && afterValley) || (lastPeak + 50) < aVline_i_k)
                         {
                             if (peakCount == 1)
                             {
                                 //  첫번쨰 Peak는 가짜 peak 일 수 있는데 가짜인 경우 valley보다 어두울 수도있다.
                                 //  따라서 첫번쨰 Peak가 가짜 Peak 인 경우는 제거해야한다.
-                                if (peakIndex[0] < k - 6 || lastPeak < aVline[i][k] / 2)
+                                if (peakIndex[0] < k - 6 || lastPeak < aVline_i_k / 2)
                                 {
                                     peakCount--;
                                     minPeak = 9999;
                                 }
                             }
                             peakIndex[peakCount] = k;
-                            peakEach[peakCount] = aVline[i][k];
-                            lastPeak = aVline[i][k];
+                            peakEach[peakCount] = aVline_i_k;
+                            lastPeak = aVline_i_k;
                             peakCount++;
                             afterValley = false;
-                            if (minPeak > lastPeak)
+                            if ((minPeak > lastPeak) || peakCount == 1)
                                 minPeak = lastPeak;
                         }
                     }
@@ -11380,10 +11407,11 @@ namespace FAutoLearn
                     {
                         //if (aVline[i][k] < lastPeak - 20 && aVline[i][k + 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
                         //    afterValley = true;
-                        if (aVline[i][k] < lastPeak - valleyThreshold && aVline[i][k + 1] >= aVline[i][k] && aVline[i][k - 1] >= aVline[i][k])    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
-                            if (aVline[i][k] < minPeak && aVline[i][k] < 100/*lastPeak - 15*/) //  Valley 는 minPeak 보다 어두워야 한다.
+                        if (aVline_i_k < lastPeak - valleyThreshold && aVline[i][k + 1] >= aVline_i_k && aVline[i][k - 1] >= aVline_i_k)    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
+                        {
+                            if (aVline_i_k < minPeak && aVline_i_k < 100/*lastPeak - 15*/) //  Valley 는 minPeak 보다 어두워야 한다.
                             {
-                                lastValley = aVline[i][k];
+                                lastValley = aVline_i_k;
                                 if (k - lastValleyIndex > 6 && peakCount > 4 && !afterValley)   //   Valley와 Valley 간 간격이 너무 넓으면 이전 Peak 는 잘못된 Peak임
                                 {
                                     if (peakIndex[peakCount] > lastValleyIndex)
@@ -11392,12 +11420,20 @@ namespace FAutoLearn
                                 afterValley = true;
                                 lastValleyIndex = k;
                             }
+                        }
+                        else if (aVline_i_k >= lastPeak - valleyThreshold && aVline[i][k + 1] >= aVline_i_k && aVline[i][k - 1] >= aVline_i_k)
+                        {
+                            //  Valley 가 너무 작으면 앞에 있었던 peak 는 엉터리 Peak 이므로 제거한다.
+                            peakCount--;
+                            afterValley = true;
+                            lastValleyIndex = k;
+                        }
                     }
                     else
                     {
-                        if (lastValley > aVline[i][k])
+                        if (lastValley > aVline_i_k)
                         {
-                            lastValley = aVline[i][k];
+                            lastValley = aVline_i_k;
                             lastValleyIndex = k;
                         }
                     }
@@ -11417,8 +11453,9 @@ namespace FAutoLearn
                                     int gap01 = peakIndex[1] - peakIndex[0];
                                     int gap12 = peakIndex[2] - peakIndex[1];
                                     int gap23 = peakIndex[3] - peakIndex[2];
-                                    int gap45 = peakIndex[4] - peakIndex[3];
-                                    if (gap01 > gap12 + 1 && gap01 > gap23 + 1)
+                                    int gap34 = peakIndex[4] - peakIndex[3];
+                                    if ( ((gap01 > gap12 && gap01 > gap23 && gap01> gap34) || (gap01 < gap12 && gap01 < gap23 && gap01 < gap34)) 
+                                        && (Math.Abs(2*gap34 - (gap12+ gap23)) < Math.Abs(2 * gap01 - (gap12 + gap23))))
                                     {
                                         resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
                                         foundMark = true;
@@ -11508,27 +11545,35 @@ namespace FAutoLearn
             int rightFinalSlope = 0;
 
             //  각 마크위치 정보에 따라 마크별 0, 3번째 Line 가로방향데이터 합산
-            resHline[si] = new int[89];  //  270/3 = 90 -> 88 -> 여기서 마크 X 길이만큼 빼줘야 한다. 따라서 86-18 = 68
+            resHline = new int[89];  //  270/3 = 90 -> 88 -> 여기서 마크 X 길이만큼 빼줘야 한다. 따라서 86-18 = 68
             int HbufLength = 89;
             if (si < 2)
             {
                 HbufLength = 89;
-                resHline[si] = new int[HbufLength];  //  260/3 = 86.67 -> 86 -> 여기서 마크 X 길이만큼 빼줘야 한다. 따라서 86-18 = 68
+                resHline = new int[HbufLength];  //  260/3 = 86.67 -> 86 -> 여기서 마크 X 길이만큼 빼줘야 한다. 따라서 86-18 = 68
             }
 
             if (resVline[si][0] > 0)
             {
+                int vlqw1 = resVline[si][1] * quaterWidth;
+                int vlqw2 = resVline[si][2] * quaterWidth;
+
                 for (int xi = 0; xi < HbufLength; xi++)
                 {
-                    if (xi + searchHline[si] < resVline[si][0] - 24)
+                    int xxi = xi + searchHline2[si] + vlqw1;
+                    int xxi2 = xi + searchHline2[si] + vlqw2;
+                    if (xi + searchHline2[si] < resVline[si][0] - 24)
                     {
-                        resHline[si][xi] = 6 * 255;
+                        resHline[xi] = 6 * 255;
                         continue;
                     }
 
-                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + resVline[si][1] * quaterWidth] + q_ValueImg[xi + searchHline[si] + resVline[si][2] * quaterWidth];
-                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] + 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] + 1) * quaterWidth];
-                    resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] - 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] - 1) * quaterWidth];
+                    //resHline[si][xi] += q_ValueImg[xi + searchHline[si] + resVline[si][1] * quaterWidth]       + q_ValueImg[xi + searchHline[si] + resVline[si][2] * quaterWidth];
+                    //resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] + 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] + 1) * quaterWidth];
+                    //resHline[si][xi] += q_ValueImg[xi + searchHline[si] + (resVline[si][1] - 1) * quaterWidth] + q_ValueImg[xi + searchHline[si] + (resVline[si][2] - 1) * quaterWidth];
+                    resHline[xi] += q_ValueImg[xxi] + q_ValueImg[xxi2];
+                    resHline[xi] += q_ValueImg[xxi + quaterWidth] + q_ValueImg[xxi2 + quaterWidth];
+                    resHline[xi] += q_ValueImg[xxi -  quaterWidth] + q_ValueImg[xxi2 - quaterWidth];
                 }
                 //  횡방향 기울기 최대점/최소점 x 위치 기록
                 int slopeMax = 127;
@@ -11537,18 +11582,19 @@ namespace FAutoLearn
                 //  관찰된 x 위치에서 앞뒤로 17.333pixel(52pixel) 만 확인하면 됨.
                 for (int xi = 1; xi < HbufLength - 2; xi++)
                 {
-                    curSlope = resHline[si][xi + 1] + resHline[si][xi + 2] - resHline[si][xi] - resHline[si][xi - 1];
+                    int resHline_si_xi = resHline[xi];
+                    curSlope = resHline[xi + 1] + resHline[xi + 2] - resHline_si_xi - resHline[xi - 1];
                     if (curSlope > slopeMax && xi < HbufLength - 16)
                     {
                         //  상승엣지는 260/3 - 18 까지에서만 찾아야 한다.
                         //slopeMax = curSlope;
-                        //left[si] = xi + searchHline[si];
-                        if ((resHline[si][xi + 4] + resHline[si][xi + 6]) > 1.6 * resHline[si][xi + 2])
-                            if (resHline[si][xi] < resHline[si][xi + 2] && resHline[si][xi] < resHline[si][xi + 3] && resHline[si][xi] < resHline[si][xi + 4])
+                        //left[si] = xi + searchHline2[si];
+                        if ((resHline[xi + 4] + resHline[xi + 6]) > 1.6 * resHline[xi + 2])
+                            if (resHline_si_xi < resHline[xi + 2] && resHline_si_xi < resHline[xi + 3] && resHline_si_xi < resHline[xi + 4])
                             {
                                 slopeMax = curSlope;
                                 left[si] = xi;
-                                rightsideofLeftEdge = (resHline[si][xi + 4] + resHline[si][xi + 6]) / 2;
+                                rightsideofLeftEdge = (resHline[xi + 4] + resHline[xi + 6]) / 2;
                                 leftFInalSlope = curSlope;
                             }
                     }
@@ -11558,7 +11604,7 @@ namespace FAutoLearn
                         if (curSlope < slopeMin)
                         {
                             //slopeMin = curSlope;
-                            //right[si] = xi + searchHline[si];
+                            //right[si] = xi + searchHline2[si];
                             //FoundSlopeMin = true;
                             slopeMin = curSlope;
                             right[si] = xi;
@@ -11572,7 +11618,7 @@ namespace FAutoLearn
                     if (right[si] - left[si] > 20 && right[si] - left[si] < 26 && FoundSlopeMin == false)
                         break;
                 }
-                res = new OpenCvSharp.Point(left[si] + searchHline[si] - 1, resVline[si][1] - 3); //  Top Left of each mark region
+                res = new OpenCvSharp.Point(left[si] + searchHline2[si] - 1, resVline[si][1] - 3); //  Top Left of each mark region
             }
             else
             {

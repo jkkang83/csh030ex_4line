@@ -91,7 +91,6 @@ namespace CSH030Ex
         public bool m_bPseudoOMM = false;
         public bool m_bcb3Line = false;
         public bool m_bSaveVideo = false;
-        public bool m_bReverseCamera = false;
 
         public string mCamID0 = "";
         public string mCamID1 = "";
@@ -100,7 +99,7 @@ namespace CSH030Ex
         public string mMOTID = "";
         public string mDoingStatus = "IDLE";
         public int mIDLEcount = 0;
-        public int mMaxThread = 10; // 13700K : 18, 12700 : 16, 14700 & Ultra7 :20
+        public int mMaxThread = 20; // 13700K : 18, 12700 : 16, 14700 & Ultra7 :20
         public int mMonitoringTestSet = 129;
         public const double LensMag = 0.30;// CSH030Ex
         //public const int mMergeImgWidth = 750;

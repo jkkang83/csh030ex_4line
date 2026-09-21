@@ -679,16 +679,8 @@ namespace CSH030Ex
 
                 BaslerCam[0].Parameters[PLCamera.ClTapGeometry].SetValue("Geometry1X10_1Y");
 
-                if(m__G.m_bReverseCamera == false)
-                {
-                    BaslerCam[0].Parameters[PLCamera.ReverseX].SetValue(true);
-                    BaslerCam[0].Parameters[PLCamera.ReverseY].SetValue(false);
-                }
-                else
-                {
-                    BaslerCam[0].Parameters[PLCamera.ReverseX].SetValue(false);
-                    BaslerCam[0].Parameters[PLCamera.ReverseY].SetValue(true);
-                }
+                BaslerCam[0].Parameters[PLCamera.ReverseX].SetValue(true);
+                BaslerCam[0].Parameters[PLCamera.ReverseY].SetValue(false);
                 
                 BaslerCam[0].Parameters[PLCamera.GainRaw].SetValue(v_OrgGain[0]);
                 BaslerCam[0].Parameters[PLCamera.GammaEnable].SetValue(true);
@@ -4456,9 +4448,7 @@ namespace CSH030Ex
 
 
                     m__G.fVision.ProcessVisionData(numFile, 1, true);   // Multi 인 경우 안된다 왜?
-                                                                        //                    m__G.fVision.ProcessVisionData(numFile, maxThread, true);
-
-
+                    //m__G.fVision.ProcessVisionData(numFile, maxThread, true);
 
                     m__G.mbSuddenStop[0] = false;
                     m__G.oCam[0].mTargetTriggerCount = orgmTargetTriggerCount;

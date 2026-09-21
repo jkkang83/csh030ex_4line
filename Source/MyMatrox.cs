@@ -1371,13 +1371,13 @@ namespace S2System.Vision
             return result;
         }
 
+        Rect SourceImg2Up = new Rect(0, 0, 550, 210);
+        Rect SourceImg2Lo = new Rect(145, 210, 260, 210);
+
         private void CropImage(int index, int nbuf)
         {
             byte[] buf = new byte[nSizeX * nSizeY];
-            // MIL 에서 Mat 로 변환한 뒤 Merge
             MIL.MbufGet2d(milCommonImageGrab[index], 0, 0, nSizeX, nSizeY, buf);
-            //if ( index==0)
-            //    MIL.MbufExport("C:\\CSHTest\\Result\\RawData\\Image\\Crop.bmp", MIL.M_BMP, milCommonImageGrab[index]);
 
             Mat src = new Mat(nSizeY, nSizeX, MatType.CV_8UC1, buf);    //  buf 로 Mat 생성
             if (bPseudoOMM)
@@ -1398,7 +1398,6 @@ namespace S2System.Vision
                 using (Mat resultRoi = mFAL.mSourceImg[nbuf].SubMat(resultRoiRect[i]))
                 {
                     srcRoi.CopyTo(resultRoi);
-                    //Cv2.ImShow(i.ToString(), mFAL.mSourceImg[nbuf]);// mFAL.mSourceImg2[nbuf]);
 
                     if (bPseudoOMM)
                     {
@@ -1425,8 +1424,6 @@ namespace S2System.Vision
                 int delta = sideLo.Bottom - 342;
                 sideLo.Y -= delta;
             }
-            Rect SourceImg2Up = new Rect(0, 0, 550, 210);
-            Rect SourceImg2Lo = new Rect(145, 210, 260, 210);
 
             Mat srcRoi2 = src.SubMat(eastUp);
             Mat resultRoi2 = mFAL.mSourceImg2[nbuf].SubMat(SourceImg2Up);
@@ -1436,7 +1433,6 @@ namespace S2System.Vision
             Mat resultRoi3 = mFAL.mSourceImg2[nbuf].SubMat(SourceImg2Lo);
             srcRoi3.CopyTo(resultRoi3);
 
-            //Cv2.ImShow("A", mFAL.mSourceImg[nbuf]);// mFAL.mSourceImg2[nbuf]);
         }
         //public Mat CropImageWide(Mat src)
         //{
@@ -3301,6 +3297,8 @@ namespace S2System.Vision
 
             SupremeTimer.QueryPerformanceCounter(ref mLastGrabTiming);
             mGrabTiming[mTriggeredFrameCount % 10000] = mLastGrabTiming;
+
+            //CropImage(mTriggeredFrameCount, )
             mTriggeredFrameCount++;
 
             return 0;

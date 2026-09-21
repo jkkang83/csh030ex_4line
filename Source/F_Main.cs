@@ -1119,17 +1119,6 @@ namespace CSH030Ex
                 chSaveVideo.Checked = false;
                 m__G.m_bSaveVideo = false;
             }
-            IsChecked = rows[i++];
-            if (IsChecked.Contains("t") || IsChecked.Contains("T"))
-            {
-                chReverseCamera.Checked = true;
-                m__G.m_bReverseCamera = true;
-            }
-            else
-            {
-                chReverseCamera.Checked = false;
-                m__G.m_bReverseCamera = false;
-            }
             return true;
 
         }
@@ -1168,7 +1157,6 @@ namespace CSH030Ex
             sr.WriteLine(chSaveUserImage.Checked.ToString());
             sr.WriteLine(cbPseudoOMM.Checked.ToString());
             sr.WriteLine(chSaveVideo.Checked.ToString());
-            sr.WriteLine(chReverseCamera.Checked.ToString());
             sr.Close();
             if (MachineType == (int)CSH030Ex.MachineType.Master)
                 SendParameterState = SendParameterState + "," + cb_ScreenCapture.Checked + "," + cbSaveRawData.Checked + "," + cbPassword.Checked + "," +
@@ -6449,14 +6437,6 @@ namespace CSH030Ex
                 m__G.m_bSaveVideo = true;
             else
                 m__G.m_bSaveVideo = false;
-        }
-        private void chReverseCamera_CheckedChanged(object sender, EventArgs e)
-        {
-            CheckBox ch = (sender as CheckBox);
-            if (ch.Checked)
-                m__G.m_bReverseCamera = true;
-            else
-                m__G.m_bReverseCamera = false;
         }
     }
 }
