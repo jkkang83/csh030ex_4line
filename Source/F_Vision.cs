@@ -679,8 +679,16 @@ namespace CSH030Ex
 
                 BaslerCam[0].Parameters[PLCamera.ClTapGeometry].SetValue("Geometry1X10_1Y");
 
-                BaslerCam[0].Parameters[PLCamera.ReverseX].SetValue(true);
-                BaslerCam[0].Parameters[PLCamera.ReverseY].SetValue(false);
+                if(m__G.m_bReverseCamera == false)
+                {
+                    BaslerCam[0].Parameters[PLCamera.ReverseX].SetValue(true);
+                    BaslerCam[0].Parameters[PLCamera.ReverseY].SetValue(false);
+                }
+                else
+                {
+                    BaslerCam[0].Parameters[PLCamera.ReverseX].SetValue(false);
+                    BaslerCam[0].Parameters[PLCamera.ReverseY].SetValue(true);
+                }
                 
                 BaslerCam[0].Parameters[PLCamera.GainRaw].SetValue(v_OrgGain[0]);
                 BaslerCam[0].Parameters[PLCamera.GammaEnable].SetValue(true);
