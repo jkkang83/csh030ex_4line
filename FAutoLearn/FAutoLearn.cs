@@ -2323,14 +2323,15 @@ namespace FAutoLearn
             //  OMMS
             int i0 = 50;   //  115더해야 절대좌표 565 ~ 595
             int ie = 80;
-            int j0 = 105/2;// 27;    //  54 ~ 142
-            int je = 160/2;// 71;
+            int j0 = 60/2;// 27;    //  54 ~ 142
+            int je = 140/2;// 71;
             int jLen = (je - j0); // (je - j0) / 2;   //  71-27 = 44
 
             //  위 영역에서  우에서 좌로 어두워지는 첫번째경계 추출
             //  수직선 검출
             int[][] xdiff = new int[jLen][];
             Point2d[] ptS = new Point2d[jLen];
+            List<Point2d> ptSL = new List<Point2d>();
 
             xdiff[0] = new int[ie - i0 + 1];
             xdiff[1] = new int[ie - i0 + 1];
@@ -2345,12 +2346,29 @@ namespace FAutoLearn
                     xdiff[j][i - i0] += -( qOMMS_Value[iBuf][i + (j0 + j + 1) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j0 + j + 1) * mOMMSImg_Width]
                                       - qOMMS_Value[iBuf][i - 1 + (j0 + j + 1) * mOMMSImg_Width] - qOMMS_Value[iBuf][i - 2 + (j0 + j + 1) * mOMMSImg_Width]);
                 }
-                ptS[j] = new Point2d(CalcPeakDiff(xdiff[j]) + i0 + 115, (2*(j0 + j) + 0.5));    //  Y 좌표는 2배 해준다
+                ptSL.Add(new Point2d(CalcPeakDiff(xdiff[j]) + i0 + 115, (2*(j0 + j) + 0.5)));    //  Y 좌표는 2배 해준다
 
             }
             //  xdiff[0], xdiff[0] 에서 각각 Peak 찾는다. 일단 Y 축이 1/2 압축된 상태의 좌표로 확보한다.
             //  X만 우선 절대 좌표계로 변환
+            double meanX = 0;
+            
+            for ( int itr = 0; itr<2; itr++)
+            {
+                meanX = ptSL.Average(p => p.X);
+
+                for (int j = 0; j < ptSL.Count; j++)
+                {
+                    if (Math.Abs(ptSL[j].X - meanX) > (2.0-itr))
+                    {
+                        ptSL.RemoveAt(j);
+                        j--;
+                    }
+                }
+            }
+            ptS = ptSL.ToArray();
             FZMath.Line2D ommSedge = mFZM.FitLinePCA(ptS);
+            jLen = ptS.Length;
 
 
             // 얻어진 pt0.X 좌표 + 2 ~ 27 의 범위에서 Y=0 -> +Scan
@@ -2379,13 +2397,13 @@ namespace FAutoLearn
             Point2d[] ptSH2 = new Point2d[HscanLen];
             int[][] ydiffB = new int[HscanLen][];
             x = 3;
-            int jstart = 29;    //  Y=84 에서 경계 => 84/2 = 42, 42-13 = 29
+            int jstart = 8;    //  Y=84 에서 경계 => 84/2 = 42, 42-13 = 29
 
             for (int i = x; i < x + HscanLen; i++)
             {
                 //  i 는 가로방향, j 는 세로방향이 된다.
-                ydiffB[i - x] = new int[25];
-                for (int j = jstart; j < jstart + 25; j++)
+                ydiffB[i - x] = new int[40];
+                for (int j = jstart; j < jstart + 40; j++)
                 {
                     ydiffB[i - x][j - jstart] = ( 
                                               (qOMMS_Value[iBuf][i + j * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + j * mOMMSImg_Width])
@@ -2394,7 +2412,8 @@ namespace FAutoLearn
                                             - (qOMMS_Value[iBuf][i + (j - 2) * mOMMSImg_Width] + qOMMS_Value[iBuf][i + 1 + (j - 2) * mOMMSImg_Width])
                                               );
                 }
-                ptSH2[i - x] = new Point2d(115 + i + 0.5, 2 * (CalcPeakDiff(ydiffB[i - x]) + jstart)); //  Y 좌표 2배 해준다.
+                double peakDiffX = CalcPeakDiff(ydiffB[i - x]);
+                ptSH2[i - x] = new Point2d(115 + i + 0.5, 2 * (peakDiffX + jstart)); //  Y 좌표 2배 해준다.
             }
             FZMath.Line2D ommSedgeBtm = mFZM.FitLinePCA(ptSH2);
             //double[] ommSedgeBtmPoly2nd = new double[3];
@@ -2407,8 +2426,8 @@ namespace FAutoLearn
             //  세로선
             i0 = 21;   //  520 더해야 절대좌표
             ie = 51;
-            j0 = 59; //   306-190 = 116, 116/2 = 58
-            je = 113;// 416 - 190 = 226, 226/2 = 113
+            j0 = 30; //   250-190 = 60, 60/2 = 30 // 306-190 = 116, 116/2 = 58
+            je = 95;//   380-190 = 190, 190/2 = 95  // 416 - 190 = 226, 226/2 = 113
             jLen = (je - j0);
             //  위 영역에서  우에서 좌로 어두워지는 경계 추출
             //  수직선 검출
@@ -2428,7 +2447,7 @@ namespace FAutoLearn
                 }
                 ptTL.Add(new Point2d(CalcPeakDiff(xdiff[j]) + i0, 2 * ((j0 + j) + 1 + 95))); //  Y 좌표 2배
             }
-            double meanX = ptTL.Average(p => p.X);
+            meanX = ptTL.Average(p => p.X);
             double meanY = ptTL.Average(p => p.Y);
             for (int j = 0; j < ptTL.Count; j++)
             {
@@ -2476,7 +2495,7 @@ namespace FAutoLearn
             Point2d[] ptTH2 = new Point2d[HscanLen];
             ydiffB = new int[HscanLen][];
             x = 2;  
-            jstart = 40;    //  270 - 190 = 80, 80/2 = 40
+            jstart = 5;    //   200 - 190 = 10, 10/2 = 5 //  270 - 190 = 80, 80/2 = 40
             for (int i = x; i < x + HscanLen; i++)
             {
                 //  i 는 가로방향, j 는 세로방향이 된다.
