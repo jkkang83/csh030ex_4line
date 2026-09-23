@@ -11419,13 +11419,18 @@ namespace FAutoLearn
                                     minPeak = 9999;
                                 }
                             }
-                            peakIndex[peakCount] = k;
-                            peakEach[peakCount] = aVline_i_k;
-                            lastPeak = aVline_i_k;
-                            peakCount++;
-                            afterValley = false;
-                            if ((minPeak > lastPeak) || peakCount == 1)
-                                minPeak = lastPeak;
+                            if (peakCount > 3 && aVline_i_k < lastPeak / 3)
+                                ;
+                            else
+                            {
+                                peakIndex[peakCount] = k;
+                                peakEach[peakCount] = aVline_i_k;
+                                lastPeak = aVline_i_k;
+                                peakCount++;
+                                afterValley = false;
+                                if ((minPeak > lastPeak) || peakCount == 1)
+                                    minPeak = lastPeak;
+                            }
                         }
                     }
                     else if (peakCount > 0)
