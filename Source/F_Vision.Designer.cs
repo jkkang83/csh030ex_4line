@@ -72,6 +72,8 @@
             this.cbCompatibility = new System.Windows.Forms.CheckBox();
             this.tbBreakIndex = new System.Windows.Forms.TextBox();
             this.grbCalibration = new System.Windows.Forms.GroupBox();
+            this.cbP45_5Times = new System.Windows.Forms.CheckBox();
+            this.cbLongTerm = new System.Windows.Forms.CheckBox();
             this.tbRepeatMeasure = new System.Windows.Forms.TextBox();
             this.label39 = new System.Windows.Forms.Label();
             this.cbMicroYcal = new System.Windows.Forms.CheckBox();
@@ -117,7 +119,6 @@
             this.button12 = new System.Windows.Forms.Button();
             this.button10 = new System.Windows.Forms.Button();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.button9 = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.btnOpenResultBin = new System.Windows.Forms.Button();
@@ -213,12 +214,9 @@
             this.label10 = new System.Windows.Forms.Label();
             this.MotionStageBtn = new System.Windows.Forms.Button();
             this.cbBench = new System.Windows.Forms.CheckBox();
-            this.Can_Reopen = new System.Windows.Forms.Button();
             this.BtnAdminMode = new System.Windows.Forms.Button();
             this.PanelAdmin1 = new System.Windows.Forms.Panel();
             this.PanelAdmin2 = new System.Windows.Forms.Panel();
-            this.cbLongTerm = new System.Windows.Forms.CheckBox();
-            this.cbP45_5Times = new System.Windows.Forms.CheckBox();
             this.grpAdjust.SuspendLayout();
             this.grbCalibration.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -829,6 +827,32 @@
             this.grbCalibration.TabStop = false;
             this.grbCalibration.Text = "Calibration";
             this.grbCalibration.Enter += new System.EventHandler(this.groupBox1_Enter);
+            // 
+            // cbP45_5Times
+            // 
+            this.cbP45_5Times.AutoSize = true;
+            this.cbP45_5Times.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbP45_5Times.ForeColor = System.Drawing.Color.White;
+            this.cbP45_5Times.Location = new System.Drawing.Point(283, 178);
+            this.cbP45_5Times.Name = "cbP45_5Times";
+            this.cbP45_5Times.Size = new System.Drawing.Size(71, 19);
+            this.cbP45_5Times.TabIndex = 501;
+            this.cbP45_5Times.Text = "5 Times";
+            this.cbP45_5Times.UseVisualStyleBackColor = true;
+            this.cbP45_5Times.Visible = false;
+            // 
+            // cbLongTerm
+            // 
+            this.cbLongTerm.AutoSize = true;
+            this.cbLongTerm.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbLongTerm.ForeColor = System.Drawing.Color.White;
+            this.cbLongTerm.Location = new System.Drawing.Point(283, 193);
+            this.cbLongTerm.Name = "cbLongTerm";
+            this.cbLongTerm.Size = new System.Drawing.Size(88, 19);
+            this.cbLongTerm.TabIndex = 500;
+            this.cbLongTerm.Text = "Long Term";
+            this.cbLongTerm.UseVisualStyleBackColor = true;
+            this.cbLongTerm.Visible = false;
             // 
             // tbRepeatMeasure
             // 
@@ -1451,22 +1475,6 @@
             this.pictureBox2.Size = new System.Drawing.Size(780, 460);
             this.pictureBox2.TabIndex = 442;
             this.pictureBox2.TabStop = false;
-            // 
-            // button9
-            // 
-            this.button9.BackColor = System.Drawing.Color.DeepSkyBlue;
-            this.button9.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button9.BackgroundImage")));
-            this.button9.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.button9.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.button9.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.button9.ForeColor = System.Drawing.Color.White;
-            this.button9.Location = new System.Drawing.Point(155, 255);
-            this.button9.Name = "button9";
-            this.button9.Size = new System.Drawing.Size(144, 60);
-            this.button9.TabIndex = 438;
-            this.button9.Text = "Cam Re-Open";
-            this.button9.UseVisualStyleBackColor = false;
-            this.button9.Click += new System.EventHandler(this.button9_Click_1);
             // 
             // button7
             // 
@@ -2613,7 +2621,6 @@
             this.PanelAdmin0.Controls.Add(this.label10);
             this.PanelAdmin0.Controls.Add(this.MotionStageBtn);
             this.PanelAdmin0.Controls.Add(this.cbBench);
-            this.PanelAdmin0.Controls.Add(this.Can_Reopen);
             this.PanelAdmin0.Location = new System.Drawing.Point(2, 71);
             this.PanelAdmin0.Name = "PanelAdmin0";
             this.PanelAdmin0.Size = new System.Drawing.Size(475, 181);
@@ -2761,21 +2768,6 @@
             this.cbBench.UseVisualStyleBackColor = true;
             this.cbBench.CheckedChanged += new System.EventHandler(this.cbBench_CheckedChanged);
             // 
-            // Can_Reopen
-            // 
-            this.Can_Reopen.BackColor = System.Drawing.Color.DeepSkyBlue;
-            this.Can_Reopen.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("Can_Reopen.BackgroundImage")));
-            this.Can_Reopen.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.Can_Reopen.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.Can_Reopen.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.Can_Reopen.ForeColor = System.Drawing.Color.White;
-            this.Can_Reopen.Location = new System.Drawing.Point(322, 71);
-            this.Can_Reopen.Name = "Can_Reopen";
-            this.Can_Reopen.Size = new System.Drawing.Size(144, 60);
-            this.Can_Reopen.TabIndex = 438;
-            this.Can_Reopen.Text = "Cam Re-Open";
-            this.Can_Reopen.UseVisualStyleBackColor = false;
-            // 
             // BtnAdminMode
             // 
             this.BtnAdminMode.BackColor = System.Drawing.Color.Green;
@@ -2845,32 +2837,6 @@
             this.PanelAdmin2.Size = new System.Drawing.Size(402, 345);
             this.PanelAdmin2.TabIndex = 514;
             // 
-            // cbLongTerm
-            // 
-            this.cbLongTerm.AutoSize = true;
-            this.cbLongTerm.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.cbLongTerm.ForeColor = System.Drawing.Color.White;
-            this.cbLongTerm.Location = new System.Drawing.Point(283, 193);
-            this.cbLongTerm.Name = "cbLongTerm";
-            this.cbLongTerm.Size = new System.Drawing.Size(88, 19);
-            this.cbLongTerm.TabIndex = 500;
-            this.cbLongTerm.Text = "Long Term";
-            this.cbLongTerm.UseVisualStyleBackColor = true;
-            this.cbLongTerm.Visible = false;
-            // 
-            // cbP45_5Times
-            // 
-            this.cbP45_5Times.AutoSize = true;
-            this.cbP45_5Times.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.cbP45_5Times.ForeColor = System.Drawing.Color.White;
-            this.cbP45_5Times.Location = new System.Drawing.Point(283, 178);
-            this.cbP45_5Times.Name = "cbP45_5Times";
-            this.cbP45_5Times.Size = new System.Drawing.Size(71, 19);
-            this.cbP45_5Times.TabIndex = 501;
-            this.cbP45_5Times.Text = "5 Times";
-            this.cbP45_5Times.UseVisualStyleBackColor = true;
-            this.cbP45_5Times.Visible = false;
-            // 
             // FVision
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2911,7 +2877,6 @@
             this.Controls.Add(this.button10);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.grbCalibration);
-            this.Controls.Add(this.button9);
             this.Controls.Add(this.button7);
             this.Controls.Add(this.label42);
             this.Controls.Add(this.label43);
@@ -3029,7 +2994,6 @@
         private System.Windows.Forms.TextBox tbBreakIndex;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.Button button9;
         private System.Windows.Forms.GroupBox grbCalibration;
         private System.Windows.Forms.Button btnCheckFovBalance;
         private System.Windows.Forms.PictureBox pictureBox2;
@@ -3161,7 +3125,6 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button MotionStageBtn;
         private System.Windows.Forms.CheckBox cbBench;
-        private System.Windows.Forms.Button Can_Reopen;
         private System.Windows.Forms.Button BtnAdminMode;
         private System.Windows.Forms.Panel PanelAdmin1;
         private System.Windows.Forms.Panel PanelAdmin2;

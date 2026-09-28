@@ -2520,6 +2520,9 @@ namespace FAutoLearn
                 ptTH2[i - x] = new Point2d(i + 0.5, 2 * (CalcPeakDiff(ydiffB[i - x]) + 95 + jstart));   //  Y 좌표 2배
             }
             FZMath.Line2D ommTedgeBtm = mFZM.FitLinePCA(ptTH2);
+            //Mat img = new Mat(135, 260, MatType.CV_8UC1, qOMMT_Value[iBuf]);
+            //Cv2.ImWrite(@"D:\\image3.bmp", img);
+
             //double[] ommTedgeBtmPoly2nd = new double[3];
             //mFZM.mcLMS2ndPoly(ptTH2, ptTH2.Length, ref ommTedgeBtmPoly2nd);
 

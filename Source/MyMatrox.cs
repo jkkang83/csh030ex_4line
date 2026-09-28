@@ -1403,7 +1403,7 @@ namespace S2System.Vision
                     {
                         if (i == 0)
                             srcRoi.CopyTo(mFAL.mOMMSImg[nbuf]);
-                        else if (i == 3)
+                        else if (i == 2)
                             srcRoi.CopyTo(mFAL.mOMMTImg[nbuf]);
                     }
                 }
@@ -2513,6 +2513,13 @@ namespace S2System.Vision
             if (index == 0)
             {
                 //  0 번 프레임의 경우 모든 버퍼에 0번 프레임을 넣어준다. MultiTask작업 시 각 Task 에서 각 버퍼를 독립적으로 활용한다.
+                //CropImage(0, 0);
+                //mFAL.mSourceImg[0].SaveImage("D:\\src1.bmp");
+                //mFAL.mSourceImg2[0].SaveImage("D:\\src2.bmp");
+                //mFAL.mOMMSImg[0].SaveImage("D:\\ommS.bmp");
+                //mFAL.mOMMTImg[0].SaveImage("D:\\ommT.bmp");
+                //mFAL.ResizeSourceImg2(0, 0);
+
                 if (!IsFile)
                 {
                     CropImage(0, 0);
@@ -2527,12 +2534,19 @@ namespace S2System.Vision
                     mFAL.mOMMTImg[0] = mFAL.mSourceImg[0].SubMat(rcTopN);
                     //mFAL.mOMMTImg[0].SaveImage("D:\\OMMT.bmp");
 
+                    mFAL.mSourceImg[0].SaveImage("D:\\src1_FILE.bmp");
+                    mFAL.mSourceImg2[0].SaveImage("D:\\src2_FILE.bmp");
+                    mFAL.mOMMSImg[0].SaveImage("D:\\ommS_FILE.bmp");
+                    mFAL.mOMMTImg[0].SaveImage("D:\\ommT_FILE.bmp");
+
+
                     if (index < mFAL.mCommonImgFile2.Count)
                     {
                         mFAL.mSourceImg2[0].SetArray(mFAL.mCommonImgFile2[index]);
                         mFAL.ResizeSourceImg2(iBuf, iBuf);
                         mFAL.mIsFile = false;
                     }
+                    mFAL.mSourceImg2[0].SaveImage("D:\\src2_FILE.bmp");
                 }
 
 

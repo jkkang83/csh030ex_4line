@@ -364,7 +364,7 @@ namespace CSH030Ex
             grpAdjust.Visible = isOn;
             groupBox4.Visible = isOn;
             btnChangeCrop.Visible = isOn;
-            Can_Reopen.Visible = isOn;
+            //Can_Reopen.Visible = isOn;
             cbLiveWithMarks.Visible = isOn;
         }
         public int GetTriggerGrabbedFrame()
@@ -4478,7 +4478,7 @@ namespace CSH030Ex
                         }
                         else
                         {
-                            strtmp += (umscale * m__G.oCam[0].mPOMM_X[fileCnt]).ToString("F2") + "\t" + (umscale * m__G.oCam[0].mPOMM_Y[fileCnt]).ToString("F2") + "\t" + (umscale * m__G.oCam[0].mPOMM_Z[fileCnt]).ToString("F2")
+                            strtmp +=         (umscale * m__G.oCam[0].mPOMM_X[fileCnt]).ToString("F2") + "\t" + (umscale * m__G.oCam[0].mPOMM_Y[fileCnt]).ToString("F2") + "\t" + (umscale * m__G.oCam[0].mPOMM_Z[fileCnt]).ToString("F2")
                                      + "\t" + (minscale * m__G.oCam[0].mPOMM_TX[fileCnt]).ToString("F2") + "\t" + (minscale * m__G.oCam[0].mPOMM_TY[fileCnt]).ToString("F2") + "\t" + (minscale * m__G.oCam[0].mPOMM_TZ[fileCnt]).ToString("F2")
                                      + "\t" + (m__G.oCam[0].mPOMM_sX[fileCnt]).ToString("F3") + "\t" + (m__G.oCam[0].mPOMM_sY[fileCnt]).ToString("F3") + "\t" + (m__G.oCam[0].mPOMM_tX[fileCnt]).ToString("F3") + "\t" + (m__G.oCam[0].mPOMM_tY[fileCnt]).ToString("F3")
                                      + "\t";
@@ -4491,7 +4491,7 @@ namespace CSH030Ex
                     //////////////////////////////////////////////////////////////
 
                 }
-
+                //MyOwner.MakeSaveResult();
                 m__G.mFAL.SetDefaultMarkNorm();
                 m__G.oCam[0].mFAL.RecoverFromBackupFMI();
 
@@ -5791,8 +5791,8 @@ namespace CSH030Ex
             else
                 m__G.oCam[0].mTargetTriggerCount = 1000;
 
-            if (m__G.oCam[0].mTargetTriggerCount > 3000)
-                m__G.oCam[0].mTargetTriggerCount = 3000;
+            if (m__G.oCam[0].mTargetTriggerCount > 10000)
+                m__G.oCam[0].mTargetTriggerCount = 10000;
 
             m__G.oCam[0].mRequestedTriggerCount = m__G.oCam[0].mTargetTriggerCount;
             m__G.oCam[0].dAFZM_FrameCount = m__G.oCam[0].mTargetTriggerCount;
