@@ -1499,62 +1499,43 @@ namespace CSH030Ex
             mbStartTriggerTest = true;
             long triggeredTime = 0;
 
-
             int waitTime = 0;
             while (true)
             {
-                if (m__G.fVision.mLoaded)
-                    break;
+                if (m__G.fVision.mLoaded) break;
                 Thread.Sleep(1);
+
                 if (waitTime++ > 80)
                 {
-                    if (InvokeRequired)
-                    {
-                        BeginInvoke((MethodInvoker)delegate
-                        {
-                            btnStartTriggeredGrab.Enabled = true;
-                        });
-                    }
+                    if (InvokeRequired) BeginInvoke((MethodInvoker)delegate { btnStartTriggeredGrab.Enabled = true; });
                     m__G.mDoingStatus = "IDLE";
                     m__G.mIDLEcount = 0;
                     mbStartTriggerTest = false;
                     return;
                 }
             }
+
             waitTime = 0;
 
-            //m__G.oCam[0].mFAL.mFastMode = m__G.m_bEulerRotation;   //  FastMode 에서는 계단(튐)현상이 나타나므로 사용하지 않기로 함. 2023.2.23
-            //m__G.fGraph.mDriverIC.AckSignal(0, false);
             while (true)
             {
-                if (m__G.oCam[0].mFAL.mFAutoLearnLoaded)
-                    break;
+                if (m__G.oCam[0].mFAL.mFAutoLearnLoaded) break;
                 Thread.Sleep(1);
+
                 if (waitTime++ > 80)
                 {
-                    if (InvokeRequired)
-                    {
-                        BeginInvoke((MethodInvoker)delegate
-                        {
-                            btnStartTriggeredGrab.Enabled = true;
-                        });
-                    }
+                    if (InvokeRequired) BeginInvoke((MethodInvoker)delegate { btnStartTriggeredGrab.Enabled = true; });
                     m__G.mDoingStatus = "IDLE";
                     m__G.mIDLEcount = 0;
                     mbStartTriggerTest = false;
                     return;
                 }
             }
+
             m__G.mDoingStatus = "Trigger Testing";
-            //m__G.oCam[0].mFAL.BackupFMI();
 
             if (m__G.oCam[0].mRequestedTriggerCount > 0)
                 m__G.oCam[0].mTargetTriggerCount = m__G.oCam[0].mRequestedTriggerCount;
-
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            /////////////////////////////////////////////////////////////////////////////////////////////////
 
             long lTimerFrequency = 1000;
             SupremeTimer.QueryPerformanceFrequency(ref lTimerFrequency);
@@ -1565,47 +1546,23 @@ namespace CSH030Ex
             int lgrabbedFrame = 0;
             double resTime = 0;
 
-            //int loopCnt = 0;
-
-            //if (m__G.m_bNoHostPC)
-            //    loopCnt = 0;
-
             long startTime = 0;
             long endTime = 0;
             long endTriggerTime = 0;
 
-
-            //int MaxLoopCnt = int.Parse(tbConsecutiveTest.Text);
             int triggergrabbedCnt = 0;
             string strAutoLastFrame = "";
             bool HasAutoLastFrame = false;
 
+            Task imageSaveTask = null;
 
-            //m__G.fVision.SetDefaultMarkConfig(false);
-
-
-            //////////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////////
-            ////////for (int mi = 0; mi < 5; mi++)
-            ////////    m__G.oCam[0].mMarkPosRes[mi] = new FAutoLearn.FZMath.Point2D[frmCnt + 99];
-
-            ////////m__G.oCam[0].mTargetTriggerCount = frmCnt;
-            ////////m__G.oCam[0].mRequestedTriggerCount = frmCnt;
-            //////////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////////
-
-            //mA_S_GrabBegin = Encoding.ASCII.GetBytes("A_S@\r\n");
             m__G.oCam[0].SetSaveLostMarkFrame(m__G.m_bSaveLostTestSet);
-
             m__G.oCam[0].mAbort = false;
 
             while (true)
             {
                 TriggerLossClear();
+
                 timeForTrigger = 0;
                 lmaxThread = m__G.mMaxThread;
                 frameRate = 0;
@@ -1617,37 +1574,16 @@ namespace CSH030Ex
                 triggergrabbedCnt = 0;
                 strAutoLastFrame = "";
                 HasAutoLastFrame = false;
-                //m__G.oCam[0].mFAL.BackupFMI();
+
                 m__G.fVision.SetDefaultMarkConfig(false);
                 m__G.fGraph.Drive_LEDs(m__G.sRecipe.iLEDcurrentLR, m__G.sRecipe.iLEDcurrentLL);
                 mbStartTriggerTest = true;
                 m__G.oCam[0].mFinishVisionData = true;
-                //if (!m__G.m_bHideAllGraph) AddViewLog(string.Format("Trigger grab Start\r\n"));
 
-
-                if (!m__G.m_bNoHostPC)
-                {
-                    //if (!m__G.m_bHideAllGraph) AddViewLog(string.Format("A_S Send, Trigger Waiting Start\r\n"));
-                    //while (m__G.oCam[0].mRequestedTriggerCount == 0)
-                    //{
-                    //    Thread.Sleep(1);
-                    //    if ( m__G.oCam[0].mAbort )
-                    //        break;
-                    //}
-                    //if (!m__G.oCam[0].mAbort)
-                    //    Network.SendData(mA_S_GrabBegin);
-                }
                 SupremeTimer.QueryPerformanceCounter(ref startTime);
-                //m__G.oCam[0].mTargetTriggerCount = m__G.oCam[0].mRequestedTriggerCount;
-
-
-
-
-
-
-
 
                 m__G.oCam[0].ExternalTriggerOrg(ref frameRate, ref lgrabbedFrame);
+
                 if (m__G.oCam[0].mAbort)
                 {
                     m__G.mDoingStatus = "IDLE";
@@ -1658,88 +1594,71 @@ namespace CSH030Ex
                     AddViewLog("Abort waiting trigger." + m__G.oCam[0].mMatroxMsg + "\r\n");
                     return;
                 }
+
                 if (m__G.mbSuddenStop[0])
                 {
-                    AddViewLog(string.Format("SuddenStop =="));
+                    AddViewLog("SuddenStop ==");
                     m__G.mbSuddenStop[0] = false;
-                    if (InvokeRequired)
-                    {
-                        BeginInvoke((MethodInvoker)delegate
-                        {
-                            btnStartTriggeredGrab.Enabled = true;   //  새로운 StartTest 요청을 받을 수 있게 함.
-                        });
-                    }
-                    else
-                        btnStartTriggeredGrab.Enabled = true;   //  새로운 StartTest 요청을 받을 수 있게 함.
+
+                    if (InvokeRequired) BeginInvoke((MethodInvoker)delegate { btnStartTriggeredGrab.Enabled = true; });
+                    else btnStartTriggeredGrab.Enabled = true;
 
                     m__G.mDoingStatus = "IDLE";
                     m__G.mIDLEcount = 0;
-                  break;
-                  //return;
+                    break;
                 }
                 else
                 {
                     if (!m__G.m_bHideAllGraph) AddViewLog(string.Format("mMatroxMsg : {0}", m__G.oCam[0].mMatroxMsg));
                 }
-                //if (!m__G.m_bHideAllGraph) AddViewLog(string.Format("Trigger grab End\r\n"));
-                //if (!m__G.m_bHideAllGraph) AddViewLog("MatroxMsg " + m__G.oCam[0].mMatroxMsg);
 
                 triggergrabbedCnt = lgrabbedFrame;
-                //AddViewLog("MSG\t" + frmCnt.ToString() + "\t>>\t" + m__G.oCam[0].mMatroxMsg);
-                //if (endTriggerTime != 0)
-                //{
-                //    timeinterval = (S2System.Vision.MILlib.mGrabTiming[0] - endTriggerTime) / (double)(lTimerFrequency);
-                //    AddViewLog("\t\tTime Interval\t " + timeinterval.ToString("F3") + "\tsec\r\n");
-                //}
 
                 SupremeTimer.QueryPerformanceCounter(ref endTime);
                 endTriggerTime = endTime;
 
-                resTime = (m__G.oCam[0].mBeforeTime - startTime) / (double)(lTimerFrequency);
+                resTime = (m__G.oCam[0].mBeforeTime - startTime) / (double)lTimerFrequency;
+
                 if (m__G.oCam[0].mMatroxMsg.Contains("Timeout 3"))
                 {
-                    //m__G.mbSuddenStop[0] = true;
-                    //MessageBox.Show("m__G.mbSuddenStop[0] = true");
-                    try
-                    {
-                        //////Network.SendData(mA_E_buffs);
-                        AddViewLog("    A_E Trigger Timeout Error " + m__G.oCam[0].mMatroxMsg + "\r\n");
-                        //SaveViewLog();
-                    }
-                    catch
-                    {
-                        AddViewLog("Network Error while sending A_E\r\n");
-                    }
+                    try { AddViewLog("    A_E Trigger Timeout Error " + m__G.oCam[0].mMatroxMsg + "\r\n"); }
+                    catch { AddViewLog("Network Error while sending A_E\r\n"); }
                 }
+
                 if (m__G.m_bAutoLastFrame)
                 {
                     HasAutoLastFrame = false;
+
                     if (lgrabbedFrame < m__G.oCam[0].mTargetTriggerCount)
                     {
                         HasAutoLastFrame = true;
+
                         int framefromtrigger = lgrabbedFrame;
                         long modeChangeFrom = 0;
                         long modeChangeTo = 0;
+
                         SupremeTimer.QueryPerformanceCounter(ref modeChangeFrom);
                         m__G.fVision.CameraReset(2, true);
                         SupremeTimer.QueryPerformanceCounter(ref modeChangeTo);
+
                         while (lgrabbedFrame < m__G.oCam[0].mTargetTriggerCount)
                         {
-                            m__G.oCam[0].GrabB(lgrabbedFrame, true);  //  milCommonImageGrab 가 아니라 다른데에 Grab 해야 한다. 수정 필요
+                            m__G.oCam[0].GrabB(lgrabbedFrame, true);
                             lgrabbedFrame++;
                         }
+
                         m__G.fVision.CameraReset(2, false);
                         m__G.oCam[0].SetTriggeredframeCount(lgrabbedFrame);
-                        resTime = (modeChangeTo - modeChangeFrom) / (double)(lTimerFrequency);
 
+                        resTime = (modeChangeTo - modeChangeFrom) / (double)lTimerFrequency;
                         strAutoLastFrame = framefromtrigger.ToString();
-                        //AddViewLog("\tStart Auto Last Frame from " + framefromtrigger.ToString() + " change took " + resTime.ToString("F4") + " sec\r\n");
 
                         if (m__G.oCam[0].mTargetTriggerCount > 50 && m__G.m_bSaveLostTestSet)
                         {
                             string fileName = m__G.m_RootDirectory + "\\Result\\RawData\\ImgAna\\" + m__G.oCam[0].mTargetTriggerCount.ToString() + "\\";
-                            if (!Directory.Exists(fileName))
-                                Directory.CreateDirectory(fileName);
+
+                            if (!Directory.Exists(fileName)) Directory.CreateDirectory(fileName);
+
                             for (int imgIndex = 0; imgIndex < m__G.oCam[0].mTargetTriggerCount; imgIndex++)
                             {
                                 string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
@@ -1749,105 +1668,68 @@ namespace CSH030Ex
                     }
                 }
 
-                //Save Image Test
-                if(m__G.m_bSaveImage && m__G.oCam[0].mTargetTriggerCount == m__G.m_SaveImageCount)
+                if (m__G.m_bSaveImage && m__G.oCam[0].mTargetTriggerCount == m__G.m_SaveImageCount)
                 {
                     string fileName = m__G.m_RootDirectory + "\\Result\\RawData\\TestIamge\\";
-                    if (!Directory.Exists(fileName))
-                        Directory.CreateDirectory(fileName);
+
+                    if (!Directory.Exists(fileName)) Directory.CreateDirectory(fileName);
+
                     for (int imgIndex = 0; imgIndex < m__G.oCam[0].mTargetTriggerCount; imgIndex++)
                     {
                         string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
                         m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
                     }
                 }
+
                 m__G.fGraph.Drive_LEDs(0, 0);
-                //AddViewLog("Process vision data " + lgrabbedFrame.ToString());
 
-
-
-
-
-
-                //  Use Default Model by setting m__G.mFAL.mCandidateIndex = 0;
                 m__G.mFAL.mCandidateIndex = 0;
                 SupremeTimer.QueryPerformanceCounter(ref startTime);
 
-                //    임시코드 - 테스트 하나에 집중해서 마크 모델이 유효하도록 조정해야함.
-                //if (loopCnt < MaxLoopCnt - 1)
-                //{
-                //    loopCnt++;
-                //    continue;
-                //}
-                //if (loopCnt == MaxLoopCnt - 1)    //    임시코드
-                //AddViewLog("Processing .. \t");
                 m__G.oCam[0].mFAL.mGotoLoopCount = 0;
                 m__G.oCam[0].mFAL.mAccuShiftX = 0;
                 m__G.oCam[0].mFAL.mAccuShiftY = 0;
-                //lgrabbedFrame--;
-                //m__G.fGraph.mDriverIC.AckSignal(0, true);
-                if (!m__G.m_bHideAllGraph) AddViewLog(string.Format("Vision Process Start\r\n"));
 
-                if (m__G.oCam[0].mTargetTriggerCount < 20)
-                    lmaxThread = 1;
+                if (!m__G.m_bHideAllGraph) AddViewLog("Vision Process Start\r\n");
 
-                ///////////////////////////////////////////////////////////////////////
-                ///////////////////////////////////////////////////////////////////////
-                //  Euler Angle Rotation 측정 및 적용
-                if (mbEulerMeasureApply)
-                    m__G.oCam[0].mFAL.ValidateEulerRotation(false); //  측정시에는 Euler Anlge Rotation 적용하지 않은상태에서 RAw Data 추출.
-                else
-                    m__G.oCam[0].mFAL.ValidateEulerRotation(mbEulerSimpleApply); //  측정시에는 Euler Anlge Rotation 적용하지 않은상태에서 RAw Data 추출.
-                ///////////////////////////////////////////////////////////////////////
-                ///////////////////////////////////////////////////////////////////////
+                if (m__G.oCam[0].mTargetTriggerCount < 20) lmaxThread = 1;
 
+                if (mbEulerMeasureApply) m__G.oCam[0].mFAL.ValidateEulerRotation(false);
+                else m__G.oCam[0].mFAL.ValidateEulerRotation(mbEulerSimpleApply);
 
-                if (!m__G.m_bHideAllGraph) AddViewLog(string.Format("Vision Process Start.. Thread Count = " + lmaxThread.ToString() + "\r\n"));
+                if (!m__G.m_bHideAllGraph) AddViewLog("Vision Process Start.. Thread Count = " + lmaxThread.ToString() + "\r\n");
 
-                if (lgrabbedFrame >= m__G.oCam[0].mTargetTriggerCount)
-                    m__G.fVision.ProcessVisionData(m__G.oCam[0].mTargetTriggerCount, lmaxThread);
-                else
-                    m__G.fVision.ProcessVisionData(lgrabbedFrame, lmaxThread);
+                if (lgrabbedFrame >= m__G.oCam[0].mTargetTriggerCount) m__G.fVision.ProcessVisionData(m__G.oCam[0].mTargetTriggerCount, lmaxThread);
+                else m__G.fVision.ProcessVisionData(lgrabbedFrame, lmaxThread);
 
-                if (!m__G.m_bHideAllGraph) AddViewLog(string.Format("Vision Process End\r\n"));
-                //m__G.fGraph.mDriverIC.AckSignal(0, false);
+                if (!m__G.m_bHideAllGraph) AddViewLog("Vision Process End\r\n");
 
                 SupremeTimer.QueryPerformanceCounter(ref endTime);
-                resTime = (endTime - startTime) / (double)(lTimerFrequency);
+                resTime = (endTime - startTime) / (double)lTimerFrequency;
 
                 int gotoCount = m__G.oCam[0].mFAL.mGotoLoopCount;
                 int accShiftX = m__G.oCam[0].mFAL.mAccuShiftX;
                 int accShiftY = m__G.oCam[0].mFAL.mAccuShiftY;
-                //AddViewLog(lgrabbedFrame.ToString() + " frames with " + lmaxThread.ToString() + " threads" + " took " + resTime.ToString("F3") + " sec." + "GotoLoop Called " + gotoCount.ToString() + " accXS=" + accShiftX.ToString() + " accYS=" + accShiftY.ToString() +  "\r\n");
-                //AddViewLog(lgrabbedFrame.ToString() + " frames with " + lmaxThread.ToString() + " threads" + " took " + resTime.ToString("F3") + " sec.\r\n");
+
                 string strRes = "\t" + m__G.oCam[0].mTargetTriggerCount.ToString() + "\t>>\t" + triggergrabbedCnt.ToString() + "\t" + lgrabbedFrame.ToString() + " " + HasAutoLastFrame.ToString() + "\t" + resTime.ToString("F3") + " sec.\r\n";
-                //if (!m__G.m_bHideAllGraph) AddViewLog(strRes);
 
                 SupremeTimer.QueryPerformanceCounter(ref endTime);
-                resTime = (endTime - startTime) / (double)(lTimerFrequency);
-                timeForTrigger = (m__G.oCam[0].mCurTime - startTime) / (double)(lTimerFrequency);
+
+                resTime = (endTime - startTime) / (double)lTimerFrequency;
+                timeForTrigger = (m__G.oCam[0].mCurTime - startTime) / (double)lTimerFrequency;
 
                 m__G.fVision.SetTriggerGrabbedFrame(lgrabbedFrame);
                 m__G.fVision.SetTriggerGrabbedFPS(frameRate);
 
-                if (m__G.mbSuddenStop[0])
-                {
-                    AddViewLog("m__G.mbSuddenStop[0] = " + m__G.mbSuddenStop[0].ToString() + "\r\n");
-                }
+                if (m__G.mbSuddenStop[0]) AddViewLog("m__G.mbSuddenStop[0] = " + m__G.mbSuddenStop[0].ToString() + "\r\n");
 
-
-
-                ///////////////////////////////////////////////////////////////////////////////////////
-                //int EffframeCount = Math.Min(lgrabbedFrame, m__G.oCam[0].mTargetTriggerCount);
                 int EffframeCount = m__G.oCam[0].mTargetTriggerCount;
                 mCommonDataCount = EffframeCount;
 
-                //  그래프 그리기 추가 필요, Thread.Sleep(500) 대신 그래프 그리기 할 것.
                 if (cb1stLFP.Checked)
                 {
                     for (int i = EffframeCount - 1; i > 0; i--)
                     {
-
                         m__G.oCam[0].mC_pTX[i] = (m__G.oCam[0].mC_pTX[i] + m__G.oCam[0].mC_pTX[i - 1]) / 2;
                         m__G.oCam[0].mC_pTY[i] = (m__G.oCam[0].mC_pTY[i] + m__G.oCam[0].mC_pTY[i - 1]) / 2;
                         m__G.oCam[0].mC_pTZ[i] = (m__G.oCam[0].mC_pTZ[i] + m__G.oCam[0].mC_pTZ[i - 1]) / 2;
@@ -1857,49 +1739,53 @@ namespace CSH030Ex
                         m__G.oCam[0].mC_pZ[i] = (m__G.oCam[0].mC_pZ[i] + m__G.oCam[0].mC_pZ[i - 1]) / 2;
                     }
                 }
+
                 SupremeTimer.QueryPerformanceCounter(ref startTime);
 
                 string lResultFile = "";
 
                 SupremeTimer.QueryPerformanceCounter(ref endTime);
-                double ltime = (endTime - startTime) / (double)(lTimerFrequency);
 
-                double totalTime = (endTime - triggeredTime) / (double)(lTimerFrequency);
-                Task.Factory.StartNew(() => {
+                double ltime = (endTime - startTime) / (double)lTimerFrequency;
+                double totalTime = (endTime - triggeredTime) / (double)lTimerFrequency;
+
+                int saveFrameCount = m__G.oCam[0].mTargetTriggerCount;
+
+                imageSaveTask = Task.Run(() =>
+                {
                     if (m__G.m_bSaveFImage)
                     {
                         string sDate = DateTime.Now.ToString("yyMMddHHmmss");
-                        string fileName = m__G.m_RootDirectory + string.Format("\\Result\\RawData\\User\\{0}_Image{1}\\", sDate, m__G.oCam[0].mTargetTriggerCount);
+                        string fileName = m__G.m_RootDirectory + string.Format("\\Result\\RawData\\User\\{0}_Image{1}\\", sDate, saveFrameCount);
 
-                        if (!Directory.Exists(fileName))
-                            Directory.CreateDirectory(fileName);
+                        if (!Directory.Exists(fileName)) Directory.CreateDirectory(fileName);
 
                         DriveInfo drive = new DriveInfo(Path.GetPathRoot(fileName));
+
                         if (drive.IsReady)
                         {
                             if (drive.AvailableFreeSpace <= mlimit)
                             {
                                 double freeGB = drive.AvailableFreeSpace / (double)GB;
 
-                                MessageBox.Show(
-                                    $"남은 용량 : {freeGB:F1} GB\n불필요한 파일을 삭제해 주세요.",
+                                MessageBox.Show($"남은 용량 : {freeGB:F1} GB\n불필요한 파일을 삭제해 주세요.",
                                     "용량 부족",
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Warning);
                             }
                             else
                             {
-                                for (int imgIndex = 0; imgIndex < m__G.oCam[0].mTargetTriggerCount; imgIndex++)
+                                for (int imgIndex = 0; imgIndex < saveFrameCount; imgIndex++)
                                 {
                                     string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
                                     m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
                                 }
                             }
                         }
+
                         if (m__G.m_bSaveVideo)
                         {
                             string videoFile = fileName + "Result.mp4";
-
                             string firstImageFile = fileName + "Ana0.bmp";
 
                             if (File.Exists(firstImageFile))
@@ -1910,14 +1796,9 @@ namespace CSH030Ex
                                     {
                                         int width = firstImage.Width;
                                         int height = firstImage.Height;
+                                        double fps = 60.0;
 
-                                        double fps = 60.0;   // 원하는 FPS
-
-                                        using (VideoWriter writer = new VideoWriter(
-                                            videoFile,
-                                            FourCC.FromString("mp4v"),
-                                            fps,
-                                            new OpenCvSharp.Size(width, height)))
+                                        using (VideoWriter writer = new VideoWriter(videoFile, FourCC.FromString("mp4v"), fps, new OpenCvSharp.Size(width, height)))
                                         {
                                             if (!writer.IsOpened())
                                             {
@@ -1925,20 +1806,15 @@ namespace CSH030Ex
                                             }
                                             else
                                             {
-                                                for (int imgIndex = 0;
-                                                     imgIndex < m__G.oCam[0].mTargetTriggerCount;
-                                                     imgIndex++)
+                                                for (int imgIndex = 0; imgIndex < saveFrameCount; imgIndex++)
                                                 {
-                                                    string imageFile =
-                                                        fileName + "Ana" + imgIndex.ToString() + ".bmp";
+                                                    string imageFile = fileName + "Ana" + imgIndex.ToString() + ".bmp";
 
-                                                    if (!File.Exists(imageFile))
-                                                        continue;
+                                                    if (!File.Exists(imageFile)) continue;
 
                                                     using (Mat img = Cv2.ImRead(imageFile, ImreadModes.Color))
                                                     {
-                                                        if (!img.Empty())
-                                                            writer.Write(img);
+                                                        if (!img.Empty()) writer.Write(img);
                                                     }
                                                 }
                                             }
@@ -1948,49 +1824,49 @@ namespace CSH030Ex
                             }
                         }
                     }
+
                     if (m__G.m_bSaveNgImage)
                     {
                         bool NeedToSaveImage = false;
                         double min = 9999;
                         double max = -9999;
-                        for (int pi = 0; pi < m__G.oCam[0].mTargetTriggerCount; pi++)
-                        {
-                            if (m__G.oCam[0].mC_pY[pi] < min)
-                                min = m__G.oCam[0].mC_pY[pi];
-                            if (m__G.oCam[0].mC_pY[pi] > max)
-                                max = m__G.oCam[0].mC_pY[pi];
 
-                        }
-                        if ((max - min) * (5.5 / Global.LensMag) > 100.0)  //  300msec ~ 330msec 에서 최대최소의 변위차가 5um 이상인 경우 영상 저장 필요. 정상적인 경우 변위 1um 이하
-                            NeedToSaveImage = true;
-                        for (int pi = 0; pi < m__G.oCam[0].mTargetTriggerCount; pi++)
+                        for (int pi = 0; pi < saveFrameCount; pi++)
                         {
-                            if (m__G.oCam[0].mC_pY[pi] == 0)
-                                NeedToSaveImage = true;
+                            if (m__G.oCam[0].mC_pY[pi] < min) min = m__G.oCam[0].mC_pY[pi];
+                            if (m__G.oCam[0].mC_pY[pi] > max) max = m__G.oCam[0].mC_pY[pi];
                         }
+
+                        if ((max - min) * (5.5 / Global.LensMag) > 100.0) NeedToSaveImage = true;
+
+                        for (int pi = 0; pi < saveFrameCount; pi++)
+                        {
+                            if (m__G.oCam[0].mC_pY[pi] == 0) NeedToSaveImage = true;
+                        }
+
                         if (NeedToSaveImage)
                         {
                             string sDate = DateTime.Now.ToString("yyMMddHHmmss");
-                            string fileName = m__G.m_RootDirectory + string.Format("\\Result\\RawData\\NG\\{0}\\Image{1}\\", sDate, m__G.oCam[0].mTargetTriggerCount);
-                            if (!Directory.Exists(fileName))
-                                Directory.CreateDirectory(fileName);
-                            // 저장 경로의 드라이브 정보
+                            string fileName = m__G.m_RootDirectory + string.Format("\\Result\\RawData\\NG\\{0}\\Image{1}\\", sDate, saveFrameCount);
+
+                            if (!Directory.Exists(fileName)) Directory.CreateDirectory(fileName);
+
                             DriveInfo drive = new DriveInfo(Path.GetPathRoot(fileName));
+
                             if (drive.IsReady)
                             {
                                 if (drive.AvailableFreeSpace <= mlimit)
                                 {
                                     double freeGB = drive.AvailableFreeSpace / (double)GB;
 
-                                    MessageBox.Show(
-                                        $"남은 용량 : {freeGB:F1} GB\n불필요한 파일을 삭제해 주세요.",
+                                    MessageBox.Show($"남은 용량 : {freeGB:F1} GB\n불필요한 파일을 삭제해 주세요.",
                                         "용량 부족",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Warning);
                                 }
                                 else
                                 {
-                                    for (int imgIndex = 0; imgIndex < m__G.oCam[0].mTargetTriggerCount; imgIndex++)
+                                    for (int imgIndex = 0; imgIndex < saveFrameCount; imgIndex++)
                                     {
                                         string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
                                         m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
@@ -2001,80 +1877,51 @@ namespace CSH030Ex
                     }
                 });
 
-                // 다음은 자화에서 검증완료
                 if (!m__G.m_bNoHostPC)
                 {
                     try
                     {
-                        ///////////////////////////////////////////////////////////////////////
-                        ///////////////////////////////////////////////////////////////////////
-                        //  Euler Angle Rotation 측정 및 적용
                         if (mbEulerMeasureApply)
                         {
                             EulerMeasureApply(EffframeCount);
                             mbEulerMeasureApply = false;
                         }
-                        ///////////////////////////////////////////////////////////////////////
-                        ///////////////////////////////////////////////////////////////////////
 
                         m__G.oCam[0].SetTriggeredframeCount(m__G.oCam[0].mTargetTriggerCount);
+
                         if (!m__G.m_bHideAllGraph) AddViewLog("MakeSaveResult " + m__G.oCam[0].mTargetTriggerCount.ToString() + "\r\n");
+
                         byte[] sDatabuffer = MyOwner.MakeSaveResult();
-                        //MyOwner.WriteResultBin(0);
                         int framCnt = m__G.oCam[0].mTargetTriggerCount;
 
-                        //Task.Factory.StartNew(() =>
-                        //{
-                        byte[] sCmdBuf = null;
-                        byte[] sRnBuf = null;
-                        byte[] sendBuf = null;
-
-                        sCmdBuf = Encoding.ASCII.GetBytes("A_R@" + framCnt.ToString() + "@");
-                        sRnBuf = Encoding.ASCII.GetBytes("@\r\n");
-                        sendBuf = new byte[sCmdBuf.Length + sDatabuffer.Length + sRnBuf.Length];
+                        byte[] sCmdBuf = Encoding.ASCII.GetBytes("A_R@" + framCnt.ToString() + "@");
+                        byte[] sRnBuf = Encoding.ASCII.GetBytes("@\r\n");
+                        byte[] sendBuf = new byte[sCmdBuf.Length + sDatabuffer.Length + sRnBuf.Length];
 
                         Array.Copy(sCmdBuf, 0, sendBuf, 0, sCmdBuf.Length);
-
                         Array.Copy(sDatabuffer, 0, sendBuf, sCmdBuf.Length, sDatabuffer.Length);
-
                         Array.Copy(sRnBuf, 0, sendBuf, sCmdBuf.Length + sDatabuffer.Length, sRnBuf.Length);
 
                         Network.SendData(sendBuf);
 
-                        if (!m__G.m_bHideAllGraph)
-                        {
-                            AddViewLog(string.Format("A_R Send\r\n"));
-                        }
-
-                        //});
+                        if (!m__G.m_bHideAllGraph) AddViewLog("A_R Send\r\n");
                     }
                     catch
                     {
                         AddViewLog("Network Error while sending A_F\r\n");
                     }
                 }
-                /////////////////////////////////////////////////////////////////
 
                 m_LastSampleNumber--;
 
-
-
                 if (m_LastSampleNumber >= 0)
                 {
-                    if (InvokeRequired)
-                    {
-                        BeginInvoke((MethodInvoker)delegate
-                        {
-                            tbResidualTestNumber.Text = m_LastSampleNumber.ToString();
-                        });
-                    }
-                    else
-                    {
-                        tbResidualTestNumber.Text = m_LastSampleNumber.ToString();
-                    }
+                    if (InvokeRequired) BeginInvoke((MethodInvoker)delegate { tbResidualTestNumber.Text = m_LastSampleNumber.ToString(); });
+                    else tbResidualTestNumber.Text = m_LastSampleNumber.ToString();
                 }
 
                 int leffFrameCount = EffframeCount;
+
                 if (!m__G.m_bHideAllGraph)
                 {
                     Array.Copy(m__G.oCam[0].mC_pTX, mStroke[3], leffFrameCount);
@@ -2088,82 +1935,68 @@ namespace CSH030Ex
                         for (int i = 0; i < leffFrameCount; i++)
                             mPosAzimuth[az][i] = m__G.oCam[0].mAzimuthPts[i][az];
 
-                    if (InvokeRequired)
+                    if (InvokeRequired) BeginInvoke((MethodInvoker)delegate { PlotMeasureData(leffFrameCount); });
+                    else PlotMeasureData(leffFrameCount);
+                }
+
+                // 이미지 Save가 끝나기 전에는 Second Mark Vision을 시작하지 않는다.
+                if (imageSaveTask != null)
+                {
+                    try
                     {
-                        BeginInvoke((MethodInvoker)delegate
-                        {
-                            PlotMeasureData(leffFrameCount);
-                        });
+                        if (!imageSaveTask.IsCompleted && !m__G.m_bHideAllGraph) AddViewLog("Waiting Image Save...\r\n");
+
+                        imageSaveTask.Wait();
+
+                        if (!m__G.m_bHideAllGraph) AddViewLog("Image Save Completed.\r\n");
                     }
-                    else
+                    catch (AggregateException ex)
                     {
-                        PlotMeasureData(leffFrameCount);
+                        AddViewLog("Image Save Error : " + ex.GetBaseException().Message + "\r\n");
+                    }
+                    finally
+                    {
+                        imageSaveTask = null;
                     }
                 }
 
-                /////////////////////////////////////////////////////////////////////////////
-                /////////////////////////////////////////////////////////////////////////////
-                //  Cal with Second Mark Set
-                //  Use Second Model by setting m__G.mFAL.mCandidateIndex = 1;
+                // Cal with Second Mark Set
                 for (int mi = 1; mi < m__G.mFAL.GetNumFMICandidate(); mi++)
                 {
-                    //////////////////////////////////////////////////////////////
-                    /////   다중 모델 추적하기위한 모델 변경 관련 코드
-                    //////////////////////////////////////////////////////////////
                     m__G.mFAL.mCandidateIndex = mi;
                     m__G.mFAL.mFZM.mbCompY = m__G.mFAL.mCandidateIndex;
                     m__G.fVision.ChangeFiducialMark(mi);
+
                     lmaxThread = m__G.mMaxThread;
-                    if (m__G.oCam[0].mTargetTriggerCount < 20)
-                        lmaxThread = 1;
 
-                    if (lgrabbedFrame >= m__G.oCam[0].mTargetTriggerCount)
-                        m__G.fVision.ProcessVisionData(m__G.oCam[0].mTargetTriggerCount, lmaxThread);
-                    else
-                        m__G.fVision.ProcessVisionData(lgrabbedFrame, lmaxThread);
+                    if (m__G.oCam[0].mTargetTriggerCount < 20) lmaxThread = 1;
 
-                    lResultFile = MyOwner.WriteResultBin(m__G.mFAL.mCandidateIndex); //  결과파일 Full Path 
-                                                                                     //lResultFile = MyOwner.WriteResultPos(m__G.mFAL.mCandidateIndex); //  결과파일 Full Path 
+                    if (lgrabbedFrame >= m__G.oCam[0].mTargetTriggerCount) m__G.fVision.ProcessVisionData(m__G.oCam[0].mTargetTriggerCount, lmaxThread);
+                    else m__G.fVision.ProcessVisionData(lgrabbedFrame, lmaxThread);
+
+                    lResultFile = MyOwner.WriteResultBin(m__G.mFAL.mCandidateIndex);
                 }
+
                 m__G.mFAL.mFZM.mbCompY = 0;
                 m__G.fVision.ChangeFiducialMark(0);
 
-                /////////////////////////////////////////////////////////////////////////////
-                /////////////////////////////////////////////////////////////////////////////
-                ///
-
-                //if (m_LastSampleNumber < 0 && !m__G.m_bNoHostPC)
-                //{
-                //    if (!m__G.m_bHideAllGraph) AddViewLog("Out of loop at loopCnt=" + loopCnt.ToString() + "\r\n");
-                //}
-
-                if (m__G.mbSuddenStop[0])
-                {
-                    AddViewLog("Stop Waiting Trigger. " + timeForTrigger.ToString("F3") + "sec Wait\r\n");
-                }
+                if (m__G.mbSuddenStop[0]) AddViewLog("Stop Waiting Trigger. " + timeForTrigger.ToString("F3") + "sec Wait\r\n");
 
                 m__G.mFAL.mCandidateIndex = 0;
                 m__G.fVision.ChangeFiducialMark(0);
 
                 m__G.oCam[0].mFAL.RecoverFromBackupFMI();
                 m__G.mbSuddenStop[0] = false;
-                if (InvokeRequired)
-                {
-                    BeginInvoke((MethodInvoker)delegate
-                    {
-                        btnStartTriggeredGrab.Enabled = true;   //  새로운 StartTest 요청을 받을 수 있게 함.
-                    });
-                }
-                else
-                    btnStartTriggeredGrab.Enabled = true;   //  새로운 StartTest 요청을 받을 수 있게 함.
+
+                if (InvokeRequired) BeginInvoke((MethodInvoker)delegate { btnStartTriggeredGrab.Enabled = true; });
+                else btnStartTriggeredGrab.Enabled = true;
 
                 m__G.mDoingStatus = "IDLE";
                 m__G.mIDLEcount = 0;
 
-            if (m__G.mbSuddenStop[0])
-                break;
-                //return;
+                if (m__G.mbSuddenStop[0]) break;
             }
+
             m__G.fGraph.Drive_LEDs(0, 0);
             mbStartTriggerTest = false;
         }
