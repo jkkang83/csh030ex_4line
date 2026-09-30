@@ -11216,7 +11216,10 @@ namespace FAutoLearn
                     {
                         //  첫번째 Peak 가 동떨어진 경우
                         for (int pi = 1; pi < peakCount; pi++)
+                        {
                             peakIndex[pi - 1] = peakIndex[pi];
+                            peakEach[pi - 1] = peakEach[pi];
+                        }
                     }
                     else
                     {
