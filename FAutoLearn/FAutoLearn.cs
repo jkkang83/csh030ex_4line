@@ -2262,7 +2262,6 @@ namespace FAutoLearn
         public bool m_bPseudoResize = false;
         public void ResizeSourceImg(int srcBuf, int resizeBuf)
         {
-            //mSourceImg[srcBuf].GetArray(out p_Value[resizeBuf]);
             Mat ImgDest = new Mat();
             Cv2.Resize(mSourceImg[srcBuf], ImgDest, new OpenCvSharp.Size(mSourceImg[srcBuf].Width / mModelScale, mSourceImg[srcBuf].Height / mModelScale), 1.0 / mModelScale, 1.0 / mModelScale, InterpolationFlags.Area);  //  1/mModelScale 축소
             ImgDest.GetArray(out q_Value[resizeBuf]);   //  ImgDest : 1/mModelScale Compressed Image
@@ -2287,7 +2286,6 @@ namespace FAutoLearn
 
         public void ResizeSourceImg2(int srcBuf, int resizeBuf)
         {
-            //mSourceImg[srcBuf].GetArray(out p_Value[resizeBuf]);
             Mat ImgDest = new Mat();
             Cv2.Resize(mSourceImg2[srcBuf], ImgDest, new OpenCvSharp.Size(mSourceImg2[srcBuf].Width / mModelScale, mSourceImg2[srcBuf].Height / mModelScale), 1.0 / mModelScale, 1.0 / mModelScale, InterpolationFlags.Area);  //  1/mModelScale 축소
             ImgDest.GetArray(out q_Value2[resizeBuf]);   //  ImgDest : 1/mModelScale Compressed Image

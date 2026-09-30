@@ -6807,9 +6807,9 @@ namespace FAutoLearn
                     if ( prevRes == null)
                     {
                         if (si < 3)
-                            res1st += 5.7;
+                            res1st += 6.5;
                         else
-                            res1st += 6.33;
+                            res1st += 9.5;
                     }
                     else
                     {

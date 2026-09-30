@@ -5234,7 +5234,7 @@ namespace CSH030Ex
 
             SetDefaultMarkConfig(false);
 
-            int lmaxThread = m__G.mMaxThread;
+            int lmaxThread = 20;// m__G.mMaxThread;
             int frmCnt = m__G.oCam[0].mTargetTriggerCount;
 
             //tbVsnLog.Text += "Target Trigger Count = " + frmCnt.ToString() + "\r\n";
