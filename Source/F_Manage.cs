@@ -685,7 +685,7 @@ namespace CSH030Ex
                     break;
             }
         }
-        private bool SaveSweepImages(int startIndex, int endIndex, string barcode, string sweepName)
+        public bool SaveSweepImages(int startIndex, int endIndex, string barcode, string sweepName)
         {
             try
             {

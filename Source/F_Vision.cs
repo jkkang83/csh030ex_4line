@@ -4505,7 +4505,10 @@ namespace CSH030Ex
                 MyOwner.WriteResultBin();
                 //MyOwner.WriteResult();
 
+                if (m__G.m_bPseudoOMM)
+                    m__G.fManage.SaveSweepImages(0, numFile, "File", "File");
             }
+
             //  Default Mark Position
             DrawMarkDetected();
             m__G.oCam[0].DrawMarkPos(Brushes.Lime, markPos);

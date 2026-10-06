@@ -11046,7 +11046,7 @@ namespace FAutoLearn
                             continue;
                         }
 
-                    if (aVline_i_k > 30 && aVline[i][k + 1] < aVline_i_k && aVline[i][k - 1] <= aVline_i_k && aVline_i_k < 252 && aVline[i][k - 1] < 252)   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
+                    if (aVline_i_k > 35 && aVline[i][k + 1] < aVline_i_k && aVline[i][k - 1] <= aVline_i_k && aVline_i_k < 252 && aVline[i][k - 1] < 252)   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
                     {
                         if (peakCount == 10)
                             break;
@@ -11108,7 +11108,7 @@ namespace FAutoLearn
                         if (aVline_i_k < 100)
                         {
                             if (aVline_i_k < lastPeak - valleyThreshold && aVline[i][k + 1] >= aVline_i_k && aVline[i][k - 1] >= aVline_i_k)    //  어떤 점이 직전 Peak 보다 20 이상 어두운데 다음 점이 밝은 경우
-                                if (aVline_i_k < minPeak) //  Valley 는 minPeak 보다 어두워야 한다.
+                                if (aVline_i_k < minPeak && aVline_i_k < peakEach[peakCount-1] - 5) //  Valley 는 minPeak 보다 어두워야 한다.
                                 {
                                     lastValley = aVline_i_k;
                                     if (peakCount<4)
@@ -11130,6 +11130,7 @@ namespace FAutoLearn
                     }
                     k++;
                 }
+                ///                
                 while (peakCount >= 4)
                 {
                     if (si < 3)
@@ -11203,7 +11204,55 @@ namespace FAutoLearn
                     }
                     else
                     {
-                        if (peakIndex[3] - peakIndex[0] < 24)
+                        if (peakCount > 4)
+                        {
+                            int peakAvg = 0;
+                            for ( int pi = 0; pi<peakCount; pi++)
+                            {
+                                peakAvg += peakEach[pi];
+                            }
+                            peakAvg = peakAvg / peakCount;
+                            int gap0 = Math.Abs(peakEach[0] - peakAvg);
+                            int gap1 = Math.Abs(peakEach[1] - peakAvg);
+                            int gap4 = Math.Abs(peakEach[4] - peakAvg);
+
+                            if (peakCount == 5)
+                            {
+                                if (gap0 < gap4)
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                }
+                                else
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                }
+                                foundMark = true;
+                                break;
+                            }
+                            else if (peakCount == 6)
+                            {
+                                int gap5 = peakEach[5] - peakAvg;
+                                if (gap0 > gap4 && gap1 > gap4 && ((peakIndex[5] - peakIndex[2]) < 22 && (peakIndex[5] - peakIndex[2]) > 16) )
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[2] + j0, peakIndex[5] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
+                                else if (gap4 > gap0 && gap5 > gap0 && ((peakIndex[3] - peakIndex[0]) < 22 && (peakIndex[3] - peakIndex[0]) > 16))
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                    foundMark = true;
+                                    break;
+                                }
+                            }
+                        }
+                        else if (peakIndex[3] - peakIndex[0] < 24 && peakIndex[3] - peakIndex[0] > 14 )
                         {
                             //                          //    Pos of Left Ref, Pos of Top Line, Pos of Bottom Line
                             resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };

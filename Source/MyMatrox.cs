@@ -2783,7 +2783,7 @@ namespace S2System.Vision
 
                 double[] lxyzTxTyTz = mFAL.RelativeToPheudoOMM(
                     index,
-                    allPts,
+                    allPts, //  N/S Mark on Side View and Tip View
                     mPseudoPtsOrg,
                     mC_pY[index],
                     mC_pZ[index]);
@@ -2854,11 +2854,17 @@ namespace S2System.Vision
                     mPOMM_rX[index],
                     mPOMM_rY[index],
                     mPOMM_rZ[index]);
+                string text5 = string.Format(
+                    "(X,Y,Z)_fid : ( {0:F3} , {1:F3} , {2:F3} )um",
+                    mC_pX[index]*18.3333,
+                    mC_pY[index]*18.3333,
+                    mC_pZ[index]*18.3333);
 
                 Cv2.PutText(resImg, text, new Point(5, 16), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
                 Cv2.PutText(resImg, text2, new Point(5, 32), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
                 Cv2.PutText(resImg, text3, new Point(5, 48), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
                 Cv2.PutText(resImg, text4, new Point(5, 64), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
+                Cv2.PutText(resImg, text5, new Point(5, 80), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
 
                 Cv2.CvtColor(resImg, resImg, ColorConversionCodes.BGR2GRAY);
 
@@ -2871,7 +2877,6 @@ namespace S2System.Vision
 
                 // 파일 저장하지 않고 메모리에 보관
                 mOMMResultImg[index] = resImg.Clone();
-
                 resImg.Dispose();
             }
             return true;
