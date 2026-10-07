@@ -8096,15 +8096,15 @@ namespace FAutoLearn
             //TX = TX - 3437.747 * TY * TY / 96;// - (3.14e-8) * dZ*dZ;   //  180/pi
 
 
-            if (mbApplyEuler)
-            {
-                double[] before = new double[3] { T.X, T.Y, dZ };
-                double[] after = new double[3];
-                MatrixCross(ref mEulerMatrix, ref before, ref after, 3);
-                T.X = after[0];
-                T.Y = after[1];
-                dZ = after[2];
-            }
+            //if (mbApplyEuler)
+            //{
+            //    double[] before = new double[3] { T.X, T.Y, dZ };
+            //    double[] after = new double[3];
+            //    MatrixCross(ref mEulerMatrix, ref before, ref after, 3);
+            //    T.X = after[0];
+            //    T.Y = after[1];
+            //    dZ = after[2];
+            //}
             if (Math.Abs(TX) > 0.1)
                 sxtr = "Event";
         }

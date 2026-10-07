@@ -22,6 +22,7 @@ namespace S2System.Vision
     using CSH030Ex;
     using Dln;
     using Dln.Exceptions;
+    using OpenCvSharp.Dnn;
     using OpenCvSharp.Extensions;
     using OpenCvSharp.Flann;
     using System;
@@ -2720,6 +2721,9 @@ namespace S2System.Vision
             allPts[8] = ptsTop[1].X;
             allPts[9] = ptsTop[1].Y;
 
+            double newTX = 0;
+            double newTY = 0;
+
             if (Nfound >= 5 && need6D)
             {
                 mMarkPosRes[0][index] = ptsSide[0];
@@ -2728,8 +2732,8 @@ namespace S2System.Vision
                 mMarkPosRes[3][index] = ptsTop[0];
                 mMarkPosRes[4][index] = ptsTop[1];
                 //double newTX = sMR_B[0].pos.Y - sMR_T[0].pos.Y + sMR_B[1].pos.Y - sMR_T[1].pos.Y + sMR_B[2].pos.Y - sMR_T[2].pos.Y;
-                double newTX = (sMR_T[2].pos.Y - (sMR_T[0].pos.Y + sMR_T[1].pos.Y) / 2);
-                double newTY = (sMR_T[0].pos.Y - sMR_T[1].pos.Y);
+                newTX = (sMR_T[2].pos.Y - (sMR_T[0].pos.Y + sMR_T[1].pos.Y) / 2);
+                newTY = (sMR_T[0].pos.Y - sMR_T[1].pos.Y);
                 if (sMR_T[0].pos.X == 0 && sMR_T[0].pos.Y == 0)
                 {
                     newTX = 0;
@@ -2776,34 +2780,66 @@ namespace S2System.Vision
             {
                 mPseudoPtsOrg = mFAL.FineLeftOMM(index, iBuf);
 
+                //   Pixel 좌표 -> 여기서 절대좌표(um)를 추출해야 한다.
                 mPOMM_sX[index] = mPseudoPtsOrg[0].X;
                 mPOMM_sY[index] = mPseudoPtsOrg[0].Y;
                 mPOMM_tX[index] = mPseudoPtsOrg[3].X;
                 mPOMM_tY[index] = mPseudoPtsOrg[3].Y;
 
+                //  Fiducial 마크 정보 형태로 가공한 다음 Extract6Dmotion 으로 돌려서 값을 얻도록 한다.
+                //  단 너무 동떨어져있으므로, 초기치를 Fiducial 마크 중심쪽으로 Delta  이동시킨 후 계산했다가 다시 Delta 만큼 거꾸로 이동시킨다.
+                FAutoLearn.FZMath.Point2D[] lptsSide0 = new FAutoLearn.FZMath.Point2D[6];
+                FAutoLearn.FZMath.Point2D[] lptsTop0 = new FAutoLearn.FZMath.Point2D[6];
+                FAutoLearn.FZMath.Point2D[] lptsSide = new FAutoLearn.FZMath.Point2D[6];
+                FAutoLearn.FZMath.Point2D[] lptsTop = new FAutoLearn.FZMath.Point2D[6];
+                FAutoLearn.FZMath.Point2D lommTranslation = new FAutoLearn.FZMath.Point2D();
+                double POMM_rX0 = 0;
+                double POMM_rY0 = 0;
+                double POMM_rZ0 = 0;
+                double POMM_rTX0 = 0;
+                double POMM_rTY0 = 0;
+                double POMM_rTZ0 = 0;
+
+                //   상대좌표
                 double[] lxyzTxTyTz = mFAL.RelativeToPheudoOMM(
-                    index,
-                    allPts, //  N/S Mark on Side View and Tip View
+                index,
+                    allPts, //  N/S Mark on Side View and Tip View Pixel 좌표
                     mPseudoPtsOrg,
                     mC_pY[index],
                     mC_pZ[index]);
 
-                mPOMM_X[index] = lxyzTxTyTz[0];
-                mPOMM_Y[index] = lxyzTxTyTz[1];
-                mPOMM_Z[index] = lxyzTxTyTz[2];
-                mPOMM_TX[index] = lxyzTxTyTz[3];
-                mPOMM_TY[index] = lxyzTxTyTz[4];
-                mPOMM_TZ[index] = lxyzTxTyTz[5];
+                mPOMM_rX[index] = lommTranslation.X; //  Pixel
+                mPOMM_rY[index] = lommTranslation.Y; //  Pixel
+                
+                mPOMM_rX[index] += POMM_rX0 ;
+               //  
+               double[] rlxyzTxTyTz = mFAL.ABSPheudoOMM(index, mPseudoPtsOrg);
 
-                double[] rlxyzTxTyTz = mFAL.ABSPheudoOMM(index, mPseudoPtsOrg);
+                lptsSide0[0] = new FAutoLearn.FZMath.Point2D(390 - rlxyzTxTyTz[0] + 118.3639, mPOMM_sY[index]);   //  118.3639 = 2170um
+                lptsSide0[2] = new FAutoLearn.FZMath.Point2D(390 - rlxyzTxTyTz[0] - 118.3639, mPOMM_sY[index]);
+                lptsSide0[3] = new FAutoLearn.FZMath.Point2D(390 - rlxyzTxTyTz[0], mPOMM_sY[index] - 95 + 190);
+                lptsTop0[0] = new FAutoLearn.FZMath.Point2D(130 - rlxyzTxTyTz[0] + 520, mPOMM_tY[index]);
+                lptsTop0[1] = new FAutoLearn.FZMath.Point2D(130 - rlxyzTxTyTz[0], mPOMM_tY[index]);
 
-                mPOMM_rX[index] = 18.3333 * rlxyzTxTyTz[0] * mFAL.mFZM.mScaleX[1];
-                mPOMM_rY[index] = 18.3333 * rlxyzTxTyTz[1] * mFAL.mFZM.mScaleY[1];
-                mPOMM_rZ[index] = 18.3333 * rlxyzTxTyTz[2] * mFAL.mFZM.mScaleZ[1];
+                mFAL.mFZM.Extract6DMotion(index, lptsTop0, lptsSide0, ref lommTranslation, ref POMM_rTZ0, ref POMM_rZ0, ref POMM_rTX0, ref POMM_rTY0, 0, 0, false);
+                POMM_rX0 = lommTranslation.X;
+                POMM_rY0 = lommTranslation.Y;
 
-                mPOMM_rTX[index] = rlxyzTxTyTz[3];
-                mPOMM_rTY[index] = rlxyzTxTyTz[4];
-                mPOMM_rTZ[index] = rlxyzTxTyTz[5];
+                //  Absolute position of OMM
+                mPOMM_rX[index]  = 18.3333* POMM_rX0 ;
+                mPOMM_rY[index]  = 18.3333* POMM_rY0 ;
+                mPOMM_rZ[index]  = 18.3333* POMM_rZ0 ;
+                mPOMM_rTX[index] = 0;
+                mPOMM_rTY[index] = 0;
+                mPOMM_rTZ[index] = rlxyzTxTyTz[5];//radian
+                
+                //  OMM에 대한 Fiducial 의 상대좌표
+                mPOMM_X[index]  = mC_pX[index]  - POMM_rX0 ; //  Pixel
+                mPOMM_Y[index]  = mC_pY[index]  - POMM_rY0 ; //  Pixel
+                mPOMM_Z[index]  = mC_pZ[index]  - POMM_rZ0; //  Pixel
+                mPOMM_TX[index] = mC_pTX[index] - mPOMM_rTX[index];    //  Radian
+                mPOMM_TY[index] = mC_pTY[index] - mPOMM_rTY[index];    //  Radian
+                mPOMM_TZ[index] = mC_pTZ[index] - mPOMM_rTZ[index];    //  Radian
 
                 // OMM Result Image 생성
                 Mat resImg = new Mat();
@@ -2850,23 +2886,31 @@ namespace S2System.Vision
                     cfy);
 
                 string text4 = string.Format(
-                    "(X,Y,Z)_omm : ( {0:F3} , {1:F3} , {2:F3} )um",
+                    "(X,Y,Z)_AbsOmm : ( {0:F3} , {1:F3} , {2:F3} )um",
                     mPOMM_rX[index],
                     mPOMM_rY[index],
                     mPOMM_rZ[index]);
+
                 string text5 = string.Format(
                     "(X,Y,Z)_fid : ( {0:F3} , {1:F3} , {2:F3} )um",
                     mC_pX[index]*18.3333,
                     mC_pY[index]*18.3333,
                     mC_pZ[index]*18.3333);
 
-                Cv2.PutText(resImg, text, new Point(5, 16), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
-                Cv2.PutText(resImg, text2, new Point(5, 32), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
-                Cv2.PutText(resImg, text3, new Point(5, 48), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
-                Cv2.PutText(resImg, text4, new Point(5, 64), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
-                Cv2.PutText(resImg, text5, new Point(5, 80), HersheyFonts.HersheySimplex, 0.4, Scalar.White, 1, LineTypes.AntiAlias);
+                string text6 = string.Format(
+                    "(X,Y,Z)_fid_Omm : ( {0:F3} , {1:F3} , {2:F3} )um",
+                    mPOMM_X[index] * 18.3333,
+                    mPOMM_Y[index] * 18.3333,
+                    mPOMM_Z[index] * 18.3333);
 
-                Cv2.CvtColor(resImg, resImg, ColorConversionCodes.BGR2GRAY);
+                Cv2.PutText(resImg, text, new Point(5, 16), HersheyFonts.HersheySimplex, 0.4, Scalar.Red, 1, LineTypes.AntiAlias);
+                Cv2.PutText(resImg, text2, new Point(5, 32), HersheyFonts.HersheySimplex, 0.4, Scalar.Red, 1, LineTypes.AntiAlias);
+                Cv2.PutText(resImg, text3, new Point(5, 48), HersheyFonts.HersheySimplex, 0.4, Scalar.Red, 1, LineTypes.AntiAlias);
+                Cv2.PutText(resImg, text4, new Point(5, 64), HersheyFonts.HersheySimplex, 0.4, Scalar.Red, 1, LineTypes.AntiAlias);
+                Cv2.PutText(resImg, text5, new Point(5, 80), HersheyFonts.HersheySimplex, 0.4, Scalar.Red, 1, LineTypes.AntiAlias);
+                Cv2.PutText(resImg, text6, new Point(5, 96), HersheyFonts.HersheySimplex, 0.4, Scalar.Red, 1, LineTypes.AntiAlias);
+
+                //Cv2.CvtColor(resImg, resImg, ColorConversionCodes.BGR2GRAY);
 
                 // 기존 Frame 영상이 있으면 제거
                 if (mOMMResultImg[index] != null)

@@ -729,10 +729,10 @@ namespace CSH030Ex
                         "Ana" +
                         imgIndex.ToString() +
                         ".bmp";
-
-                    m__G.oCam[0].SaveGrabbedImage(
-                        imgIndex,
-                        sweepFileName);
+                    if (barcode!="File")
+                        m__G.oCam[0].SaveGrabbedImage(
+                            imgIndex,
+                            sweepFileName);
 
 
                     // =====================================================
