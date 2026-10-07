@@ -2886,7 +2886,7 @@ namespace S2System.Vision
                     cfy);
 
                 string text4 = string.Format(
-                    "(X,Y,Z)_AbsOmm : ( {0:F3} , {1:F3} , {2:F3} )um",
+                    "(X,Y,Z)_AbsRef : ( {0:F3} , {1:F3} , {2:F3} )um",
                     mPOMM_rX[index],
                     mPOMM_rY[index],
                     mPOMM_rZ[index]);
@@ -2898,7 +2898,7 @@ namespace S2System.Vision
                     mC_pZ[index]*18.3333);
 
                 string text6 = string.Format(
-                    "(X,Y,Z)_fid_Omm : ( {0:F3} , {1:F3} , {2:F3} )um",
+                    "(X,Y,Z)_fid_Ref : ( {0:F3} , {1:F3} , {2:F3} )um",
                     mPOMM_X[index] * 18.3333,
                     mPOMM_Y[index] * 18.3333,
                     mPOMM_Z[index] * 18.3333);
