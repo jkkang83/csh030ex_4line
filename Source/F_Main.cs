@@ -716,7 +716,14 @@ namespace CSH030Ex
                 ChkCLAF();
 
                 Splasher.Status = "Load Check Box Status : CBstates.txt";
-                ReadPrevCBstates();
+                try
+                {
+                    ReadPrevCBstates();
+                }
+                catch (IndexOutOfRangeException)
+                {                    
+                    WriteCurrentCBstates();
+                }
                 ShowOperatorMode();
                 Splasher.Status = "Loading Last Model File List.";
                 if (!LoadLastModelFileList())
@@ -948,6 +955,7 @@ namespace CSH030Ex
                 cbReverseTX.Checked = false;
                 m__G.m_bTXDirReverse = false;
             }
+            if (i == rows.Length) return true;
             IsChecked = rows[i++];
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
@@ -959,6 +967,7 @@ namespace CSH030Ex
                 cbReverseTY.Checked = false;
                 m__G.m_bTYDirReverse = false;
             }
+            if (i == rows.Length) return true;
             IsChecked = rows[i++];
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
@@ -970,6 +979,7 @@ namespace CSH030Ex
                 cbReverseX.Checked = false;
                 m__G.m_bXDirReverse = false;
             }
+            if (i == rows.Length) return true;
             IsChecked = rows[i++];
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
@@ -1053,6 +1063,7 @@ namespace CSH030Ex
                 cbDebugMode.Checked = false;
                 m__G.m_bDebugMode = false;
             }
+            if (i == rows.Length) return true;
             IsChecked = rows[i++];
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
@@ -1064,6 +1075,7 @@ namespace CSH030Ex
                 cbTestStage.Checked = false;
                 m__G.m_bTestStage = false;
             }
+            if (i == rows.Length) return true;
             IsChecked = rows[i++];
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
@@ -1075,6 +1087,7 @@ namespace CSH030Ex
                 cbSaveNGImage.Checked = false;
                 m__G.m_bSaveNgImage = false;
             }
+            if (i == rows.Length) return true;
             IsChecked = rows[i++];
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
@@ -1086,6 +1099,7 @@ namespace CSH030Ex
                 chOISOption.Checked = false;
                 m__G.m_bOISOption = false;
             }
+            if (i == rows.Length) return true;
             IsChecked = rows[i++];
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
@@ -1097,6 +1111,7 @@ namespace CSH030Ex
                 chSaveUserImage.Checked = false;
                 m__G.m_bSaveFImage = false;
             }
+            if (i == rows.Length) return true;
             IsChecked = rows[i++];
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
@@ -1108,6 +1123,7 @@ namespace CSH030Ex
                 cbPseudoOMM.Checked = false;
                 m__G.m_bPseudoOMM = false;
             }
+            if (i == rows.Length) return true;
             IsChecked = rows[i++];
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
@@ -1119,6 +1135,7 @@ namespace CSH030Ex
                 chSaveVideo.Checked = false;
                 m__G.m_bSaveVideo = false;
             }
+            if (i == rows.Length) return true;
             IsChecked = rows[i++];
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
