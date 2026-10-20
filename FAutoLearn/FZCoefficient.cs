@@ -8003,8 +8003,8 @@ namespace FAutoLearn
             T.Y -= T.X * T.X * mXtoYst[0] * mPixelToUm + T.X * mXtoYst[1];// + mXtoYst[2] / mPixelToUm;
 
 
-            TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);  //  260904 에 이쪽으로 옮김
-            TY -= (signTY > 0 ? mOffsetTY : -mOffsetTY);
+            //TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);  //  260904 에 이쪽으로 옮김
+            //TY -= (signTY > 0 ? mOffsetTY : -mOffsetTY);
 
 
             TX -= mXtoTXst[0] * T.X * T.X / 10.228 + mXtoTXst[1] * T.X / 187.5135 + mYtoTXst[0] * T.Y * T.Y / 10.228 + mYtoTXst[1] * T.Y / 187.5135 + mZtoTXst[0] * dZ * dZ / 10.228 + mZtoTXst[1] * dZ / 187.5135;
@@ -8039,7 +8039,7 @@ namespace FAutoLearn
 
             //TY -= 1.05812E-07 * TY * TY * TY * 3437.746771  * 3437.746771  - 2.02529E-06 * TY * TY * 3437.746771 - 0.00236603 * TY;
             //TY -= 1.2505 * TY * TY * TY - -0.006962 * TY * TY - 0.002366 * TY;  //  TY 의 3차 성분 제거
-            psi -= mOffsetTZ;
+            //psi -= mOffsetTZ;
 
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8084,14 +8084,19 @@ namespace FAutoLearn
             TX = signTX * TX;
             TY = signTY * TY;
 
-            if (mOffsetTX != 0 && mOffsetTY != 0)
-                TX += 0.96 * TY * psi; //  P45 를 위한 보정 ,  0.1 일 때 P45 +/-180min 구동 시 P45 TY 양끝단을 0.4um 낮추는 효과있음
+            //if (mOffsetTX != 0 && mOffsetTY != 0)
+            TX += 0.96 * TY * psi; //  P45 를 위한 보정 ,  0.1 일 때 P45 +/-180min 구동 시 P45 TY 양끝단을 0.4um 낮추는 효과있음
 
             //if (mOffsetTX != 0 && mOffsetTY != 0)
             //    psi += 0.05 * TY * psi; //  P45 를 위한 보정 ,  0.1 일 때 P45 +/-180min 구동 시 P45 TZ 양끝단을 0.4um 낮추는 효과있음
 
-            if (mOffsetTX != 0 && mOffsetTY != 0)
-                TY += 0.19 * TY * psi * Math.Sign(TY * psi);
+            //if (mOffsetTX != 0 && mOffsetTY != 0)
+            TY += 0.19 * TY * psi * Math.Sign(TY * psi);
+
+
+            TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);  //  260904 에 이쪽으로 옮김
+            TY -= (signTY > 0 ? mOffsetTY : -mOffsetTY);
+            psi -= mOffsetTZ;
 
             //TX = TX - 3437.747 * TY * TY / 96;// - (3.14e-8) * dZ*dZ;   //  180/pi
 
