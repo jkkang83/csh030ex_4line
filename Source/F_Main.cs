@@ -498,6 +498,9 @@ namespace CSH030Ex
             this.Hide();
             try
             {
+                string[] tokens = Text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                m__G.SWVersion = tokens.Length > 0 ? tokens[tokens.Length - 1] : "0";
+
                 // 출력시작 시점 지정.
                 sForm.BringToFront();
 
@@ -1672,7 +1675,6 @@ namespace CSH030Ex
             public double[] X5 = new double [5000];
             public double[] Y5 = new double [5000];
         }
-
         public string WriteResultPos(int modelIndex = 0)
         {
             string sLotName = m__G.fManage.GetLotName();
@@ -2618,6 +2620,70 @@ namespace CSH030Ex
             }
 
             return dataBuf;
+        }
+        public byte[] MakeSettingOptionData()
+        {
+            byte[] buf = new byte[104];
+            int offset = 0;
+
+            Action<double> PutDouble = value =>
+            {
+                byte[] data = BitConverter.GetBytes(value);
+                Buffer.BlockCopy(data, 0, buf, offset, 8);
+                offset += 8;
+            };
+
+            Action<int> PutInt = value =>
+            {
+                byte[] data = BitConverter.GetBytes(value);
+                Buffer.BlockCopy(data, 0, buf, offset, 4);
+                offset += 4;
+            };
+
+            double offsetX, offsetY, offsetZ;
+            double offsetTX, offsetTY, offsetTZ;
+
+            m__G.fVision.GetTXTYZeroOffset(
+                out offsetX,
+                out offsetY,
+                out offsetZ,
+                out offsetTX,
+                out offsetTY,
+                out offsetTZ);
+
+            m__G.m_bSetMasterTilt =
+                offsetX != 0 ||
+                offsetY != 0 ||
+                offsetZ != 0 ||
+                offsetTX != 0 ||
+                offsetTY != 0 ||
+                offsetTZ != 0;
+
+            // 11 x double = 88 Byte
+            PutDouble(m__G.sRecipe.iRawGain);
+            PutDouble(m__G.sRecipe.iGamma);
+            PutDouble(m__G.sRecipe.iExposure);
+            PutDouble(m__G.sRecipe.iLEDcurrentLL);
+            PutDouble(m__G.sRecipe.iLEDcurrentLR);
+
+            PutDouble(offsetX);
+            PutDouble(offsetY);
+            PutDouble(offsetZ);
+            PutDouble(offsetTX);
+            PutDouble(offsetTY);
+            PutDouble(offsetTZ);
+
+            PutInt(m__G.m_bOISOption ? 1 : 0);
+            PutInt(m__G.m_bPseudoOMM ? 1 : 0);
+            PutInt(m__G.m_bSetMasterTilt ? 1 : 0);
+
+            int swVersion;
+            if (!int.TryParse(m__G.SWVersion, out swVersion))
+                swVersion = 0;
+
+            PutInt(swVersion);
+
+            return buf;
         }
         public static sSaveResultPos ReadsSaveResultPos(string FileName)
         {

@@ -8002,7 +8002,7 @@ namespace FAutoLearn
             T.Y = T.Y * T.Y * mScaleY[0] * mPixelToUm + T.Y * mScaleY[1] + mScaleY[2] / mPixelToUm;// - 6;    //Pixel Unit
             T.Y -= T.X * T.X * mXtoYst[0] * mPixelToUm + T.X * mXtoYst[1];// + mXtoYst[2] / mPixelToUm;
 
-
+            //Shift 만 되는지 확인 필요.. 
             TX -= (signTX > 0 ? mOffsetTX : -mOffsetTX);  //  260904 에 이쪽으로 옮김
             TY -= (signTY > 0 ? mOffsetTY : -mOffsetTY);
 

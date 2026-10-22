@@ -459,6 +459,26 @@ namespace CSH030Ex
 
                         break;
                     }
+                case "R_O": // Request Setting Option
+                    {
+                        byte[] optionData = MyOwner.MakeSettingOptionData();
+
+                        byte[] head = Encoding.ASCII.GetBytes("A_O@");
+                        byte[] tail = Encoding.ASCII.GetBytes("@\r\n");
+
+                        byte[] sendData = new byte[head.Length + optionData.Length + tail.Length];
+
+                        Buffer.BlockCopy(head, 0, sendData, 0, head.Length);
+                        Buffer.BlockCopy(optionData, 0, sendData, head.Length, optionData.Length);
+                        Buffer.BlockCopy(tail, 0, sendData, head.Length + optionData.Length, tail.Length);
+
+                        Network.SendData(sendData);
+
+                        if (!m__G.m_bHideAllGraph)
+                            AddViewLog("R_O Receive -> A_O Send (104 Byte)\r\n");
+
+                        break;
+                    }
                 case "R_P": //Request Program Restart
                     //Application.Exit();
                     //Thread.Sleep(5000);

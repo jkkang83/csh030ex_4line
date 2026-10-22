@@ -8234,7 +8234,44 @@ namespace CSH030Ex
                 return "X Y Z TX TY TZ offset = 0, 0, 0, 0, 0, 0";
             }
         }
+        public bool GetTXTYZeroOffset(
+    out double x, out double y, out double z,
+    out double tx, out double ty, out double tz)
+        {
+            x = y = z = tx = ty = tz = 0;
 
+            try
+            {
+                int curIndex = GetMasterZeroIndex();
+
+                string sFile = m__G.m_RootDirectory +
+                    "\\DoNotTouch\\OffsetZero\\" +
+                    curIndex.ToString() + "_" +
+                    camID0.ToString() + ".txt";
+
+                if (!File.Exists(sFile))
+                    return false;
+
+                string[] eachLine = File.ReadAllLines(sFile);
+
+                if (eachLine.Length < 12)
+                    return false;
+
+                x = double.Parse(eachLine[6]);
+                y = double.Parse(eachLine[7]);
+                z = double.Parse(eachLine[8]);
+                tx = double.Parse(eachLine[9]);
+                ty = double.Parse(eachLine[10]);
+                tz = double.Parse(eachLine[11]);
+
+                return true;
+            }
+            catch
+            {
+                x = y = z = tx = ty = tz = 0;
+                return false;
+            }
+        }
         ////public OpenCvSharp.Point2d[] mZLUT = null;
 
         ////public double ApplyZLUT(double Z)

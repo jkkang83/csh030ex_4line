@@ -92,6 +92,8 @@ namespace CSH030Ex
         public bool m_bcb3Line = false;
         public bool m_bSaveVideo = false;
         public bool m_bReverseCamera = false;
+        public bool m_bSetMasterTilt = false;
+        public string SWVersion = "";
 
         public string mCamID0 = "";
         public string mCamID1 = "";
