@@ -11450,7 +11450,7 @@ namespace FAutoLearn
                     //if (aVline[i][k] > 35 && aVline[i][k + 1] < aVline[i][k])   //  어떤 점이 51 이상인데 다음 점이 어두운 경우 peak
                     int aVline_i_k = aVline[i][k];
                     if (si < 3 && peakCount == 0)
-                        if (aVline[i][k - 2] + 10 > aVline_i_k)
+                        if ((aVline[i][k - 2] + 10 > aVline_i_k) && (aVline_i_k> peakThreshold))
                         {
                             k++;
                             continue;
