@@ -462,10 +462,8 @@ namespace CSH030Ex
                 case "R_O": // Request Setting Option
                     {
                         byte[] optionData = MyOwner.MakeSettingOptionData();
-
                         byte[] head = Encoding.ASCII.GetBytes("A_O@");
                         byte[] tail = Encoding.ASCII.GetBytes("@\r\n");
-
                         byte[] sendData = new byte[head.Length + optionData.Length + tail.Length];
 
                         Buffer.BlockCopy(head, 0, sendData, 0, head.Length);
@@ -474,8 +472,7 @@ namespace CSH030Ex
 
                         Network.SendData(sendData);
 
-                        if (!m__G.m_bHideAllGraph)
-                            AddViewLog("R_O Receive -> A_O Send (104 Byte)\r\n");
+                        if (!m__G.m_bHideAllGraph) AddViewLog($"R_O Receive -> A_O Send (ASCII, Payload={optionData.Length} Byte, Total={sendData.Length} Byte)\r\n");
 
                         break;
                     }
