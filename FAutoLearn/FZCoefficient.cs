@@ -6199,7 +6199,7 @@ namespace FAutoLearn
             roughPeak = new double[kLength + 6];
             roughPeakBk = new double[kLength + 6];
 
-            xi0 = (int)(width - res1st - 10);
+            xi0 = (int)(width - res1st - 13);
             peak = 0;
 
             try

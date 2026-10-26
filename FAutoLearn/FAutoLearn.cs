@@ -8948,16 +8948,16 @@ namespace FAutoLearn
 
 
                 //  각 마크의 COG 를 구한다.
-                int xhead = 3;
+                int xhead = 4;
                 int yhead = 4;
 
                 int xtail = 8;
                 int ytail = 7;
                 if (lfMark.xPosType == 3 || lfMark.yPosType == 3)
                 {
-                    xhead = 4;
+                    xhead = 5;
                     yhead = 4;
-                    xtail = 6;
+                    xtail = 10;
                     ytail = 6;
                 }
                 int ItrCountHeadExtension = 0;
