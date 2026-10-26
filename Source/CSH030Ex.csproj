@@ -181,6 +181,9 @@
     <Compile Include="F_Vision.Designer.cs">
       <DependentUpon>F_Vision.cs</DependentUpon>
     </Compile>
+    <Compile Include="F_SubMarkView.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Motion\AxisStatus.cs" />
     <Compile Include="Motion\F_Motion_SK_PI.cs">
       <SubType>Form</SubType>

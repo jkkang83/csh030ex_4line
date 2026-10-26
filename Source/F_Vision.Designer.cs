@@ -259,7 +259,7 @@
             // 
             this.tbVsnLog.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(8)))));
             this.tbVsnLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tbVsnLog.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbVsnLog.Font = new System.Drawing.Font("맑은 고딕", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tbVsnLog.ForeColor = System.Drawing.Color.LemonChiffon;
             this.tbVsnLog.Location = new System.Drawing.Point(724, 927);
             this.tbVsnLog.Multiline = true;
