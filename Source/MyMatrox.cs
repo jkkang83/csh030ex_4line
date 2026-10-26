@@ -63,6 +63,8 @@ namespace S2System.Vision
         public OpenCvSharp.Point2d[][] mAzimuthPts = new OpenCvSharp.Point2d[10000][];
         public OpenCvSharp.Point2d[][] mAzimuthPtsUpper = new OpenCvSharp.Point2d[10000][];
         public OpenCvSharp.Point2d[][] mAzimuthPtsLower = new OpenCvSharp.Point2d[10000][];
+        public OpenCvSharp.Point2d[][] mSubMarkPts = new OpenCvSharp.Point2d[10000][];     //  frame 별 보조마크 좌표 ( 0:N, 1:S, 2:E ), mSourceImg2 좌표
+        public OpenCvSharp.Point[][] mDetectedMarkPts = new OpenCvSharp.Point[10000][];     //  frame 별 메인마크 검출 위치 ( mDetectedMarkPos 와 동일, 1/MScale 좌표 )
         public double[] mAvgLED = new double[10000];
 
         public bool[] mC_pDone  =  new bool[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
@@ -396,6 +398,7 @@ namespace S2System.Vision
                 mAzimuthPts[i] = new OpenCvSharp.Point2d[12];
                 mAzimuthPtsUpper[i] = new OpenCvSharp.Point2d[12];
                 mAzimuthPtsLower[i] = new OpenCvSharp.Point2d[12];
+                mSubMarkPts[i] = new OpenCvSharp.Point2d[3];
             }
 
             mFAL = new FAutoLearn.FAutoLearn();
@@ -2453,6 +2456,8 @@ namespace S2System.Vision
         //public bool FineCOG(int index, int iBuf, bool IsShowBox = false, bool need6D = true)
         public FAutoLearn.FAutoLearn.sMarkResult[] mOldSMR = new FAutoLearn.FAutoLearn.sMarkResult[12];
         public OpenCvSharp.Point[][] mDetectedMarkPos = new Point[30][];
+        public OpenCvSharp.Point2d[][] mSubMarkPos = new Point2d[30][];     //  iBuf 별 마지막 보조마크 좌표 ( 0:N, 1:S, 2:E ), mSourceImg2 좌표
+        public int[] mSubMarkFrame = new int[30];                           //  iBuf 별 마지막으로 처리한 frame index
         public OpenCvSharp.Point2d[][] mDetectedOMMPos = new Point2d[30][];
         public OpenCvSharp.Point2d[] mPseudoPtsOrg = null;
         public OpenCvSharp.Point2d[] mPseudoPtsOrg1X = null;
@@ -2607,6 +2612,7 @@ namespace S2System.Vision
 
 
             mDetectedMarkPos[iBuf] = mFAL.FineCOG(IsFirst, index, ref sMR, ref sMR_T, ref sMR_B, ref Nfound, false, iBuf);
+            mDetectedMarkPts[index] = mDetectedMarkPos[iBuf];
 
             mOldSMR = sMR;
 
@@ -2652,6 +2658,10 @@ namespace S2System.Vision
             mAzimuthPts[index] = pts;
             mAzimuthPtsUpper[index] = ptsU;
             mAzimuthPtsLower[index] = ptsL;
+
+            mSubMarkPts[index] = new OpenCvSharp.Point2d[3] { sMR_T[0].pos, sMR_T[1].pos, sMR_T[2].pos };
+            mSubMarkPos[iBuf] = mSubMarkPts[index];
+            mSubMarkFrame[iBuf] = index;
 
             for (int j = 0; j < 4; j++)
             {

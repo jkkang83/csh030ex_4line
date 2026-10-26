@@ -314,6 +314,181 @@ namespace CSH030Ex
         {
             InitializeComponent();
             //ReadVisionParam();
+
+            //  상단/우측 Panel 더블클릭 시 보조마크 확인 팝업
+            pictureBox2.DoubleClick += ShowSubMarkView;
+            panelCam0.DoubleClick += ShowSubMarkView;
+        }
+
+        F_SubMarkView mSubMarkView = null;
+
+        private void ShowSubMarkView(object sender, EventArgs e)
+        {
+            if (!PanelAdmin0.Visible)   //  Admin Mode 에서만 사용
+                return;
+
+            if (mSubMarkView == null || mSubMarkView.IsDisposed)
+            {
+                mSubMarkView = new F_SubMarkView();
+                mSubMarkView.FrameRequested = ShowFrameView;
+                mSubMarkView.Show(this);
+            }
+            mSubMarkView.Activate();
+
+            //  메인 화면이 아직 ShowFrameView 로 그린 영상이면 팝업도 같은 frame 으로 맞춘다.
+            if (mFrameViewFrame >= 0 && pictureBox2.Image != null && pictureBox2.Image == mFrameViewImage)
+                ShowFrameView(mFrameViewFrame);
+            else
+                UpdateSubMarkView();
+        }
+
+        int mFrameViewFrame = -1;       //  ShowFrameView 로 마지막에 표시한 frame
+        System.Drawing.Image mFrameViewImage = null;   //  그때 pictureBox2 에 넣은 영상 ( 다른 곳에서 pictureBox2 를 갱신했는지 판단용 )
+
+        //  mSourceImg2[0] 와 같은 버퍼(iBuf 0)에서 마지막으로 처리된 frame 의 보조마크 결과를 팝업에 표시한다.
+        public void UpdateSubMarkView()
+        {
+            if (mSubMarkView == null || mSubMarkView.IsDisposed)
+                return;
+
+            if (InvokeRequired)
+            {
+                BeginInvoke((MethodInvoker)delegate { UpdateSubMarkView(); });
+                return;
+            }
+            mSubMarkView.SetFrameRange(m__G.oCam[0].mFAL.mCommonImgFile.Count);
+
+            try
+            {
+                Mat src = m__G.oCam[0].mFAL.mSourceImg2[0];
+                OpenCvSharp.Point2d[] sub = m__G.oCam[0].mSubMarkPos[0];
+                if (src == null || src.Empty() || sub == null)
+                {
+                    mSubMarkView.SetView(null, "보조마크 결과 없음. 마크 검사(Grab Initial Mark, Load BMP, +N'th 등) 후 갱신됩니다.");
+                    return;
+                }
+                SetSubMarkView(src, sub, m__G.oCam[0].mSubMarkFrame[0]);
+            }
+            catch (Exception ex)
+            {
+                AddVsnLog("UpdateSubMarkView:" + ex.Message);
+            }
+        }
+
+        private void SetSubMarkView(Mat src, OpenCvSharp.Point2d[] sub, int frame)
+        {
+            Mat img = new Mat();
+            Cv2.CvtColor(src, img, ColorConversionCodes.GRAY2BGR);
+
+            string[] name = { "N", "S", "E" };
+            Scalar[] color = { Scalar.DodgerBlue, Scalar.OrangeRed, Scalar.Lime };
+            string info = string.Format("Frame {0}\r\n", frame);
+
+            for (int i = 0; i < 3; i++)
+            {
+                bool valid = sub[i].X > 0 && sub[i].Y > 0;
+                info += string.Format("Sub {0} : ({1,8:F3}, {2,8:F3})  {3}\r\n", name[i], sub[i].X, sub[i].Y, valid ? "OK" : "FAIL");
+                if (!valid)
+                    continue;
+
+                int x = (int)Math.Round(sub[i].X);
+                int y = (int)Math.Round(sub[i].Y);
+                Cv2.Line(img, x - 10, y, x + 10, y, color[i], 1);
+                Cv2.Line(img, x, y - 10, x, y + 10, color[i], 1);
+                Cv2.PutText(img, name[i], new OpenCvSharp.Point(x + 6, y - 6), HersheyFonts.HersheySimplex, 0.4, color[i], 1, LineTypes.AntiAlias);
+            }
+
+            double minscale = 180 / Math.PI * 60;
+            info += string.Format("Result  : TX = {0:F3} min, TY = {1:F3} min", m__G.oCam[0].mC_pTX[frame] * minscale, m__G.oCam[0].mC_pTY[frame] * minscale);
+
+            Bitmap bmp = BitmapConverter.ToBitmap(img);
+            img.Dispose();
+            mSubMarkView.SetView(bmp, info);
+        }
+
+        //  Load BMP 로 불러온 영상 중 frame 번째 영상을 메인(pictureBox2)과 보조마크 팝업에 함께 표시한다.
+        //  재검출 없이 이미 저장된 결과(mAzimuthPts, mSubMarkPts)를 그린다.
+        public void ShowFrameView(int frame)
+        {
+            if (mSubMarkView == null || mSubMarkView.IsDisposed)
+                return;
+
+            try
+            {
+                List<byte[]> mainFiles = m__G.oCam[0].mFAL.mCommonImgFile;
+                List<byte[]> subFiles = m__G.oCam[0].mFAL.mCommonImgFile2;
+                mSubMarkView.SetFrameRange(mainFiles.Count);
+                if (frame >= mainFiles.Count)
+                {
+                    MessageBox.Show(string.Format("불러온 영상은 0 ~ {0} 입니다. (Load BMP 영상만 지원)", mainFiles.Count - 1));
+                    return;
+                }
+
+                //  메인 : DrawMarkDetected 와 동일한 검출 사각형 + 상세측정 마크 위치 (mAzimuthPts)
+                Mat mainSrc = new Mat(Global.mMergeImgHeight, Global.mMergeImgWidth, MatType.CV_8UC1);
+                mainSrc.SetArray(mainFiles[frame]);
+                Mat mainImg = new Mat();
+                Cv2.CvtColor(mainSrc, mainImg, ColorConversionCodes.GRAY2RGB);
+                mainSrc.Dispose();
+
+                OpenCvSharp.Point[] fMarkPos = m__G.oCam[0].mDetectedMarkPts[frame];
+                if (fMarkPos != null)
+                {
+                    int lModelScale = m__G.oCam[0].mFAL.mFidMarkTop[0].MScale;
+                    OpenCvSharp.Rect lrc = new OpenCvSharp.Rect();
+                    for (int i = 0; i < fMarkPos.Length; i++)
+                    {
+                        if (fMarkPos[i].X == 0 && fMarkPos[i].Y == 0)
+                            continue;
+
+                        OpenCvSharp.Size msize = i < 3 ? m__G.oCam[0].mFAL.mFidMarkSide[0].modelSize : m__G.oCam[0].mFAL.mFidMarkTop[0].modelSize;
+                        lrc.X = fMarkPos[i].X * lModelScale;
+                        lrc.Y = fMarkPos[i].Y * lModelScale;
+                        lrc.Width = lModelScale * msize.Width;
+                        lrc.Height = lModelScale * msize.Height;
+                        mainImg.Rectangle(lrc, Scalar.Cyan, 1);
+
+                        if (m__G.oCam[0].mbDrawReference)
+                        {
+                            int x = (int)m__G.oCam[0].mFAL.mMarkPosOnPanel[i].X;
+                            int y = (int)m__G.oCam[0].mFAL.mMarkPosOnPanel[i].Y;
+                            Cv2.Line(mainImg, x - 10, y, x + 10, y, Scalar.OrangeRed, 1, LineTypes.Link4);
+                            Cv2.Line(mainImg, x, y - 10, x, y + 10, Scalar.OrangeRed, 1, LineTypes.Link4);
+                        }
+                    }
+                }
+
+                OpenCvSharp.Point2d[] pts = m__G.oCam[0].mAzimuthPts[frame];
+                for (int i = 0; i < pts.Length; i++)
+                {
+                    if (pts[i].X < 1) continue;
+                    int x = (int)Math.Round(pts[i].X);
+                    int y = (int)Math.Round(pts[i].Y);
+                    Cv2.Line(mainImg, x - 10, y, x + 10, y, Scalar.Yellow, 1);
+                    Cv2.Line(mainImg, x, y - 10, x, y + 10, Scalar.Yellow, 1);
+                }
+                Cv2.PutText(mainImg, "Frame " + frame.ToString(), new OpenCvSharp.Point(5, 15), HersheyFonts.HersheySimplex, 0.5, Scalar.Yellow, 1, LineTypes.AntiAlias);
+                pictureBox2.Image = BitmapConverter.ToBitmap(mainImg);
+                mainImg.Dispose();
+                mFrameViewFrame = frame;
+                mFrameViewImage = pictureBox2.Image;
+                mSubMarkView.SetFrame(frame);
+
+                //  보조마크
+                if (frame >= subFiles.Count)
+                {
+                    mSubMarkView.SetView(null, string.Format("Frame {0} : 보조마크 영상 없음", frame));
+                    return;
+                }
+                Mat subSrc = new Mat(420, 550, MatType.CV_8UC1);
+                subSrc.SetArray(subFiles[frame]);
+                SetSubMarkView(subSrc, m__G.oCam[0].mSubMarkPts[frame], frame);
+                subSrc.Dispose();
+            }
+            catch (Exception ex)
+            {
+                AddVsnLog("ShowFrameView:" + ex.Message);
+            }
         }
         private void BtnAdminMode_Click(object sender, EventArgs e)
         {
@@ -366,6 +541,9 @@ namespace CSH030Ex
             btnChangeCrop.Visible = isOn;
             //Can_Reopen.Visible = isOn;
             cbLiveWithMarks.Visible = isOn;
+
+            if (!isOn && mSubMarkView != null && !mSubMarkView.IsDisposed)
+                mSubMarkView.Close();
         }
         public int GetTriggerGrabbedFrame()
         {
@@ -3907,6 +4085,8 @@ namespace CSH030Ex
                 AddVsnLog("DrawMarkDected:" + ex.Message);
             }
 
+            UpdateSubMarkView();
+
         }
 
         public void DrawMarkDetectedWithDummyShift(int dummyX, int dummyY, bool withID = false)
@@ -4475,6 +4655,9 @@ namespace CSH030Ex
                                 if (m__G.oCam[0].mAzimuthPts[fileCnt][i].X == 0) continue;
                                 strtmp += m__G.oCam[0].mAzimuthPts[fileCnt][i].X.ToString("F3") + "\t" + m__G.oCam[0].mAzimuthPts[fileCnt][i].Y.ToString("F3") + "\t";
                             }
+                            //  보조마크 N, S, E ( 검출 실패값도 그대로 기록 )
+                            for (i = 0; i < 3; i++)
+                                strtmp += m__G.oCam[0].mSubMarkPts[fileCnt][i].X.ToString("F3") + "\t" + m__G.oCam[0].mSubMarkPts[fileCnt][i].Y.ToString("F3") + "\t";
                         }
                         else
                         {
@@ -5057,6 +5240,8 @@ namespace CSH030Ex
             //    m__G.oCam[0].DrawDCBox(lptLT, lptRB, Brushes.Red);
             //}
             string strtmp = m__G.oCam[0].mMatroxMsg;
+
+            UpdateSubMarkView();
 
             return strtmp;
         }
