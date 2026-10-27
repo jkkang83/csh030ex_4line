@@ -6210,7 +6210,7 @@ namespace FAutoLearn
                     while (repeatCnt < 6)
                     {
                         //  뒤쪽 Edge 만 찾는다.
-                        for (i = 0; i < res1st + 10; i++)
+                        for (i = 0; i < res1st + 13; i++)
                         {
                             xi0_i = (int)(xi0 + i);
                             peakIndex[i] = i;
@@ -6267,7 +6267,7 @@ namespace FAutoLearn
                 }
                 else
                 {
-                    for (i = 0; i < res1st + 10; i++)
+                    for (i = 0; i < res1st + 13; i++)
                     {
                         xi0_i = (int)(xi0 + i);
                         peakIndex[i] = i;
