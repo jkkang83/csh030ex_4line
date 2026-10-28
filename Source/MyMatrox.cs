@@ -1384,6 +1384,15 @@ namespace S2System.Vision
             MIL.MbufGet2d(milCommonImageGrab[index], 0, 0, nSizeX, nSizeY, buf);
 
             Mat src = new Mat(nSizeY, nSizeX, MatType.CV_8UC1, buf);    //  buf 로 Mat 생성
+
+            ////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////
+            //   확인 후 재시도
+            double meanGray = Cv2.Mean(src).Val0;
+            if (meanGray==0)
+                MIL.MbufGet2d(milCommonImageGrab[index], 0, 0, nSizeX, nSizeY, buf);
+
+
             if (bPseudoOMM)
             {
                 mFAL.mOMMSImg[nbuf] = new Mat();
@@ -2540,10 +2549,10 @@ namespace S2System.Vision
                     mFAL.mOMMTImg[0] = mFAL.mSourceImg[0].SubMat(rcTopN);
                     //mFAL.mOMMTImg[0].SaveImage("D:\\OMMT.bmp");
 
-                    mFAL.mSourceImg[0].SaveImage("D:\\src1_FILE.bmp");
-                    mFAL.mSourceImg2[0].SaveImage("D:\\src2_FILE.bmp");
-                    mFAL.mOMMSImg[0].SaveImage("D:\\ommS_FILE.bmp");
-                    mFAL.mOMMTImg[0].SaveImage("D:\\ommT_FILE.bmp");
+                    //mFAL.mSourceImg[0].SaveImage("D:\\src1_FILE.bmp");
+                    //mFAL.mSourceImg2[0].SaveImage("D:\\src2_FILE.bmp");
+                    //mFAL.mOMMSImg[0].SaveImage("D:\\ommS_FILE.bmp");
+                    //mFAL.mOMMTImg[0].SaveImage("D:\\ommT_FILE.bmp");
 
 
                     if (index < mFAL.mCommonImgFile2.Count)
@@ -2552,7 +2561,7 @@ namespace S2System.Vision
                         mFAL.ResizeSourceImg2(iBuf, iBuf);
                         mFAL.mIsFile = false;
                     }
-                    mFAL.mSourceImg2[0].SaveImage("D:\\src2_FILE.bmp");
+                    //mFAL.mSourceImg2[0].SaveImage("D:\\src2_FILE.bmp");
                 }
 
 

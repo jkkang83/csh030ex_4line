@@ -1716,8 +1716,10 @@ namespace CSH030Ex
 
                 if (!m__G.m_bHideAllGraph) AddViewLog("Vision Process Start.. Thread Count = " + lmaxThread.ToString() + "\r\n");
 
-                if (lgrabbedFrame >= m__G.oCam[0].mTargetTriggerCount) m__G.fVision.ProcessVisionData(m__G.oCam[0].mTargetTriggerCount, lmaxThread);
-                else m__G.fVision.ProcessVisionData(lgrabbedFrame, lmaxThread);
+                if (lgrabbedFrame >= m__G.oCam[0].mTargetTriggerCount)
+                    m__G.fVision.ProcessVisionData(m__G.oCam[0].mTargetTriggerCount, lmaxThread);
+                else 
+                    m__G.fVision.ProcessVisionData(lgrabbedFrame, lmaxThread);
 
                 if (!m__G.m_bHideAllGraph) AddViewLog("Vision Process End\r\n");
 

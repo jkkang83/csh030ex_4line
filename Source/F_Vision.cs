@@ -4557,7 +4557,7 @@ namespace CSH030Ex
                 m__G.oCam[0].mFAL.mBreakIndex = int.Parse(tbBreakIndex.Text);
 
             for (int mi = 0; mi < 5; mi++)
-                m__G.oCam[0].mMarkPosRes[mi] = new FAutoLearn.FZMath.Point2D[5000];
+                m__G.oCam[0].mMarkPosRes[mi] = new FAutoLearn.FZMath.Point2D[10000];
 
             if (openFile.FileNames.Length == 1)
             {

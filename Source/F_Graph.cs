@@ -1069,7 +1069,7 @@ namespace CSH030Ex
             byte[] DIdata = new byte[3];
             while (true)
             {
-                Thread.Sleep(10000);
+                Thread.Sleep(30000);
 
                 if (m__G.mDoingStatus == "IDLE")
                 {
