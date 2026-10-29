@@ -2357,7 +2357,17 @@ namespace FAutoLearn
 
                 for (int j = 0; j < ptSL.Count; j++)
                 {
-                    if (Math.Abs(ptSL[j].X - meanX) > (2.0-itr))
+                    if (Math.Abs(ptSL[j].X - meanX) > (10.0-itr))
+                    {
+                        ptSL.RemoveAt(j);
+                        j--;
+                    }
+                }
+                meanX = ptSL.Average(p => p.X);
+
+                for (int j = 0; j < ptSL.Count; j++)
+                {
+                    if (Math.Abs(ptSL[j].X - meanX) > (2.0 - itr))
                     {
                         ptSL.RemoveAt(j);
                         j--;
@@ -2392,6 +2402,7 @@ namespace FAutoLearn
 
             //  아래쪽 수평선검출
             int HscanLen = (int)(ptS[jLen - 1].X - 115 - 20);
+            List<Point2d> ptSH2org = new List<Point2d>();
             Point2d[] ptSH2 = new Point2d[HscanLen];
             int[][] ydiffB = new int[HscanLen][];
             x = 3;
@@ -2411,8 +2422,34 @@ namespace FAutoLearn
                                               );
                 }
                 double peakDiffX = CalcPeakDiff(ydiffB[i - x]);
-                ptSH2[i - x] = new Point2d(115 + i + 0.5, 2 * (peakDiffX + jstart)); //  Y 좌표 2배 해준다.
+                ptSH2org.Add(new Point2d(115 + i + 0.5, 2 * (peakDiffX + jstart))); //  Y 좌표 2배 해준다.
             }
+            double meanY = 0;
+
+            for (int itr = 0; itr < 2; itr++)
+            {
+                meanY = ptSH2org.Average(p => p.Y);
+
+                for (int j = 0; j < ptSH2org.Count; j++)
+                {
+                    if (Math.Abs(ptSH2org[j].Y - meanY) > (10.0 - itr))
+                    {
+                        ptSH2org.RemoveAt(j);
+                        j--;
+                    }
+                }
+                meanY = ptSH2org.Average(p => p.Y);
+
+                for (int j = 0; j < ptSH2org.Count; j++)
+                {
+                    if (Math.Abs(ptSH2org[j].Y - meanY) > (2.0 - itr))
+                    {
+                        ptSH2org.RemoveAt(j);
+                        j--;
+                    }
+                }
+            }
+            ptSH2 = ptSH2org.ToArray();
             FZMath.Line2D ommSedgeBtm = mFZM.FitLinePCA(ptSH2);
             //double[] ommSedgeBtmPoly2nd = new double[3];
             //mFZM.mcLMS2ndPoly(ptSH2, ptSH2.Length, ref ommSedgeBtmPoly2nd);
@@ -2446,9 +2483,16 @@ namespace FAutoLearn
                 ptTL.Add(new Point2d(CalcPeakDiff(xdiff[j]) + i0, 2 * ((j0 + j) + 1 + 95))); //  Y 좌표 2배
             }
             meanX = ptTL.Average(p => p.X);
-            double meanY = ptTL.Average(p => p.Y);
+            meanY = ptTL.Average(p => p.Y);
             for (int j = 0; j < ptTL.Count; j++)
             {
+                meanX = ptTL.Average(p => p.X);
+                if (Math.Abs(ptTL[j].X - meanX) > 10)
+                {
+                    ptTL.RemoveAt(j);
+                    j--;
+                }
+                meanX = ptTL.Average(p => p.X);
                 if (Math.Abs(ptTL[j].X - meanX) > 2)
                 {
                     ptTL.RemoveAt(j);
@@ -2490,6 +2534,7 @@ namespace FAutoLearn
 
             //  아래쪽 수평선검출
             HscanLen = (int)(ptT[jLen - 1].X - 17);
+            List<Point2d> ptTH2org = new List<Point2d>();
             Point2d[] ptTH2 = new Point2d[HscanLen];
             ydiffB = new int[HscanLen][];
             x = 2;  
@@ -2515,8 +2560,31 @@ namespace FAutoLearn
                                      + ( qOMMT_Value[iBuf][i + (j + 1) * mOMMTImg_Width] + qOMMT_Value[iBuf][i + 1 + (j + 1) * mOMMTImg_Width]) 
                                      );
                 }
-                ptTH2[i - x] = new Point2d(i + 0.5, 2 * (CalcPeakDiff(ydiffB[i - x]) + 95 + jstart));   //  Y 좌표 2배
+                ptTH2org.Add(new Point2d(i + 0.5, 2 * (CalcPeakDiff(ydiffB[i - x]) + 95 + jstart)));   //  Y 좌표 2배
             }
+            for (int itr = 0; itr < 2; itr++)
+            {
+                meanY = ptTH2org.Average(p => p.Y);
+
+                for (int j = 0; j < ptTH2org.Count; j++)
+                {
+                    if (Math.Abs(ptTH2org[j].Y - meanY) > (10.0 - itr))
+                    {
+                        ptTH2org.RemoveAt(j);
+                        j--;
+                    }
+                }
+                meanY = ptTH2org.Average(p => p.Y);
+                for (int j = 0; j < ptTH2org.Count; j++)
+                {
+                    if (Math.Abs(ptTH2org[j].Y - meanY) > (2.0 - itr))
+                    {
+                        ptTH2org.RemoveAt(j);
+                        j--;
+                    }
+                }
+            }
+            ptTH2 = ptTH2org.ToArray();
             FZMath.Line2D ommTedgeBtm = mFZM.FitLinePCA(ptTH2);
             //Mat img = new Mat(135, 260, MatType.CV_8UC1, qOMMT_Value[iBuf]);
             //Cv2.ImWrite(@"D:\\image3.bmp", img);
