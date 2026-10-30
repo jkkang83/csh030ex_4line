@@ -1844,52 +1844,31 @@ namespace CSH030Ex
                         }
                     }
 
-                    if (m__G.m_bSaveNgImage)
+                    if (m__G.m_bSaveNgImage && saveFrameCount > 0)
                     {
-                        bool NeedToSaveImage = false;
-                        double min = 9999;
-                        double max = -9999;
+                        string sDate = DateTime.Now.ToString("yyMMddHHmmssfff");
+                        string fileName = Path.Combine(m__G.m_RootDirectory, "Result", "RawData", "NG", sDate, "Image" + saveFrameCount.ToString());
 
-                        for (int pi = 0; pi < saveFrameCount; pi++)
+                        DriveInfo drive = new DriveInfo(Path.GetPathRoot(fileName));
+
+                        if (drive.IsReady)
                         {
-                            if (m__G.oCam[0].mC_pY[pi] < min) min = m__G.oCam[0].mC_pY[pi];
-                            if (m__G.oCam[0].mC_pY[pi] > max) max = m__G.oCam[0].mC_pY[pi];
-                        }
-
-                        if ((max - min) * (5.5 / Global.LensMag) > 100.0) NeedToSaveImage = true;
-
-                        for (int pi = 0; pi < saveFrameCount; pi++)
-                        {
-                            if (m__G.oCam[0].mC_pY[pi] == 0) NeedToSaveImage = true;
-                        }
-
-                        if (NeedToSaveImage)
-                        {
-                            string sDate = DateTime.Now.ToString("yyMMddHHmmss");
-                            string fileName = m__G.m_RootDirectory + string.Format("\\Result\\RawData\\NG\\{0}\\Image{1}\\", sDate, saveFrameCount);
-
-                            if (!Directory.Exists(fileName)) Directory.CreateDirectory(fileName);
-
-                            DriveInfo drive = new DriveInfo(Path.GetPathRoot(fileName));
-
-                            if (drive.IsReady)
+                            if (drive.AvailableFreeSpace <= mlimit)
                             {
-                                if (drive.AvailableFreeSpace <= mlimit)
-                                {
-                                    double freeGB = drive.AvailableFreeSpace / (double)GB;
+                                double freeGB = drive.AvailableFreeSpace / (double)GB;
 
-                                    MessageBox.Show($"남은 용량 : {freeGB:F1} GB\n불필요한 파일을 삭제해 주세요.",
-                                        "용량 부족",
-                                        MessageBoxButtons.OK,
-                                        MessageBoxIcon.Warning);
-                                }
-                                else
+                                MessageBox.Show($"남은 용량 : {freeGB:F1} GB\n불필요한 파일을 삭제해 주세요.", "용량 부족", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+                            else
+                            {
+                                if (!Directory.Exists(fileName)) Directory.CreateDirectory(fileName);
+
+                                for (int imgIndex = 0; imgIndex < saveFrameCount; imgIndex++)
                                 {
-                                    for (int imgIndex = 0; imgIndex < saveFrameCount; imgIndex++)
-                                    {
-                                        string savefilename = fileName + "Ana" + imgIndex.ToString() + ".bmp";
-                                        m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
-                                    }
+                                    if (imgIndex >= 3 && imgIndex < saveFrameCount - 3) continue;
+
+                                    string savefilename = Path.Combine(fileName, "Ana" + imgIndex.ToString() + ".bmp");
+                                    m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
                                 }
                             }
                         }
