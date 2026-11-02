@@ -6443,6 +6443,8 @@ namespace CSH030Ex
                     CalcVisionData(0, taskIndex, count, HowManyThread, taskIndex, IsFile);
                 });
             }
+            m__G.oCam[0].FineCOG(false, count-1, 0, false, true, false, IsFile);    // 마크찾기
+
 
             m__G.oCam[0].mFinishVisionData = true;   //  맞다
 
