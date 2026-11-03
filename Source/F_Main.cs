@@ -2012,15 +2012,17 @@ namespace CSH030Ex
             return sFilePath;
         }
         public bool DebugStop = false;
-        public byte[] MakeSaveResult(bool isManual = false)
+        public byte[] MakeSaveResult(int lgrabbedFrame, bool isManual = false)
         {
             string sLotName = m__G.fManage.GetLotName();
             m__G.mNowLotName = sLotName;
 
-            int framCnt = m__G.oCam[0].mTargetTriggerCount;
+            //int framCnt = m__G.oCam[0].mTargetTriggerCount;
+            int framCnt = lgrabbedFrame;
 
             if (framCnt > m__G.oCam[0].mTargetTriggerCount)
                 framCnt = m__G.oCam[0].mTargetTriggerCount;
+
 
             int structCnt = 44;
             int databufCnt = 9;

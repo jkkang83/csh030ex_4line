@@ -1889,8 +1889,10 @@ namespace CSH030Ex
 
                         if (!m__G.m_bHideAllGraph) AddViewLog("MakeSaveResult " + m__G.oCam[0].mTargetTriggerCount.ToString() + "\r\n");
 
-                        byte[] sDatabuffer = MyOwner.MakeSaveResult();
+                        byte[] sDatabuffer = MyOwner.MakeSaveResult(lgrabbedFrame);
                         int framCnt = m__G.oCam[0].mTargetTriggerCount;
+                        if (lgrabbedFrame < framCnt)
+                            framCnt = lgrabbedFrame;
 
                         byte[] sCmdBuf = Encoding.ASCII.GetBytes("A_R@" + framCnt.ToString() + "@");
                         byte[] sRnBuf = Encoding.ASCII.GetBytes("@\r\n");
@@ -2526,7 +2528,7 @@ namespace CSH030Ex
                 {
                     try
                     {
-                        byte[] sDatabuffer = MyOwner.MakeSaveResult();
+                        byte[] sDatabuffer = MyOwner.MakeSaveResult(m__G.oCam[0].mTargetTriggerCount);
                         int framCnt = m__G.fVision.GetTriggerGrabbedFrame();
 
                         Task.Factory.StartNew(() =>
@@ -2798,7 +2800,7 @@ namespace CSH030Ex
             m__G.fVision.CameraReset(2, false);
             try
             {
-                byte[] sDatabuffer = MyOwner.MakeSaveResult();
+                byte[] sDatabuffer = MyOwner.MakeSaveResult(m__G.oCam[0].mTargetTriggerCount);
                 Task.Factory.StartNew(() =>
                 {
                     byte[] sCmdBuf = null;
