@@ -1889,10 +1889,10 @@ namespace CSH030Ex
 
                         if (!m__G.m_bHideAllGraph) AddViewLog("MakeSaveResult " + m__G.oCam[0].mTargetTriggerCount.ToString() + "\r\n");
 
-                        byte[] sDatabuffer = MyOwner.MakeSaveResult(lgrabbedFrame);
+                        byte[] sDatabuffer = MyOwner.MakeSaveResult(triggergrabbedCnt);
                         int framCnt = m__G.oCam[0].mTargetTriggerCount;
-                        if (lgrabbedFrame < framCnt)
-                            framCnt = lgrabbedFrame;
+                        //if (lgrabbedFrame < framCnt)
+                        //    framCnt = lgrabbedFrame;
 
                         byte[] sCmdBuf = Encoding.ASCII.GetBytes("A_R@" + framCnt.ToString() + "@");
                         byte[] sRnBuf = Encoding.ASCII.GetBytes("@\r\n");

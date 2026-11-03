@@ -2017,12 +2017,17 @@ namespace CSH030Ex
             string sLotName = m__G.fManage.GetLotName();
             m__G.mNowLotName = sLotName;
 
-            //int framCnt = m__G.oCam[0].mTargetTriggerCount;
-            int framCnt = lgrabbedFrame;
+            int framCnt = m__G.oCam[0].mTargetTriggerCount;
+            //int framCnt = lgrabbedFrame;
 
-            if (framCnt > m__G.oCam[0].mTargetTriggerCount)
-                framCnt = m__G.oCam[0].mTargetTriggerCount;
+            //if (framCnt > m__G.oCam[0].mTargetTriggerCount)
+            //    framCnt = m__G.oCam[0].mTargetTriggerCount;
 
+            // 실제 트리거로 수신한 유효 개수
+            int validFrameCount = Math.Max(0, Math.Min(lgrabbedFrame, framCnt));
+
+            // 실제 유효한 트리거가 모자를경우 모든축을 88888로 대체
+            const double MissingFrameValue = 88888.0;
 
             int structCnt = 44;
             int databufCnt = 9;
@@ -2230,6 +2235,35 @@ namespace CSH030Ex
                 }
             }
 
+            // 실제 수신하지 못한 프레임은 모든 출력 축을 오류값으로 설정
+            for (int frame = validFrameCount; frame < framCnt; frame++)
+            {
+                sResult.X[frame] = MissingFrameValue;
+                sResult.Y[frame] = MissingFrameValue;
+                sResult.Z[frame] = MissingFrameValue;
+
+                sResult.TX[frame] = MissingFrameValue;
+                sResult.TY[frame] = MissingFrameValue;
+                sResult.TZ[frame] = MissingFrameValue;
+
+                sResult.CoX[frame] = MissingFrameValue;
+                sResult.CoY[frame] = MissingFrameValue;
+                sResult.CoZ[frame] = MissingFrameValue;
+
+                if (m__G.m_bPseudoOMM)
+                {
+                    sResult.pOmmX[frame] = MissingFrameValue;
+                    sResult.pOmmY[frame] = MissingFrameValue;
+                    sResult.pOmmZ[frame] = MissingFrameValue;
+                    sResult.pOmmTZ[frame] = MissingFrameValue;
+
+                    sResult.pOmmrX[frame] = MissingFrameValue;
+                    sResult.pOmmrY[frame] = MissingFrameValue;
+                    sResult.pOmmrZ[frame] = MissingFrameValue;
+                    sResult.pOmmrTZ[frame] = MissingFrameValue;
+                }
+            }
+
 
             DateTime dt = DateTime.Now;
             string sLotDir = "C:\\CSHTest\\Data\\" + dt.Year + "\\" + dt.Month + "\\" + dt.Day + "\\" + "A_RData\\";
@@ -2361,7 +2395,9 @@ namespace CSH030Ex
                 }
                 for (i = 0; i < framCnt; i++)
                 {
-                    data = BitConverter.GetBytes(-sResult.pOmmZ[i]);
+                    double ommZToSend = i >= validFrameCount? MissingFrameValue : -sResult.pOmmZ[i];
+                    data = BitConverter.GetBytes(ommZToSend);
+                    //data = BitConverter.GetBytes(-sResult.pOmmZ[i]);
                     Array.Copy(data, 0, dataBuf, curCount, data.Length);
                     curCount += data.Length;
                 }
