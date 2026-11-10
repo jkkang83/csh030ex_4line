@@ -4644,31 +4644,80 @@ namespace CSH030Ex
                     double umscale = 5.5 / Global.LensMag;                           //  rad to min
                     double minscale = 180 / Math.PI * 60;                           //  rad to min
 
-                    for (int fileCnt = 0; fileCnt < numFile; fileCnt++)
+                    if (!m__G.m_bPrismCS)
                     {
-                        strtmp += fileCnt.ToString() + "\t" + (umscale * m__G.oCam[0].mC_pX[fileCnt]).ToString("F2") + "\t" + (umscale * m__G.oCam[0].mC_pY[fileCnt]).ToString("F2") + "\t" + (umscale * m__G.oCam[0].mC_pZ[fileCnt]).ToString("F2")
-                             + "\t" + (minscale * m__G.oCam[0].mC_pTX[fileCnt]).ToString("F2") + "\t" + (minscale * m__G.oCam[0].mC_pTY[fileCnt]).ToString("F2") + "\t" + (minscale * m__G.oCam[0].mC_pTZ[fileCnt]).ToString("F2") + "\t";
-                        if (!m__G.m_bPseudoOMM)
+                        for (int fileCnt = 0; fileCnt < numFile; fileCnt++)
                         {
-                            for (i = 0; i < 12; i++)
-                            {
-                                if (m__G.oCam[0].mAzimuthPts[fileCnt][i].X == 0) continue;
-                                strtmp += m__G.oCam[0].mAzimuthPts[fileCnt][i].X.ToString("F3") + "\t" + m__G.oCam[0].mAzimuthPts[fileCnt][i].Y.ToString("F3") + "\t";
-                            }
-                            //  보조마크 N, S, E ( 검출 실패값도 그대로 기록 )
-                            for (i = 0; i < 3; i++)
-                                strtmp += m__G.oCam[0].mSubMarkPts[fileCnt][i].X.ToString("F3") + "\t" + m__G.oCam[0].mSubMarkPts[fileCnt][i].Y.ToString("F3") + "\t";
-                        }
-                        else
-                        {
-                            strtmp +=         (umscale * m__G.oCam[0].mPOMM_X[fileCnt]).ToString("F2") + "\t" + (umscale * m__G.oCam[0].mPOMM_Y[fileCnt]).ToString("F2") + "\t" + (umscale * m__G.oCam[0].mPOMM_Z[fileCnt]).ToString("F2")
-                                     + "\t" + (minscale * m__G.oCam[0].mPOMM_TX[fileCnt]).ToString("F2") + "\t" + (minscale * m__G.oCam[0].mPOMM_TY[fileCnt]).ToString("F2") + "\t" + (minscale * m__G.oCam[0].mPOMM_TZ[fileCnt]).ToString("F2")
-                                     + "\t" + (m__G.oCam[0].mPOMM_sX[fileCnt]).ToString("F3") + "\t" + (m__G.oCam[0].mPOMM_sY[fileCnt]).ToString("F3") + "\t" + (m__G.oCam[0].mPOMM_tX[fileCnt]).ToString("F3") + "\t" + (m__G.oCam[0].mPOMM_tY[fileCnt]).ToString("F3")
-                                     + "\t";
+                            strtmp += fileCnt.ToString() + "\t" +
+                                (umscale * m__G.oCam[0].mC_pX[fileCnt]).ToString("F2") + "\t" +
+                                (umscale * m__G.oCam[0].mC_pY[fileCnt]).ToString("F2") + "\t" +
+                                (umscale * m__G.oCam[0].mC_pZ[fileCnt]).ToString("F2") + "\t" +
+                                (minscale * m__G.oCam[0].mC_pTX[fileCnt]).ToString("F2") + "\t" +
+                                (minscale * m__G.oCam[0].mC_pTY[fileCnt]).ToString("F2") + "\t" +
+                                (minscale * m__G.oCam[0].mC_pTZ[fileCnt]).ToString("F2") + "\t";
 
+                            if (!m__G.m_bPseudoOMM)
+                            {
+                                for (i = 0; i < 12; i++)
+                                {
+                                    if (m__G.oCam[0].mAzimuthPts[fileCnt][i].X == 0) continue;
+                                    strtmp += m__G.oCam[0].mAzimuthPts[fileCnt][i].X.ToString("F3") + "\t" + m__G.oCam[0].mAzimuthPts[fileCnt][i].Y.ToString("F3") + "\t";
+                                }
+                                //  보조마크 N, S, E ( 검출 실패값도 그대로 기록 )
+                                for (i = 0; i < 3; i++)
+                                    strtmp += m__G.oCam[0].mSubMarkPts[fileCnt][i].X.ToString("F3") + "\t" + m__G.oCam[0].mSubMarkPts[fileCnt][i].Y.ToString("F3") + "\t";
+                            }
+                            else
+                            {
+                                strtmp += (umscale * m__G.oCam[0].mPOMM_X[fileCnt]).ToString("F2") + "\t" + (umscale * m__G.oCam[0].mPOMM_Y[fileCnt]).ToString("F2") + "\t" + (umscale * m__G.oCam[0].mPOMM_Z[fileCnt]).ToString("F2")
+                                         + "\t" + (minscale * m__G.oCam[0].mPOMM_TX[fileCnt]).ToString("F2") + "\t" + (minscale * m__G.oCam[0].mPOMM_TY[fileCnt]).ToString("F2") + "\t" + (minscale * m__G.oCam[0].mPOMM_TZ[fileCnt]).ToString("F2")
+                                         + "\t" + (m__G.oCam[0].mPOMM_sX[fileCnt]).ToString("F3") + "\t" + (m__G.oCam[0].mPOMM_sY[fileCnt]).ToString("F3") + "\t" + (m__G.oCam[0].mPOMM_tX[fileCnt]).ToString("F3") + "\t" + (m__G.oCam[0].mPOMM_tY[fileCnt]).ToString("F3")
+                                         + "\t";
+
+                            }
+                            strtmp += "\r\n";
                         }
-                        strtmp += "\r\n";
                     }
+                    else
+                    {
+                        for (int fileCnt = 0; fileCnt < numFile; fileCnt++)
+                        {
+                            double[] lPrismTXTYTZ = new double[3];
+                            lPrismTXTYTZ = m__G.oCam[0].mFAL.mFZM.ConvertTXTYTZofCSHtoPrism(m__G.oCam[0].mC_pTX[fileCnt], m__G.oCam[0].mC_pTY[fileCnt], m__G.oCam[0].mC_pTZ[fileCnt], true);
+                            double p45TZ = CompensateP45TZ(lPrismTXTYTZ[2]);
+                            lPrismTXTYTZ[2] = p45TZ;//  rad to min
+
+                            strtmp += fileCnt.ToString() + "\t" +
+                                (umscale * m__G.oCam[0].mC_pX[fileCnt]).ToString("F2") + "\t" +
+                                (umscale * m__G.oCam[0].mC_pY[fileCnt]).ToString("F2") + "\t" +
+                                (umscale * m__G.oCam[0].mC_pZ[fileCnt]).ToString("F2") + "\t" +
+                                (minscale * lPrismTXTYTZ[0]).ToString("F2") + "\t" +
+                                (minscale * lPrismTXTYTZ[1]).ToString("F2") + "\t" +
+                                (minscale * lPrismTXTYTZ[2]).ToString("F2") + "\t";
+
+                            if (!m__G.m_bPseudoOMM)
+                            {
+                                for (i = 0; i < 12; i++)
+                                {
+                                    if (m__G.oCam[0].mAzimuthPts[fileCnt][i].X == 0) continue;
+                                    strtmp += m__G.oCam[0].mAzimuthPts[fileCnt][i].X.ToString("F3") + "\t" + m__G.oCam[0].mAzimuthPts[fileCnt][i].Y.ToString("F3") + "\t";
+                                }
+                                //  보조마크 N, S, E ( 검출 실패값도 그대로 기록 )
+                                for (i = 0; i < 3; i++)
+                                    strtmp += m__G.oCam[0].mSubMarkPts[fileCnt][i].X.ToString("F3") + "\t" + m__G.oCam[0].mSubMarkPts[fileCnt][i].Y.ToString("F3") + "\t";
+                            }
+                            else
+                            {
+                                strtmp += (umscale * m__G.oCam[0].mPOMM_X[fileCnt]).ToString("F2") + "\t" + (umscale * m__G.oCam[0].mPOMM_Y[fileCnt]).ToString("F2") + "\t" + (umscale * m__G.oCam[0].mPOMM_Z[fileCnt]).ToString("F2")
+                                         + "\t" + (minscale * m__G.oCam[0].mPOMM_TX[fileCnt]).ToString("F2") + "\t" + (minscale * m__G.oCam[0].mPOMM_TY[fileCnt]).ToString("F2") + "\t" + (minscale * m__G.oCam[0].mPOMM_TZ[fileCnt]).ToString("F2")
+                                         + "\t" + (m__G.oCam[0].mPOMM_sX[fileCnt]).ToString("F3") + "\t" + (m__G.oCam[0].mPOMM_sY[fileCnt]).ToString("F3") + "\t" + (m__G.oCam[0].mPOMM_tX[fileCnt]).ToString("F3") + "\t" + (m__G.oCam[0].mPOMM_tY[fileCnt]).ToString("F3")
+                                         + "\t";
+
+                            }
+                            strtmp += "\r\n";
+                        }
+                    }
+
                     strtmp += "\r\n";
                     //////////////////////////////////////////////////////////////
                     //////////////////////////////////////////////////////////////

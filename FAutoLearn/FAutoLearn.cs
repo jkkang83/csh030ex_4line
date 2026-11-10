@@ -11409,7 +11409,7 @@ namespace FAutoLearn
                         //  상승엣지는 260/3 - 18 까지에서만 찾아야 한다.
                         //slopeMax = curSlope;
                         //left[si] = xi + searchHline[si];
-                        if ((resHline[xi + 4] + resHline[xi + 6]) >= 1.6*resHline[xi + 2])
+                        if ((resHline[xi + 4] + resHline[xi + 6] + resHline[xi + 8]) > 2.3 * resHline[xi + 2])
                             if (resHline_si_xi < resHline[xi + 2] && resHline_si_xi < resHline[xi + 3] && resHline_si_xi < resHline[xi + 4])
                             {
                                 slopeMax = curSlope;
@@ -11743,7 +11743,7 @@ namespace FAutoLearn
                         //  상승엣지는 260/3 - 18 까지에서만 찾아야 한다.
                         //slopeMax = curSlope;
                         //left[si] = xi + searchHline2[si];
-                        if ((resHline[xi + 4] + resHline[xi + 6]) > 1.6 * resHline[xi + 2])
+                        if ((resHline[xi + 4] + resHline[xi + 6] + +resHline[xi + 8]) >= 2.3 * resHline[xi + 2])
                             if (resHline_si_xi < resHline[xi + 2] && resHline_si_xi < resHline[xi + 3] && resHline_si_xi < resHline[xi + 4])
                             {
                                 slopeMax = curSlope;
