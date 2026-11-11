@@ -2680,16 +2680,20 @@ namespace CSH030Ex
             AddValue("LED_Left", m__G.sRecipe.iLEDcurrentLL);
             AddValue("LED_Right", m__G.sRecipe.iLEDcurrentLR);
 
-            AddValue("Offset_X", offsetX);
-            AddValue("Offset_Y", offsetY);
-            AddValue("Offset_Z", offsetZ);
-            AddValue("Offset_TX", offsetTX);
-            AddValue("Offset_TY", offsetTY);
-            AddValue("Offset_TZ", offsetTZ);
+            AddValue("MasterTilt_Rot_X", offsetX);
+            AddValue("MasterTilt_Rot_Y", offsetY);
+            AddValue("MasterTilt_Rot_Z", offsetZ);
+            AddValue("MasterTilt_Rot_TX", offsetTX);
+            AddValue("MasterTilt_Rot_TY", offsetTY);
+            AddValue("MasterTilt_Rot_TZ", offsetTZ);
 
             AddValue("OIS_Option", m__G.m_bOISOption ? 1 : 0);
             AddValue("Pseudo_OMM", m__G.m_bPseudoOMM ? 1 : 0);
             AddValue("Master_Set_Tilt", m__G.m_bSetMasterTilt ? 1 : 0);
+            AddValue("X_Tilt_Reversal", m__G.m_bXDirReverse ? 1 : 0);
+            AddValue("Y_Tilt_Reversal", m__G.m_bYDirReverse ? 1 : 0);
+            AddValue("Prism_Coordinate_System", m__G.m_bPrismCS ? 1 : 0);
+            AddValue("Reverse_Camera", m__G.m_bReverseCamera ? 1 : 0);
 
             return Encoding.ASCII.GetBytes(sb.ToString());
         }
