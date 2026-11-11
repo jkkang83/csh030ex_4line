@@ -8710,7 +8710,10 @@ namespace CSH030Ex
 
             Mat lCropImg = m__G.oCam[0].GrabLoadCropImg(0, false);
             pictureBox2.Image = BitmapConverter.ToBitmap(lCropImg);    //  Grab & Crop
-            string fileName = m__G.m_RootDirectory + "\\Result\\RawData\\Image\\LastGrab.bmp";
+            string folderName = m__G.m_RootDirectory + "\\Result\\RawData\\Image\\";
+            if(!Directory.Exists(folderName))
+                Directory.CreateDirectory(folderName);
+            string fileName = folderName + "LastGrab.bmp";
 
             m__G.oCam[0].mFAL.LoadFMICandidate();
             m__G.oCam[0].mFAL.BackupFMI();
