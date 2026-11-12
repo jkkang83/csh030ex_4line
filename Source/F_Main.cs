@@ -2690,8 +2690,8 @@ namespace CSH030Ex
             AddValue("OIS_Option", m__G.m_bOISOption ? 1 : 0);
             AddValue("Pseudo_OMM", m__G.m_bPseudoOMM ? 1 : 0);
             AddValue("Master_Set_Tilt", m__G.m_bSetMasterTilt ? 1 : 0);
-            AddValue("X_Tilt_Reversal", m__G.m_bXDirReverse ? 1 : 0);
-            AddValue("Y_Tilt_Reversal", m__G.m_bYDirReverse ? 1 : 0);
+            //AddValue("X_Tilt_Reversal", m__G.m_bXDirReverse ? 1 : 0);
+            //AddValue("Y_Tilt_Reversal", m__G.m_bYDirReverse ? 1 : 0);
             AddValue("Prism_Coordinate_System", m__G.m_bPrismCS ? 1 : 0);
             AddValue("Reverse_Camera", m__G.m_bReverseCamera ? 1 : 0);
 
