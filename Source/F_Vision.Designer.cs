@@ -225,6 +225,9 @@
             this.PanelAdmin0.SuspendLayout();
             this.PanelAdmin1.SuspendLayout();
             this.PanelAdmin2.SuspendLayout();
+            this.pnlMasterTilt = new System.Windows.Forms.Panel();
+            this.btnMasterTilt = new System.Windows.Forms.Button();
+            this.pnlMasterTilt.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnLEDUP
@@ -670,7 +673,7 @@
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label6.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label6.Location = new System.Drawing.Point(588, 594);
+            this.label6.Location = new System.Drawing.Point(276, 78);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(26, 19);
             this.label6.TabIndex = 424;
@@ -681,7 +684,7 @@
             this.tbMasterTX.BackColor = System.Drawing.Color.GreenYellow;
             this.tbMasterTX.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tbMasterTX.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
-            this.tbMasterTX.Location = new System.Drawing.Point(620, 595);
+            this.tbMasterTX.Location = new System.Drawing.Point(308, 79);
             this.tbMasterTX.Name = "tbMasterTX";
             this.tbMasterTX.Size = new System.Drawing.Size(43, 17);
             this.tbMasterTX.TabIndex = 423;
@@ -693,7 +696,7 @@
             this.label41.AutoSize = true;
             this.label41.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label41.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label41.Location = new System.Drawing.Point(588, 612);
+            this.label41.Location = new System.Drawing.Point(276, 96);
             this.label41.Name = "label41";
             this.label41.Size = new System.Drawing.Size(25, 19);
             this.label41.TabIndex = 426;
@@ -704,7 +707,7 @@
             this.tbMasterTY.BackColor = System.Drawing.Color.GreenYellow;
             this.tbMasterTY.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tbMasterTY.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
-            this.tbMasterTY.Location = new System.Drawing.Point(620, 613);
+            this.tbMasterTY.Location = new System.Drawing.Point(308, 97);
             this.tbMasterTY.Name = "tbMasterTY";
             this.tbMasterTY.Size = new System.Drawing.Size(43, 17);
             this.tbMasterTY.TabIndex = 425;
@@ -716,7 +719,7 @@
             this.cbSetTXTYwithMaster.AutoSize = true;
             this.cbSetTXTYwithMaster.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbSetTXTYwithMaster.ForeColor = System.Drawing.Color.GreenYellow;
-            this.cbSetTXTYwithMaster.Location = new System.Drawing.Point(318, 522);
+            this.cbSetTXTYwithMaster.Location = new System.Drawing.Point(6, 6);
             this.cbSetTXTYwithMaster.Name = "cbSetTXTYwithMaster";
             this.cbSetTXTYwithMaster.Size = new System.Drawing.Size(141, 19);
             this.cbSetTXTYwithMaster.TabIndex = 427;
@@ -729,7 +732,7 @@
             this.label42.AutoSize = true;
             this.label42.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label42.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label42.Location = new System.Drawing.Point(666, 612);
+            this.label42.Location = new System.Drawing.Point(354, 96);
             this.label42.Name = "label42";
             this.label42.Size = new System.Drawing.Size(35, 19);
             this.label42.TabIndex = 429;
@@ -740,7 +743,7 @@
             this.label43.AutoSize = true;
             this.label43.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label43.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label43.Location = new System.Drawing.Point(666, 594);
+            this.label43.Location = new System.Drawing.Point(354, 78);
             this.label43.Name = "label43";
             this.label43.Size = new System.Drawing.Size(35, 19);
             this.label43.TabIndex = 428;
@@ -1536,7 +1539,7 @@
             this.btnInitialTilt.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnInitialTilt.Font = new System.Drawing.Font("맑은 고딕", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnInitialTilt.ForeColor = System.Drawing.Color.GreenYellow;
-            this.btnInitialTilt.Location = new System.Drawing.Point(488, 547);
+            this.btnInitialTilt.Location = new System.Drawing.Point(176, 31);
             this.btnInitialTilt.Name = "btnInitialTilt";
             this.btnInitialTilt.Size = new System.Drawing.Size(100, 36);
             this.btnInitialTilt.TabIndex = 421;
@@ -1556,7 +1559,7 @@
             this.btnSetMasterTilt.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnSetMasterTilt.Font = new System.Drawing.Font("맑은 고딕", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnSetMasterTilt.ForeColor = System.Drawing.Color.GreenYellow;
-            this.btnSetMasterTilt.Location = new System.Drawing.Point(601, 547);
+            this.btnSetMasterTilt.Location = new System.Drawing.Point(289, 31);
             this.btnSetMasterTilt.Name = "btnSetMasterTilt";
             this.btnSetMasterTilt.Size = new System.Drawing.Size(100, 36);
             this.btnSetMasterTilt.TabIndex = 420;
@@ -2152,7 +2155,7 @@
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label16.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label16.Location = new System.Drawing.Point(666, 630);
+            this.label16.Location = new System.Drawing.Point(354, 114);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(35, 19);
             this.label16.TabIndex = 472;
@@ -2163,7 +2166,7 @@
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label17.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label17.Location = new System.Drawing.Point(588, 630);
+            this.label17.Location = new System.Drawing.Point(276, 114);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(26, 19);
             this.label17.TabIndex = 471;
@@ -2174,7 +2177,7 @@
             this.tbMasterTZ.BackColor = System.Drawing.Color.GreenYellow;
             this.tbMasterTZ.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tbMasterTZ.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
-            this.tbMasterTZ.Location = new System.Drawing.Point(620, 631);
+            this.tbMasterTZ.Location = new System.Drawing.Point(308, 115);
             this.tbMasterTZ.Name = "tbMasterTZ";
             this.tbMasterTZ.Size = new System.Drawing.Size(43, 17);
             this.tbMasterTZ.TabIndex = 470;
@@ -2186,7 +2189,7 @@
             this.label19.AutoSize = true;
             this.label19.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label19.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label19.Location = new System.Drawing.Point(556, 630);
+            this.label19.Location = new System.Drawing.Point(244, 114);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(31, 19);
             this.label19.TabIndex = 482;
@@ -2197,7 +2200,7 @@
             this.label20.AutoSize = true;
             this.label20.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label20.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label20.Location = new System.Drawing.Point(486, 630);
+            this.label20.Location = new System.Drawing.Point(174, 114);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(18, 19);
             this.label20.TabIndex = 481;
@@ -2208,7 +2211,7 @@
             this.tbMasterZ.BackColor = System.Drawing.Color.GreenYellow;
             this.tbMasterZ.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tbMasterZ.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
-            this.tbMasterZ.Location = new System.Drawing.Point(510, 631);
+            this.tbMasterZ.Location = new System.Drawing.Point(198, 115);
             this.tbMasterZ.Name = "tbMasterZ";
             this.tbMasterZ.Size = new System.Drawing.Size(43, 17);
             this.tbMasterZ.TabIndex = 480;
@@ -2220,7 +2223,7 @@
             this.label21.AutoSize = true;
             this.label21.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label21.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label21.Location = new System.Drawing.Point(556, 612);
+            this.label21.Location = new System.Drawing.Point(244, 96);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(31, 19);
             this.label21.TabIndex = 479;
@@ -2231,7 +2234,7 @@
             this.label22.AutoSize = true;
             this.label22.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label22.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label22.Location = new System.Drawing.Point(556, 594);
+            this.label22.Location = new System.Drawing.Point(244, 78);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(31, 19);
             this.label22.TabIndex = 478;
@@ -2242,7 +2245,7 @@
             this.label23.AutoSize = true;
             this.label23.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label23.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label23.Location = new System.Drawing.Point(487, 612);
+            this.label23.Location = new System.Drawing.Point(175, 96);
             this.label23.Name = "label23";
             this.label23.Size = new System.Drawing.Size(17, 19);
             this.label23.TabIndex = 477;
@@ -2253,7 +2256,7 @@
             this.tbMasterY.BackColor = System.Drawing.Color.GreenYellow;
             this.tbMasterY.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tbMasterY.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
-            this.tbMasterY.Location = new System.Drawing.Point(510, 613);
+            this.tbMasterY.Location = new System.Drawing.Point(198, 97);
             this.tbMasterY.Name = "tbMasterY";
             this.tbMasterY.Size = new System.Drawing.Size(43, 17);
             this.tbMasterY.TabIndex = 476;
@@ -2265,7 +2268,7 @@
             this.label24.AutoSize = true;
             this.label24.Font = new System.Drawing.Font("맑은 고딕", 10F, System.Drawing.FontStyle.Bold);
             this.label24.ForeColor = System.Drawing.Color.GreenYellow;
-            this.label24.Location = new System.Drawing.Point(486, 594);
+            this.label24.Location = new System.Drawing.Point(174, 78);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(18, 19);
             this.label24.TabIndex = 475;
@@ -2276,7 +2279,7 @@
             this.tbMasterX.BackColor = System.Drawing.Color.GreenYellow;
             this.tbMasterX.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tbMasterX.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
-            this.tbMasterX.Location = new System.Drawing.Point(510, 595);
+            this.tbMasterX.Location = new System.Drawing.Point(198, 79);
             this.tbMasterX.Name = "tbMasterX";
             this.tbMasterX.Size = new System.Drawing.Size(43, 17);
             this.tbMasterX.TabIndex = 474;
@@ -2292,7 +2295,7 @@
             this.MasterList.FormattingEnabled = true;
             this.MasterList.HorizontalScrollbar = true;
             this.MasterList.ItemHeight = 14;
-            this.MasterList.Location = new System.Drawing.Point(316, 584);
+            this.MasterList.Location = new System.Drawing.Point(4, 68);
             this.MasterList.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.MasterList.Name = "MasterList";
             this.MasterList.ScrollAlwaysVisible = true;
@@ -2308,7 +2311,7 @@
             this.btnAddMaster.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnAddMaster.Font = new System.Drawing.Font("맑은 고딕", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnAddMaster.ForeColor = System.Drawing.Color.GreenYellow;
-            this.btnAddMaster.Location = new System.Drawing.Point(316, 547);
+            this.btnAddMaster.Location = new System.Drawing.Point(4, 31);
             this.btnAddMaster.Name = "btnAddMaster";
             this.btnAddMaster.Size = new System.Drawing.Size(65, 36);
             this.btnAddMaster.TabIndex = 484;
@@ -2324,7 +2327,7 @@
             this.btnDeleteMaster.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnDeleteMaster.Font = new System.Drawing.Font("맑은 고딕", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnDeleteMaster.ForeColor = System.Drawing.Color.GreenYellow;
-            this.btnDeleteMaster.Location = new System.Drawing.Point(404, 547);
+            this.btnDeleteMaster.Location = new System.Drawing.Point(92, 31);
             this.btnDeleteMaster.Name = "btnDeleteMaster";
             this.btnDeleteMaster.Size = new System.Drawing.Size(65, 36);
             this.btnDeleteMaster.TabIndex = 485;
@@ -2338,7 +2341,7 @@
             this.txtMsaterNum.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtMsaterNum.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.txtMsaterNum.ForeColor = System.Drawing.Color.Red;
-            this.txtMsaterNum.Location = new System.Drawing.Point(592, 522);
+            this.txtMsaterNum.Location = new System.Drawing.Point(280, 6);
             this.txtMsaterNum.Name = "txtMsaterNum";
             this.txtMsaterNum.Size = new System.Drawing.Size(42, 16);
             this.txtMsaterNum.TabIndex = 487;
@@ -2349,7 +2352,7 @@
             // 
             this.label26.AutoSize = true;
             this.label26.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label26.Location = new System.Drawing.Point(507, 522);
+            this.label26.Location = new System.Drawing.Point(195, 6);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(76, 16);
             this.label26.TabIndex = 486;
@@ -2837,6 +2840,54 @@
             this.PanelAdmin2.Size = new System.Drawing.Size(402, 345);
             this.PanelAdmin2.TabIndex = 514;
             // 
+            this.pnlMasterTilt.Controls.Add(this.cbSetTXTYwithMaster);
+            this.pnlMasterTilt.Controls.Add(this.btnAddMaster);
+            this.pnlMasterTilt.Controls.Add(this.btnDeleteMaster);
+            this.pnlMasterTilt.Controls.Add(this.btnInitialTilt);
+            this.pnlMasterTilt.Controls.Add(this.btnSetMasterTilt);
+            this.pnlMasterTilt.Controls.Add(this.MasterList);
+            this.pnlMasterTilt.Controls.Add(this.txtMsaterNum);
+            this.pnlMasterTilt.Controls.Add(this.label26);
+            this.pnlMasterTilt.Controls.Add(this.tbMasterX);
+            this.pnlMasterTilt.Controls.Add(this.tbMasterY);
+            this.pnlMasterTilt.Controls.Add(this.tbMasterZ);
+            this.pnlMasterTilt.Controls.Add(this.tbMasterTX);
+            this.pnlMasterTilt.Controls.Add(this.tbMasterTY);
+            this.pnlMasterTilt.Controls.Add(this.tbMasterTZ);
+            this.pnlMasterTilt.Controls.Add(this.label6);
+            this.pnlMasterTilt.Controls.Add(this.label41);
+            this.pnlMasterTilt.Controls.Add(this.label42);
+            this.pnlMasterTilt.Controls.Add(this.label43);
+            this.pnlMasterTilt.Controls.Add(this.label16);
+            this.pnlMasterTilt.Controls.Add(this.label17);
+            this.pnlMasterTilt.Controls.Add(this.label19);
+            this.pnlMasterTilt.Controls.Add(this.label20);
+            this.pnlMasterTilt.Controls.Add(this.label21);
+            this.pnlMasterTilt.Controls.Add(this.label22);
+            this.pnlMasterTilt.Controls.Add(this.label23);
+            this.pnlMasterTilt.Controls.Add(this.label24);
+            this.pnlMasterTilt.Location = new System.Drawing.Point(312, 516);
+            this.pnlMasterTilt.Name = "pnlMasterTilt";
+            this.pnlMasterTilt.Size = new System.Drawing.Size(395, 144);
+            this.pnlMasterTilt.TabIndex = 427;
+            this.pnlMasterTilt.Visible = false;
+            //
+            // btnMasterTilt
+            //
+            this.btnMasterTilt.BackColor = System.Drawing.Color.DodgerBlue;
+            this.btnMasterTilt.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnAddMaster.BackgroundImage")));
+            this.btnMasterTilt.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnMasterTilt.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnMasterTilt.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.btnMasterTilt.ForeColor = System.Drawing.Color.GreenYellow;
+            this.btnMasterTilt.Location = new System.Drawing.Point(334, 522);
+            this.btnMasterTilt.Name = "btnMasterTilt";
+            this.btnMasterTilt.Size = new System.Drawing.Size(170, 41);
+            this.btnMasterTilt.TabIndex = 488;
+            this.btnMasterTilt.Text = "Master Tilt";
+            this.btnMasterTilt.UseVisualStyleBackColor = false;
+            this.btnMasterTilt.Click += new System.EventHandler(this.btnMasterTilt_Click);
+            //
             // FVision
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2847,23 +2898,6 @@
             this.Controls.Add(this.PanelAdmin0);
             this.Controls.Add(this.tbUncalibratedInfo);
             this.Controls.Add(this.label31);
-            this.Controls.Add(this.txtMsaterNum);
-            this.Controls.Add(this.label26);
-            this.Controls.Add(this.btnDeleteMaster);
-            this.Controls.Add(this.btnAddMaster);
-            this.Controls.Add(this.MasterList);
-            this.Controls.Add(this.label19);
-            this.Controls.Add(this.label20);
-            this.Controls.Add(this.tbMasterZ);
-            this.Controls.Add(this.label21);
-            this.Controls.Add(this.label22);
-            this.Controls.Add(this.label23);
-            this.Controls.Add(this.tbMasterY);
-            this.Controls.Add(this.label24);
-            this.Controls.Add(this.tbMasterX);
-            this.Controls.Add(this.label16);
-            this.Controls.Add(this.label17);
-            this.Controls.Add(this.tbMasterTZ);
             this.Controls.Add(this.BaseUpBtn);
             this.Controls.Add(this.SidePushloadBtn);
             this.Controls.Add(this.PogoPinloadBtn);
@@ -2878,19 +2912,12 @@
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.grbCalibration);
             this.Controls.Add(this.button7);
-            this.Controls.Add(this.label42);
-            this.Controls.Add(this.label43);
-            this.Controls.Add(this.cbSetTXTYwithMaster);
-            this.Controls.Add(this.label41);
-            this.Controls.Add(this.tbMasterTY);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.tbMasterTX);
-            this.Controls.Add(this.btnInitialTilt);
-            this.Controls.Add(this.btnSetMasterTilt);
             this.Controls.Add(this.cbLiveWithMarks);
             this.Controls.Add(this.grpAdjust);
             this.Controls.Add(this.cbContinuosMode);
             this.Controls.Add(this.panelCam0);
+            this.Controls.Add(this.pnlMasterTilt);
+            this.Controls.Add(this.btnMasterTilt);
             this.Controls.Add(this.btnBack);
             this.Controls.Add(this.btnLive2);
             this.Controls.Add(this.btnHalt2);
@@ -2934,6 +2961,8 @@
             this.PanelAdmin1.PerformLayout();
             this.PanelAdmin2.ResumeLayout(false);
             this.PanelAdmin2.PerformLayout();
+            this.pnlMasterTilt.ResumeLayout(false);
+            this.pnlMasterTilt.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2977,6 +3006,8 @@
         private System.Windows.Forms.CheckBox cbContinuosMode;
         private System.Windows.Forms.Button btnFitFOV;
         private System.Windows.Forms.CheckBox cbLiveWithMarks;
+        private System.Windows.Forms.Panel pnlMasterTilt;
+        private System.Windows.Forms.Button btnMasterTilt;
         private System.Windows.Forms.Button btnSetMasterTilt;
         private System.Windows.Forms.Button btnInitialTilt;
         private System.Windows.Forms.Button btnOpenResultBin;

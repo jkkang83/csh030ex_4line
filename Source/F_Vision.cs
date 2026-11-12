@@ -514,8 +514,14 @@ namespace CSH030Ex
         }
         private void VisibleAdmin(bool isOn)
         {
+            if (!isOn)
+                ResetMasterTiltPanel();
+
             if (isOn)
             {
+                btnMasterTilt.Visible = false;
+                pnlMasterTilt.Visible = true;
+                pnlMasterTilt.BringToFront();
                 BtnAdminMode.Text = "Amdin Mode";
                 tbInfo.Location = new System.Drawing.Point(724, 736);
                 tbInfo.Size = new System.Drawing.Size(1192, 185);
@@ -4856,6 +4862,7 @@ namespace CSH030Ex
 
         private void btnBack_Click(object sender, EventArgs e)
         {
+            ResetMasterTiltPanel();
             //m__G.fManage.ManualToPlot();
             if (!bHaltLive)
                 GrabHalt();
@@ -8620,37 +8627,60 @@ namespace CSH030Ex
             }
         }
 
+        private void btnMasterTilt_Click(object sender, EventArgs e)
+        {
+            ResetMasterTiltPanel();
+            m__G = m__G ?? Global.GetInstance();
+            if (m__G.m_bPasswordOn)
+            {
+                using (PassFailInfromation dialog = new PassFailInfromation(false, true))
+                {
+                    dialog.m__G = m__G;
+                    if (dialog.ShowDialog(this) != DialogResult.OK)
+                        return;
+                }
+            }
+
+            btnMasterTilt.Visible = false;
+            pnlMasterTilt.Visible = true;
+            pnlMasterTilt.BringToFront();
+        }
+
+        private void ResetMasterTiltPanel()
+        {
+            bool passwordOn = (m__G ?? Global.GetInstance()).m_bPasswordOn;
+            pnlMasterTilt.Visible = !passwordOn;
+            btnMasterTilt.Visible = passwordOn;
+            if (!passwordOn)
+                pnlMasterTilt.BringToFront();
+            cbSetTXTYwithMaster.Checked = false;
+            SetMasterTiltControlsEnabled(false);
+        }
+
+        private void SetMasterTiltControlsEnabled(bool enabled)
+        {
+            MasterList.Enabled = enabled;
+            btnDeleteMaster.Enabled = enabled;
+            btnAddMaster.Enabled = enabled;
+            btnInitialTilt.Enabled = enabled;
+            btnSetMasterTilt.Enabled = enabled;
+            tbMasterX.Enabled = enabled;
+            tbMasterY.Enabled = enabled;
+            tbMasterZ.Enabled = enabled;
+            tbMasterTX.Enabled = enabled;
+            tbMasterTY.Enabled = enabled;
+            tbMasterTZ.Enabled = enabled;
+        }
+
         private void cbSetTXTYwithMaster_CheckedChanged(object sender, EventArgs e)
         {
-            if (cbSetTXTYwithMaster.Checked)
+            if (cbSetTXTYwithMaster.Checked && !pnlMasterTilt.Visible)
             {
-                MasterList.Enabled = true;
-                btnDeleteMaster.Enabled = true;
-                btnAddMaster.Enabled = true;
-                btnInitialTilt.Enabled = true;
-                btnSetMasterTilt.Enabled = true;
-                tbMasterX.Enabled = true;
-                tbMasterY.Enabled = true;
-                tbMasterZ.Enabled = true;
-                tbMasterTX.Enabled = true;
-                tbMasterTY.Enabled = true;
-                tbMasterTZ.Enabled = true;
+                cbSetTXTYwithMaster.Checked = false;
+                return;
+            }
 
-            }
-            else
-            {
-                MasterList.Enabled = false;
-                btnDeleteMaster.Enabled = false;
-                btnAddMaster.Enabled = false;
-                btnInitialTilt.Enabled = false;
-                btnSetMasterTilt.Enabled = false;
-                tbMasterX.Enabled = false;
-                tbMasterY.Enabled = false;
-                tbMasterZ.Enabled = false;
-                tbMasterTX.Enabled = false;
-                tbMasterTY.Enabled = false;
-                tbMasterTZ.Enabled = false;
-            }
+            SetMasterTiltControlsEnabled(cbSetTXTYwithMaster.Checked);
         }
 
         private void tbInfo_TextChanged(object sender, EventArgs e)
@@ -17761,6 +17791,10 @@ namespace CSH030Ex
 
         private void FVision_VisibleChanged(object sender, EventArgs e)
         {
+            ResetMasterTiltPanel();
+            if (!Visible)
+                VisibleAdmin(false);
+
             if (Visible)
             {
                 InitMasterZeroList();
