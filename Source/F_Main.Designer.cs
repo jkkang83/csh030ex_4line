@@ -29,8 +29,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(F_Main));
             this.panel5 = new System.Windows.Forms.Panel();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
@@ -50,22 +50,29 @@
             this.tb_CurrResult = new System.Windows.Forms.TextBox();
             this.P_Sub = new System.Windows.Forms.Panel();
             this.groupBox1 = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.cbDebugMode = new System.Windows.Forms.CheckBox();
+            this.cb_ScreenCapture = new System.Windows.Forms.CheckBox();
+            this.cbReverseX = new System.Windows.Forms.CheckBox();
+            this.cbReverseY = new System.Windows.Forms.CheckBox();
+            this.cbAutoLastFrame = new System.Windows.Forms.CheckBox();
+            this.cbCalibrationModel = new System.Windows.Forms.CheckBox();
+            this.cbNoHost = new System.Windows.Forms.CheckBox();
+            this.cbReverseTY = new System.Windows.Forms.CheckBox();
+            this.cbTestStage = new System.Windows.Forms.CheckBox();
+            this.cbReverseTX = new System.Windows.Forms.CheckBox();
+            this.cbYTiltReverse = new System.Windows.Forms.CheckBox();
+            this.cbXTiltReverse = new System.Windows.Forms.CheckBox();
             this.chReverseCamera = new System.Windows.Forms.CheckBox();
             this.chSaveVideo = new System.Windows.Forms.CheckBox();
             this.cbPseudoOMM = new System.Windows.Forms.CheckBox();
             this.chSaveUserImage = new System.Windows.Forms.CheckBox();
             this.chOISOption = new System.Windows.Forms.CheckBox();
             this.cbSaveNGImage = new System.Windows.Forms.CheckBox();
-            this.cbTestStage = new System.Windows.Forms.CheckBox();
-            this.cbReverseTY = new System.Windows.Forms.CheckBox();
-            this.cbReverseY = new System.Windows.Forms.CheckBox();
-            this.cbReverseX = new System.Windows.Forms.CheckBox();
             this.lblDefaultModel = new System.Windows.Forms.Label();
-            this.cbNoHost = new System.Windows.Forms.CheckBox();
             this.cbSaveLostTestSet = new System.Windows.Forms.CheckBox();
             this.tbMonitoringTestSetCount = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.cbAutoLastFrame = new System.Windows.Forms.CheckBox();
             this.cbPrismCoordinateSystem = new System.Windows.Forms.CheckBox();
             this.cbEulerRotation = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -88,17 +95,13 @@
             this.label22 = new System.Windows.Forms.Label();
             this.lbxBarcodeMaker = new System.Windows.Forms.ListBox();
             this.lblMaker = new System.Windows.Forms.Label();
-            this.cbReverseTX = new System.Windows.Forms.CheckBox();
-            this.cbXTiltReverse = new System.Windows.Forms.CheckBox();
             this.tbTesterNumber = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.lbxProductModel = new System.Windows.Forms.ListBox();
             this.lblRevisionNumber = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.lbxPrismSupplier = new System.Windows.Forms.ListBox();
-            this.cbYTiltReverse = new System.Windows.Forms.CheckBox();
             this.tbProductLine = new System.Windows.Forms.TextBox();
-            this.cbCalibrationModel = new System.Windows.Forms.CheckBox();
             this.label17 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.cbHideAllGraph = new System.Windows.Forms.CheckBox();
@@ -108,7 +111,6 @@
             this.cb_EditSpec = new System.Windows.Forms.CheckBox();
             this.btn_SaveSpecFile = new System.Windows.Forms.Button();
             this.btn_SaveAsSpecFile = new System.Windows.Forms.Button();
-            this.cb_ScreenCapture = new System.Windows.Forms.CheckBox();
             this.cbSaveRawData = new System.Windows.Forms.CheckBox();
             this.cbPassword = new System.Windows.Forms.CheckBox();
             this.btnAutoLearn = new System.Windows.Forms.Button();
@@ -121,11 +123,9 @@
             this.btn_ToRight = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.labelMOTID = new System.Windows.Forms.Label();
-            this.cbDebugMode = new System.Windows.Forms.CheckBox();
             this.cbSaveImage = new System.Windows.Forms.CheckBox();
             this.txtSaveImage = new System.Windows.Forms.TextBox();
             this.lblSaveImage = new System.Windows.Forms.Label();
-            this.panel2 = new System.Windows.Forms.Panel();
             this.panel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.panel1.SuspendLayout();
@@ -133,9 +133,9 @@
             this.panel3.SuspendLayout();
             this.P_Sub.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.panel4.SuspendLayout();
-            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel5
@@ -153,14 +153,14 @@
             this.dataGridView2.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(132)))));
             this.dataGridView2.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView2.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView2.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView2.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView2.Location = new System.Drawing.Point(0, 0);
             this.dataGridView2.Name = "dataGridView2";
@@ -201,14 +201,14 @@
             this.dataGridView1.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(132)))));
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
@@ -416,10 +416,7 @@
             this.groupBox1.Controls.Add(this.cbSaveNGImage);
             this.groupBox1.Controls.Add(this.lblDefaultModel);
             this.groupBox1.Controls.Add(this.cbSaveLostTestSet);
-            this.groupBox1.Controls.Add(this.tbMonitoringTestSetCount);
-            this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.cbPrismCoordinateSystem);
-            this.groupBox1.Controls.Add(this.cbEulerRotation);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.button2);
             this.groupBox1.Controls.Add(this.button1);
@@ -439,10 +436,220 @@
             this.groupBox1.Controls.Add(this.label17);
             this.groupBox1.Controls.Add(this.label16);
             this.groupBox1.Controls.Add(this.cbHideAllGraph);
-            this.groupBox1.Location = new System.Drawing.Point(481, 2);
+            this.groupBox1.Location = new System.Drawing.Point(480, 2);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(593, 962);
             this.groupBox1.TabIndex = 200;
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.cbDebugMode);
+            this.panel2.Controls.Add(this.cb_ScreenCapture);
+            this.panel2.Controls.Add(this.cbReverseX);
+            this.panel2.Controls.Add(this.cbReverseY);
+            this.panel2.Controls.Add(this.cbAutoLastFrame);
+            this.panel2.Controls.Add(this.cbCalibrationModel);
+            this.panel2.Controls.Add(this.cbNoHost);
+            this.panel2.Controls.Add(this.cbReverseTY);
+            this.panel2.Controls.Add(this.cbTestStage);
+            this.panel2.Controls.Add(this.tbMonitoringTestSetCount);
+            this.panel2.Controls.Add(this.cbReverseTX);
+            this.panel2.Controls.Add(this.label3);
+            this.panel2.Controls.Add(this.cbYTiltReverse);
+            this.panel2.Controls.Add(this.cbXTiltReverse);
+            this.panel2.Controls.Add(this.cbEulerRotation);
+            this.panel2.Location = new System.Drawing.Point(530, 560);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(10, 10);
+            this.panel2.TabIndex = 206;
+            // 
+            // cbDebugMode
+            // 
+            this.cbDebugMode.AutoSize = true;
+            this.cbDebugMode.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
+            this.cbDebugMode.Location = new System.Drawing.Point(291, 1);
+            this.cbDebugMode.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
+            this.cbDebugMode.Name = "cbDebugMode";
+            this.cbDebugMode.Size = new System.Drawing.Size(104, 21);
+            this.cbDebugMode.TabIndex = 185;
+            this.cbDebugMode.Text = "Debug Mode";
+            this.cbDebugMode.UseVisualStyleBackColor = true;
+            this.cbDebugMode.Visible = false;
+            this.cbDebugMode.CheckedChanged += new System.EventHandler(this.cbDebugMode_CheckedChanged);
+            // 
+            // cb_ScreenCapture
+            // 
+            this.cb_ScreenCapture.AutoSize = true;
+            this.cb_ScreenCapture.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
+            this.cb_ScreenCapture.Location = new System.Drawing.Point(187, 4);
+            this.cb_ScreenCapture.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
+            this.cb_ScreenCapture.Name = "cb_ScreenCapture";
+            this.cb_ScreenCapture.Size = new System.Drawing.Size(98, 21);
+            this.cb_ScreenCapture.TabIndex = 122;
+            this.cb_ScreenCapture.Text = "Save Screen";
+            this.cb_ScreenCapture.UseVisualStyleBackColor = true;
+            this.cb_ScreenCapture.Visible = false;
+            this.cb_ScreenCapture.CheckedChanged += new System.EventHandler(this.cb_ScreenCapture_CheckedChanged);
+            // 
+            // cbReverseX
+            // 
+            this.cbReverseX.AutoSize = true;
+            this.cbReverseX.BackColor = System.Drawing.Color.Transparent;
+            this.cbReverseX.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbReverseX.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbReverseX.ForeColor = System.Drawing.Color.Black;
+            this.cbReverseX.Location = new System.Drawing.Point(181, 51);
+            this.cbReverseX.Name = "cbReverseX";
+            this.cbReverseX.Size = new System.Drawing.Size(152, 25);
+            this.cbReverseX.TabIndex = 191;
+            this.cbReverseX.Text = "Reverse Probe X";
+            this.cbReverseX.UseVisualStyleBackColor = false;
+            this.cbReverseX.Visible = false;
+            this.cbReverseX.CheckedChanged += new System.EventHandler(this.cbReverseX_CheckedChanged);
+            // 
+            // cbReverseY
+            // 
+            this.cbReverseY.AutoSize = true;
+            this.cbReverseY.BackColor = System.Drawing.Color.Transparent;
+            this.cbReverseY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbReverseY.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbReverseY.ForeColor = System.Drawing.Color.Black;
+            this.cbReverseY.Location = new System.Drawing.Point(339, 51);
+            this.cbReverseY.Name = "cbReverseY";
+            this.cbReverseY.Size = new System.Drawing.Size(152, 25);
+            this.cbReverseY.TabIndex = 192;
+            this.cbReverseY.Text = "Reverse Probe Y";
+            this.cbReverseY.UseVisualStyleBackColor = false;
+            this.cbReverseY.Visible = false;
+            this.cbReverseY.CheckedChanged += new System.EventHandler(this.cbReverseY_CheckedChanged);
+            // 
+            // cbAutoLastFrame
+            // 
+            this.cbAutoLastFrame.AutoSize = true;
+            this.cbAutoLastFrame.BackColor = System.Drawing.Color.Transparent;
+            this.cbAutoLastFrame.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbAutoLastFrame.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbAutoLastFrame.ForeColor = System.Drawing.Color.Black;
+            this.cbAutoLastFrame.Location = new System.Drawing.Point(13, 113);
+            this.cbAutoLastFrame.Name = "cbAutoLastFrame";
+            this.cbAutoLastFrame.Size = new System.Drawing.Size(152, 25);
+            this.cbAutoLastFrame.TabIndex = 185;
+            this.cbAutoLastFrame.Text = "Auto Last Frame";
+            this.cbAutoLastFrame.UseVisualStyleBackColor = false;
+            this.cbAutoLastFrame.Visible = false;
+            this.cbAutoLastFrame.CheckedChanged += new System.EventHandler(this.cbAutoLastFrame_CheckedChanged);
+            // 
+            // cbCalibrationModel
+            // 
+            this.cbCalibrationModel.AutoSize = true;
+            this.cbCalibrationModel.BackColor = System.Drawing.Color.Transparent;
+            this.cbCalibrationModel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbCalibrationModel.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbCalibrationModel.ForeColor = System.Drawing.Color.Black;
+            this.cbCalibrationModel.Location = new System.Drawing.Point(13, 175);
+            this.cbCalibrationModel.Name = "cbCalibrationModel";
+            this.cbCalibrationModel.Size = new System.Drawing.Size(162, 25);
+            this.cbCalibrationModel.TabIndex = 162;
+            this.cbCalibrationModel.Text = "Calibration Model";
+            this.cbCalibrationModel.UseVisualStyleBackColor = false;
+            this.cbCalibrationModel.Visible = false;
+            this.cbCalibrationModel.CheckedChanged += new System.EventHandler(this.cbSkipVisionCheck_CheckedChanged);
+            // 
+            // cbNoHost
+            // 
+            this.cbNoHost.AutoSize = true;
+            this.cbNoHost.BackColor = System.Drawing.Color.Transparent;
+            this.cbNoHost.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbNoHost.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbNoHost.ForeColor = System.Drawing.Color.Black;
+            this.cbNoHost.Location = new System.Drawing.Point(13, 72);
+            this.cbNoHost.Name = "cbNoHost";
+            this.cbNoHost.Size = new System.Drawing.Size(116, 25);
+            this.cbNoHost.TabIndex = 189;
+            this.cbNoHost.Text = "No Host PC";
+            this.cbNoHost.UseVisualStyleBackColor = false;
+            this.cbNoHost.Visible = false;
+            this.cbNoHost.CheckedChanged += new System.EventHandler(this.cbNoHost_CheckedChanged);
+            // 
+            // cbReverseTY
+            // 
+            this.cbReverseTY.AutoSize = true;
+            this.cbReverseTY.BackColor = System.Drawing.Color.Transparent;
+            this.cbReverseTY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbReverseTY.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbReverseTY.ForeColor = System.Drawing.Color.Black;
+            this.cbReverseTY.Location = new System.Drawing.Point(181, 82);
+            this.cbReverseTY.Name = "cbReverseTY";
+            this.cbReverseTY.Size = new System.Drawing.Size(161, 25);
+            this.cbReverseTY.TabIndex = 193;
+            this.cbReverseTY.Text = "Reverse Probe TY";
+            this.cbReverseTY.UseVisualStyleBackColor = false;
+            this.cbReverseTY.Visible = false;
+            this.cbReverseTY.CheckedChanged += new System.EventHandler(this.cbReverseTY_CheckedChanged);
+            // 
+            // cbTestStage
+            // 
+            this.cbTestStage.AutoSize = true;
+            this.cbTestStage.BackColor = System.Drawing.Color.Transparent;
+            this.cbTestStage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbTestStage.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbTestStage.ForeColor = System.Drawing.Color.Black;
+            this.cbTestStage.Location = new System.Drawing.Point(13, 144);
+            this.cbTestStage.Name = "cbTestStage";
+            this.cbTestStage.Size = new System.Drawing.Size(106, 25);
+            this.cbTestStage.TabIndex = 199;
+            this.cbTestStage.Text = "Test Stage";
+            this.cbTestStage.UseVisualStyleBackColor = false;
+            this.cbTestStage.Visible = false;
+            this.cbTestStage.CheckedChanged += new System.EventHandler(this.cbTestStage_CheckedChanged);
+            // 
+            // cbReverseTX
+            // 
+            this.cbReverseTX.AutoSize = true;
+            this.cbReverseTX.BackColor = System.Drawing.Color.Transparent;
+            this.cbReverseTX.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbReverseTX.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbReverseTX.ForeColor = System.Drawing.Color.Black;
+            this.cbReverseTX.Location = new System.Drawing.Point(339, 82);
+            this.cbReverseTX.Name = "cbReverseTX";
+            this.cbReverseTX.Size = new System.Drawing.Size(161, 25);
+            this.cbReverseTX.TabIndex = 178;
+            this.cbReverseTX.Text = "Reverse Probe TX";
+            this.cbReverseTX.UseVisualStyleBackColor = false;
+            this.cbReverseTX.Visible = false;
+            this.cbReverseTX.CheckedChanged += new System.EventHandler(this.cbReverseAF_CheckedChanged);
+            // 
+            // cbYTiltReverse
+            // 
+            this.cbYTiltReverse.AutoSize = true;
+            this.cbYTiltReverse.BackColor = System.Drawing.Color.Transparent;
+            this.cbYTiltReverse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbYTiltReverse.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbYTiltReverse.ForeColor = System.Drawing.Color.Black;
+            this.cbYTiltReverse.Location = new System.Drawing.Point(13, 29);
+            this.cbYTiltReverse.Name = "cbYTiltReverse";
+            this.cbYTiltReverse.Size = new System.Drawing.Size(134, 25);
+            this.cbYTiltReverse.TabIndex = 160;
+            this.cbYTiltReverse.Text = "Y Tilt Reversal";
+            this.cbYTiltReverse.UseVisualStyleBackColor = false;
+            this.cbYTiltReverse.Visible = false;
+            this.cbYTiltReverse.CheckedChanged += new System.EventHandler(this.cbPitchDirReverse_CheckedChanged);
+            // 
+            // cbXTiltReverse
+            // 
+            this.cbXTiltReverse.AutoSize = true;
+            this.cbXTiltReverse.BackColor = System.Drawing.Color.Transparent;
+            this.cbXTiltReverse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbXTiltReverse.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.cbXTiltReverse.ForeColor = System.Drawing.Color.Black;
+            this.cbXTiltReverse.Location = new System.Drawing.Point(13, 4);
+            this.cbXTiltReverse.Name = "cbXTiltReverse";
+            this.cbXTiltReverse.Size = new System.Drawing.Size(134, 25);
+            this.cbXTiltReverse.TabIndex = 177;
+            this.cbXTiltReverse.Text = "X Tilt Reversal";
+            this.cbXTiltReverse.UseVisualStyleBackColor = false;
+            this.cbXTiltReverse.Visible = false;
+            this.cbXTiltReverse.CheckedChanged += new System.EventHandler(this.cbYawDirReverse_CheckedChanged);
             // 
             // chReverseCamera
             // 
@@ -451,7 +658,7 @@
             this.chReverseCamera.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chReverseCamera.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.chReverseCamera.ForeColor = System.Drawing.Color.Black;
-            this.chReverseCamera.Location = new System.Drawing.Point(346, 299);
+            this.chReverseCamera.Location = new System.Drawing.Point(346, 264);
             this.chReverseCamera.Name = "chReverseCamera";
             this.chReverseCamera.Size = new System.Drawing.Size(149, 25);
             this.chReverseCamera.TabIndex = 205;
@@ -466,7 +673,7 @@
             this.chSaveVideo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chSaveVideo.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.chSaveVideo.ForeColor = System.Drawing.Color.Black;
-            this.chSaveVideo.Location = new System.Drawing.Point(346, 240);
+            this.chSaveVideo.Location = new System.Drawing.Point(346, 205);
             this.chSaveVideo.Name = "chSaveVideo";
             this.chSaveVideo.Size = new System.Drawing.Size(112, 25);
             this.chSaveVideo.TabIndex = 204;
@@ -481,7 +688,7 @@
             this.cbPseudoOMM.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbPseudoOMM.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbPseudoOMM.ForeColor = System.Drawing.Color.Aqua;
-            this.cbPseudoOMM.Location = new System.Drawing.Point(346, 271);
+            this.cbPseudoOMM.Location = new System.Drawing.Point(346, 236);
             this.cbPseudoOMM.Name = "cbPseudoOMM";
             this.cbPseudoOMM.Size = new System.Drawing.Size(124, 25);
             this.cbPseudoOMM.TabIndex = 203;
@@ -496,7 +703,7 @@
             this.chSaveUserImage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chSaveUserImage.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.chSaveUserImage.ForeColor = System.Drawing.Color.Black;
-            this.chSaveUserImage.Location = new System.Drawing.Point(346, 209);
+            this.chSaveUserImage.Location = new System.Drawing.Point(346, 174);
             this.chSaveUserImage.Name = "chSaveUserImage";
             this.chSaveUserImage.Size = new System.Drawing.Size(156, 25);
             this.chSaveUserImage.TabIndex = 202;
@@ -511,7 +718,7 @@
             this.chOISOption.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chOISOption.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.chOISOption.ForeColor = System.Drawing.Color.Black;
-            this.chOISOption.Location = new System.Drawing.Point(346, 181);
+            this.chOISOption.Location = new System.Drawing.Point(346, 146);
             this.chOISOption.Name = "chOISOption";
             this.chOISOption.Size = new System.Drawing.Size(110, 25);
             this.chOISOption.TabIndex = 201;
@@ -526,77 +733,13 @@
             this.cbSaveNGImage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbSaveNGImage.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbSaveNGImage.ForeColor = System.Drawing.Color.Black;
-            this.cbSaveNGImage.Location = new System.Drawing.Point(346, 153);
+            this.cbSaveNGImage.Location = new System.Drawing.Point(346, 118);
             this.cbSaveNGImage.Name = "cbSaveNGImage";
             this.cbSaveNGImage.Size = new System.Drawing.Size(147, 25);
             this.cbSaveNGImage.TabIndex = 200;
             this.cbSaveNGImage.Text = "Save NG Image";
             this.cbSaveNGImage.UseVisualStyleBackColor = false;
             this.cbSaveNGImage.CheckedChanged += new System.EventHandler(this.cbSaveNGImage_CheckedChanged);
-            // 
-            // cbTestStage
-            // 
-            this.cbTestStage.AutoSize = true;
-            this.cbTestStage.BackColor = System.Drawing.Color.Transparent;
-            this.cbTestStage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbTestStage.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.cbTestStage.ForeColor = System.Drawing.Color.Black;
-            this.cbTestStage.Location = new System.Drawing.Point(13, 82);
-            this.cbTestStage.Name = "cbTestStage";
-            this.cbTestStage.Size = new System.Drawing.Size(106, 25);
-            this.cbTestStage.TabIndex = 199;
-            this.cbTestStage.Text = "Test Stage";
-            this.cbTestStage.UseVisualStyleBackColor = false;
-            this.cbTestStage.Visible = false;
-            this.cbTestStage.CheckedChanged += new System.EventHandler(this.cbTestStage_CheckedChanged);
-            // 
-            // cbReverseTY
-            // 
-            this.cbReverseTY.AutoSize = true;
-            this.cbReverseTY.BackColor = System.Drawing.Color.Transparent;
-            this.cbReverseTY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbReverseTY.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.cbReverseTY.ForeColor = System.Drawing.Color.Black;
-            this.cbReverseTY.Location = new System.Drawing.Point(14, 51);
-            this.cbReverseTY.Name = "cbReverseTY";
-            this.cbReverseTY.Size = new System.Drawing.Size(161, 25);
-            this.cbReverseTY.TabIndex = 193;
-            this.cbReverseTY.Text = "Reverse Probe TY";
-            this.cbReverseTY.UseVisualStyleBackColor = false;
-            this.cbReverseTY.Visible = false;
-            this.cbReverseTY.CheckedChanged += new System.EventHandler(this.cbReverseTY_CheckedChanged);
-            // 
-            // cbReverseY
-            // 
-            this.cbReverseY.AutoSize = true;
-            this.cbReverseY.BackColor = System.Drawing.Color.Transparent;
-            this.cbReverseY.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbReverseY.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.cbReverseY.ForeColor = System.Drawing.Color.Black;
-            this.cbReverseY.Location = new System.Drawing.Point(13, 51);
-            this.cbReverseY.Name = "cbReverseY";
-            this.cbReverseY.Size = new System.Drawing.Size(152, 25);
-            this.cbReverseY.TabIndex = 192;
-            this.cbReverseY.Text = "Reverse Probe Y";
-            this.cbReverseY.UseVisualStyleBackColor = false;
-            this.cbReverseY.Visible = false;
-            this.cbReverseY.CheckedChanged += new System.EventHandler(this.cbReverseY_CheckedChanged);
-            // 
-            // cbReverseX
-            // 
-            this.cbReverseX.AutoSize = true;
-            this.cbReverseX.BackColor = System.Drawing.Color.Transparent;
-            this.cbReverseX.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbReverseX.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.cbReverseX.ForeColor = System.Drawing.Color.Black;
-            this.cbReverseX.Location = new System.Drawing.Point(13, 51);
-            this.cbReverseX.Name = "cbReverseX";
-            this.cbReverseX.Size = new System.Drawing.Size(152, 25);
-            this.cbReverseX.TabIndex = 191;
-            this.cbReverseX.Text = "Reverse Probe X";
-            this.cbReverseX.UseVisualStyleBackColor = false;
-            this.cbReverseX.Visible = false;
-            this.cbReverseX.CheckedChanged += new System.EventHandler(this.cbReverseX_CheckedChanged);
             // 
             // lblDefaultModel
             // 
@@ -607,22 +750,6 @@
             this.lblDefaultModel.Size = new System.Drawing.Size(126, 17);
             this.lblDefaultModel.TabIndex = 190;
             this.lblDefaultModel.Text = "Default Model File";
-            // 
-            // cbNoHost
-            // 
-            this.cbNoHost.AutoSize = true;
-            this.cbNoHost.BackColor = System.Drawing.Color.Transparent;
-            this.cbNoHost.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbNoHost.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.cbNoHost.ForeColor = System.Drawing.Color.Black;
-            this.cbNoHost.Location = new System.Drawing.Point(13, 51);
-            this.cbNoHost.Name = "cbNoHost";
-            this.cbNoHost.Size = new System.Drawing.Size(116, 25);
-            this.cbNoHost.TabIndex = 189;
-            this.cbNoHost.Text = "No Host PC";
-            this.cbNoHost.UseVisualStyleBackColor = false;
-            this.cbNoHost.Visible = false;
-            this.cbNoHost.CheckedChanged += new System.EventHandler(this.cbNoHost_CheckedChanged);
             // 
             // cbSaveLostTestSet
             // 
@@ -643,7 +770,7 @@
             // 
             this.tbMonitoringTestSetCount.BackColor = System.Drawing.Color.SandyBrown;
             this.tbMonitoringTestSetCount.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.tbMonitoringTestSetCount.Location = new System.Drawing.Point(483, 8);
+            this.tbMonitoringTestSetCount.Location = new System.Drawing.Point(354, 118);
             this.tbMonitoringTestSetCount.Name = "tbMonitoringTestSetCount";
             this.tbMonitoringTestSetCount.Size = new System.Drawing.Size(55, 25);
             this.tbMonitoringTestSetCount.TabIndex = 187;
@@ -654,27 +781,11 @@
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.label3.ForeColor = System.Drawing.Color.Peru;
-            this.label3.Location = new System.Drawing.Point(343, 8);
+            this.label3.Location = new System.Drawing.Point(184, 121);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(134, 17);
             this.label3.TabIndex = 186;
             this.label3.Text = "Monitoring Test Set";
-            // 
-            // cbAutoLastFrame
-            // 
-            this.cbAutoLastFrame.AutoSize = true;
-            this.cbAutoLastFrame.BackColor = System.Drawing.Color.Transparent;
-            this.cbAutoLastFrame.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbAutoLastFrame.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.cbAutoLastFrame.ForeColor = System.Drawing.Color.Black;
-            this.cbAutoLastFrame.Location = new System.Drawing.Point(13, 82);
-            this.cbAutoLastFrame.Name = "cbAutoLastFrame";
-            this.cbAutoLastFrame.Size = new System.Drawing.Size(152, 25);
-            this.cbAutoLastFrame.TabIndex = 185;
-            this.cbAutoLastFrame.Text = "Auto Last Frame";
-            this.cbAutoLastFrame.UseVisualStyleBackColor = false;
-            this.cbAutoLastFrame.Visible = false;
-            this.cbAutoLastFrame.CheckedChanged += new System.EventHandler(this.cbAutoLastFrame_CheckedChanged);
             // 
             // cbPrismCoordinateSystem
             // 
@@ -683,7 +794,7 @@
             this.cbPrismCoordinateSystem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbPrismCoordinateSystem.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbPrismCoordinateSystem.ForeColor = System.Drawing.Color.Lime;
-            this.cbPrismCoordinateSystem.Location = new System.Drawing.Point(346, 124);
+            this.cbPrismCoordinateSystem.Location = new System.Drawing.Point(346, 89);
             this.cbPrismCoordinateSystem.Name = "cbPrismCoordinateSystem";
             this.cbPrismCoordinateSystem.Size = new System.Drawing.Size(219, 25);
             this.cbPrismCoordinateSystem.TabIndex = 184;
@@ -698,7 +809,7 @@
             this.cbEulerRotation.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbEulerRotation.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold);
             this.cbEulerRotation.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.cbEulerRotation.Location = new System.Drawing.Point(346, 93);
+            this.cbEulerRotation.Location = new System.Drawing.Point(311, 29);
             this.cbEulerRotation.Name = "cbEulerRotation";
             this.cbEulerRotation.Size = new System.Drawing.Size(185, 25);
             this.cbEulerRotation.TabIndex = 183;
@@ -970,38 +1081,6 @@
             this.lblMaker.TabIndex = 150;
             this.lblMaker.Text = "Maker";
             // 
-            // cbReverseTX
-            // 
-            this.cbReverseTX.AutoSize = true;
-            this.cbReverseTX.BackColor = System.Drawing.Color.Transparent;
-            this.cbReverseTX.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbReverseTX.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.cbReverseTX.ForeColor = System.Drawing.Color.Black;
-            this.cbReverseTX.Location = new System.Drawing.Point(13, 26);
-            this.cbReverseTX.Name = "cbReverseTX";
-            this.cbReverseTX.Size = new System.Drawing.Size(161, 25);
-            this.cbReverseTX.TabIndex = 178;
-            this.cbReverseTX.Text = "Reverse Probe TX";
-            this.cbReverseTX.UseVisualStyleBackColor = false;
-            this.cbReverseTX.Visible = false;
-            this.cbReverseTX.CheckedChanged += new System.EventHandler(this.cbReverseAF_CheckedChanged);
-            // 
-            // cbXTiltReverse
-            // 
-            this.cbXTiltReverse.AutoSize = true;
-            this.cbXTiltReverse.BackColor = System.Drawing.Color.Transparent;
-            this.cbXTiltReverse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbXTiltReverse.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.cbXTiltReverse.ForeColor = System.Drawing.Color.Black;
-            this.cbXTiltReverse.Location = new System.Drawing.Point(13, 4);
-            this.cbXTiltReverse.Name = "cbXTiltReverse";
-            this.cbXTiltReverse.Size = new System.Drawing.Size(134, 25);
-            this.cbXTiltReverse.TabIndex = 177;
-            this.cbXTiltReverse.Text = "X Tilt Reversal";
-            this.cbXTiltReverse.UseVisualStyleBackColor = false;
-            this.cbXTiltReverse.Visible = false;
-            this.cbXTiltReverse.CheckedChanged += new System.EventHandler(this.cbYawDirReverse_CheckedChanged);
-            // 
             // tbTesterNumber
             // 
             this.tbTesterNumber.BackColor = System.Drawing.Color.White;
@@ -1076,22 +1155,6 @@
             this.lbxPrismSupplier.TabIndex = 173;
             this.lbxPrismSupplier.SelectedIndexChanged += new System.EventHandler(this.lbxPrismSupplier_SelectedIndexChanged);
             // 
-            // cbYTiltReverse
-            // 
-            this.cbYTiltReverse.AutoSize = true;
-            this.cbYTiltReverse.BackColor = System.Drawing.Color.Transparent;
-            this.cbYTiltReverse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbYTiltReverse.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.cbYTiltReverse.ForeColor = System.Drawing.Color.Black;
-            this.cbYTiltReverse.Location = new System.Drawing.Point(13, 1);
-            this.cbYTiltReverse.Name = "cbYTiltReverse";
-            this.cbYTiltReverse.Size = new System.Drawing.Size(134, 25);
-            this.cbYTiltReverse.TabIndex = 160;
-            this.cbYTiltReverse.Text = "Y Tilt Reversal";
-            this.cbYTiltReverse.UseVisualStyleBackColor = false;
-            this.cbYTiltReverse.Visible = false;
-            this.cbYTiltReverse.CheckedChanged += new System.EventHandler(this.cbPitchDirReverse_CheckedChanged);
-            // 
             // tbProductLine
             // 
             this.tbProductLine.BackColor = System.Drawing.Color.White;
@@ -1102,22 +1165,6 @@
             this.tbProductLine.TabIndex = 170;
             this.tbProductLine.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.tbProductLine.TextChanged += new System.EventHandler(this.tbProductLine_TextChanged);
-            // 
-            // cbCalibrationModel
-            // 
-            this.cbCalibrationModel.AutoSize = true;
-            this.cbCalibrationModel.BackColor = System.Drawing.Color.Transparent;
-            this.cbCalibrationModel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbCalibrationModel.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.cbCalibrationModel.ForeColor = System.Drawing.Color.Black;
-            this.cbCalibrationModel.Location = new System.Drawing.Point(13, 51);
-            this.cbCalibrationModel.Name = "cbCalibrationModel";
-            this.cbCalibrationModel.Size = new System.Drawing.Size(162, 25);
-            this.cbCalibrationModel.TabIndex = 162;
-            this.cbCalibrationModel.Text = "Calibration Model";
-            this.cbCalibrationModel.UseVisualStyleBackColor = false;
-            this.cbCalibrationModel.Visible = false;
-            this.cbCalibrationModel.CheckedChanged += new System.EventHandler(this.cbSkipVisionCheck_CheckedChanged);
             // 
             // label17
             // 
@@ -1255,25 +1302,11 @@
             this.btn_SaveAsSpecFile.MouseLeave += new System.EventHandler(this.btnMouseHover);
             this.btn_SaveAsSpecFile.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnMouseEnter);
             // 
-            // cb_ScreenCapture
-            // 
-            this.cb_ScreenCapture.AutoSize = true;
-            this.cb_ScreenCapture.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
-            this.cb_ScreenCapture.Location = new System.Drawing.Point(13, 25);
-            this.cb_ScreenCapture.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
-            this.cb_ScreenCapture.Name = "cb_ScreenCapture";
-            this.cb_ScreenCapture.Size = new System.Drawing.Size(98, 21);
-            this.cb_ScreenCapture.TabIndex = 122;
-            this.cb_ScreenCapture.Text = "Save Screen";
-            this.cb_ScreenCapture.UseVisualStyleBackColor = true;
-            this.cb_ScreenCapture.Visible = false;
-            this.cb_ScreenCapture.CheckedChanged += new System.EventHandler(this.cb_ScreenCapture_CheckedChanged);
-            // 
             // cbSaveRawData
             // 
             this.cbSaveRawData.AutoSize = true;
             this.cbSaveRawData.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
-            this.cbSaveRawData.Location = new System.Drawing.Point(1792, 3);
+            this.cbSaveRawData.Location = new System.Drawing.Point(1780, 1);
             this.cbSaveRawData.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
             this.cbSaveRawData.Name = "cbSaveRawData";
             this.cbSaveRawData.Size = new System.Drawing.Size(114, 21);
@@ -1473,20 +1506,6 @@
             this.labelMOTID.TabIndex = 184;
             this.labelMOTID.Text = "--";
             // 
-            // cbDebugMode
-            // 
-            this.cbDebugMode.AutoSize = true;
-            this.cbDebugMode.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
-            this.cbDebugMode.Location = new System.Drawing.Point(13, 1);
-            this.cbDebugMode.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
-            this.cbDebugMode.Name = "cbDebugMode";
-            this.cbDebugMode.Size = new System.Drawing.Size(104, 21);
-            this.cbDebugMode.TabIndex = 185;
-            this.cbDebugMode.Text = "Debug Mode";
-            this.cbDebugMode.UseVisualStyleBackColor = true;
-            this.cbDebugMode.Visible = false;
-            this.cbDebugMode.CheckedChanged += new System.EventHandler(this.cbDebugMode_CheckedChanged);
-            // 
             // cbSaveImage
             // 
             this.cbSaveImage.AutoSize = true;
@@ -1523,25 +1542,6 @@
             this.lblSaveImage.TabIndex = 194;
             this.lblSaveImage.Text = "count";
             // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.cbDebugMode);
-            this.panel2.Controls.Add(this.cb_ScreenCapture);
-            this.panel2.Controls.Add(this.cbReverseX);
-            this.panel2.Controls.Add(this.cbReverseY);
-            this.panel2.Controls.Add(this.cbAutoLastFrame);
-            this.panel2.Controls.Add(this.cbCalibrationModel);
-            this.panel2.Controls.Add(this.cbNoHost);
-            this.panel2.Controls.Add(this.cbReverseTY);
-            this.panel2.Controls.Add(this.cbTestStage);
-            this.panel2.Controls.Add(this.cbReverseTX);
-            this.panel2.Controls.Add(this.cbYTiltReverse);
-            this.panel2.Controls.Add(this.cbXTiltReverse);
-            this.panel2.Location = new System.Drawing.Point(571, 584);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(10, 10);
-            this.panel2.TabIndex = 206;
-            // 
             // F_Main
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1576,7 +1576,7 @@
             this.Name = "F_Main";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "CSH030Ex 4Line Mark 26111202";
+            this.Text = "CSH030Ex 4Line Mark 26111301";
             this.TransparencyKey = System.Drawing.Color.Gray;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.F_Main_FormClosing);
@@ -1592,12 +1592,12 @@
             this.P_Sub.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
