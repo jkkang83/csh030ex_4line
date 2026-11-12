@@ -5037,15 +5037,6 @@ namespace CSH030Ex
             if (m_bFinishLoadMain)
             {
                 m__G.m_bPasswordOn = cbPassword.Checked;
-                if (m__G.m_bPasswordOn)
-                {
-                    PassFailInfromation mPWdialog = null;
-                    mPWdialog = new PassFailInfromation(true);
-
-                    mPWdialog.m__G = m__G;
-                    mPWdialog.SetDesktopLocation(100, 500);
-                    mPWdialog.ShowDialog();
-                }
             }
             if (MachineType == (int)CSH030Ex.MachineType.Master)
                 btnApplyTesterNo.Enabled = true;

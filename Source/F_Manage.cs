@@ -4739,7 +4739,7 @@ namespace CSH030Ex
 
         private void btnToAdmin_Click(object sender, EventArgs e)
         {
-            this.Hide();
+            
             if (!m__G.m_bPasswordOn)
                 MyOwner.ShowAdminMode();
             else
@@ -4750,6 +4750,8 @@ namespace CSH030Ex
                 mPWdialog.SetDesktopLocation(100, 500);
                 mPWdialog.ShowDialog();
             }
+            if (MyOwner.m_bAdmin)
+                this.Hide();
         }
 
         public void ManualToPlot()
