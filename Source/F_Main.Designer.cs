@@ -29,8 +29,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(F_Main));
             this.panel5 = new System.Windows.Forms.Panel();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
@@ -60,9 +60,12 @@
             this.cbNoHost = new System.Windows.Forms.CheckBox();
             this.cbReverseTY = new System.Windows.Forms.CheckBox();
             this.cbTestStage = new System.Windows.Forms.CheckBox();
+            this.tbMonitoringTestSetCount = new System.Windows.Forms.TextBox();
             this.cbReverseTX = new System.Windows.Forms.CheckBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.cbYTiltReverse = new System.Windows.Forms.CheckBox();
             this.cbXTiltReverse = new System.Windows.Forms.CheckBox();
+            this.cbEulerRotation = new System.Windows.Forms.CheckBox();
             this.chReverseCamera = new System.Windows.Forms.CheckBox();
             this.chSaveVideo = new System.Windows.Forms.CheckBox();
             this.cbPseudoOMM = new System.Windows.Forms.CheckBox();
@@ -71,10 +74,7 @@
             this.cbSaveNGImage = new System.Windows.Forms.CheckBox();
             this.lblDefaultModel = new System.Windows.Forms.Label();
             this.cbSaveLostTestSet = new System.Windows.Forms.CheckBox();
-            this.tbMonitoringTestSetCount = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.cbPrismCoordinateSystem = new System.Windows.Forms.CheckBox();
-            this.cbEulerRotation = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
@@ -153,14 +153,14 @@
             this.dataGridView2.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(132)))));
             this.dataGridView2.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView2.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView2.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView2.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView2.Location = new System.Drawing.Point(0, 0);
             this.dataGridView2.Name = "dataGridView2";
@@ -201,14 +201,14 @@
             this.dataGridView1.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(132)))));
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle8;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
@@ -458,10 +458,11 @@
             this.panel2.Controls.Add(this.cbYTiltReverse);
             this.panel2.Controls.Add(this.cbXTiltReverse);
             this.panel2.Controls.Add(this.cbEulerRotation);
-            this.panel2.Location = new System.Drawing.Point(530, 560);
+            this.panel2.Location = new System.Drawing.Point(565, 584);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(10, 10);
             this.panel2.TabIndex = 206;
+            this.panel2.Visible = false;
             // 
             // cbDebugMode
             // 
@@ -603,6 +604,17 @@
             this.cbTestStage.Visible = false;
             this.cbTestStage.CheckedChanged += new System.EventHandler(this.cbTestStage_CheckedChanged);
             // 
+            // tbMonitoringTestSetCount
+            // 
+            this.tbMonitoringTestSetCount.BackColor = System.Drawing.Color.SandyBrown;
+            this.tbMonitoringTestSetCount.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tbMonitoringTestSetCount.Location = new System.Drawing.Point(354, 118);
+            this.tbMonitoringTestSetCount.Name = "tbMonitoringTestSetCount";
+            this.tbMonitoringTestSetCount.Size = new System.Drawing.Size(55, 25);
+            this.tbMonitoringTestSetCount.TabIndex = 187;
+            this.tbMonitoringTestSetCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.tbMonitoringTestSetCount.Visible = false;
+            // 
             // cbReverseTX
             // 
             this.cbReverseTX.AutoSize = true;
@@ -618,6 +630,18 @@
             this.cbReverseTX.UseVisualStyleBackColor = false;
             this.cbReverseTX.Visible = false;
             this.cbReverseTX.CheckedChanged += new System.EventHandler(this.cbReverseAF_CheckedChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label3.ForeColor = System.Drawing.Color.Peru;
+            this.label3.Location = new System.Drawing.Point(184, 121);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(134, 17);
+            this.label3.TabIndex = 186;
+            this.label3.Text = "Monitoring Test Set";
+            this.label3.Visible = false;
             // 
             // cbYTiltReverse
             // 
@@ -650,6 +674,22 @@
             this.cbXTiltReverse.UseVisualStyleBackColor = false;
             this.cbXTiltReverse.Visible = false;
             this.cbXTiltReverse.CheckedChanged += new System.EventHandler(this.cbYawDirReverse_CheckedChanged);
+            // 
+            // cbEulerRotation
+            // 
+            this.cbEulerRotation.AutoSize = true;
+            this.cbEulerRotation.BackColor = System.Drawing.Color.Transparent;
+            this.cbEulerRotation.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbEulerRotation.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold);
+            this.cbEulerRotation.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this.cbEulerRotation.Location = new System.Drawing.Point(311, 29);
+            this.cbEulerRotation.Name = "cbEulerRotation";
+            this.cbEulerRotation.Size = new System.Drawing.Size(185, 25);
+            this.cbEulerRotation.TabIndex = 183;
+            this.cbEulerRotation.Text = "Euler Angle Rotation";
+            this.cbEulerRotation.UseVisualStyleBackColor = false;
+            this.cbEulerRotation.Visible = false;
+            this.cbEulerRotation.CheckedChanged += new System.EventHandler(this.cbEulerRotation_CheckedChanged);
             // 
             // chReverseCamera
             // 
@@ -766,27 +806,6 @@
             this.cbSaveLostTestSet.UseVisualStyleBackColor = false;
             this.cbSaveLostTestSet.CheckedChanged += new System.EventHandler(this.cbSaveLostTestSet_CheckedChanged);
             // 
-            // tbMonitoringTestSetCount
-            // 
-            this.tbMonitoringTestSetCount.BackColor = System.Drawing.Color.SandyBrown;
-            this.tbMonitoringTestSetCount.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.tbMonitoringTestSetCount.Location = new System.Drawing.Point(354, 118);
-            this.tbMonitoringTestSetCount.Name = "tbMonitoringTestSetCount";
-            this.tbMonitoringTestSetCount.Size = new System.Drawing.Size(55, 25);
-            this.tbMonitoringTestSetCount.TabIndex = 187;
-            this.tbMonitoringTestSetCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.label3.ForeColor = System.Drawing.Color.Peru;
-            this.label3.Location = new System.Drawing.Point(184, 121);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(134, 17);
-            this.label3.TabIndex = 186;
-            this.label3.Text = "Monitoring Test Set";
-            // 
             // cbPrismCoordinateSystem
             // 
             this.cbPrismCoordinateSystem.AutoSize = true;
@@ -801,21 +820,6 @@
             this.cbPrismCoordinateSystem.Text = "Prism Cooridnate System";
             this.cbPrismCoordinateSystem.UseVisualStyleBackColor = false;
             this.cbPrismCoordinateSystem.CheckedChanged += new System.EventHandler(this.cbSuperFastMode_CheckedChanged);
-            // 
-            // cbEulerRotation
-            // 
-            this.cbEulerRotation.AutoSize = true;
-            this.cbEulerRotation.BackColor = System.Drawing.Color.Transparent;
-            this.cbEulerRotation.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbEulerRotation.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold);
-            this.cbEulerRotation.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.cbEulerRotation.Location = new System.Drawing.Point(311, 29);
-            this.cbEulerRotation.Name = "cbEulerRotation";
-            this.cbEulerRotation.Size = new System.Drawing.Size(185, 25);
-            this.cbEulerRotation.TabIndex = 183;
-            this.cbEulerRotation.Text = "Euler Angle Rotation";
-            this.cbEulerRotation.UseVisualStyleBackColor = false;
-            this.cbEulerRotation.CheckedChanged += new System.EventHandler(this.cbEulerRotation_CheckedChanged);
             // 
             // label1
             // 
