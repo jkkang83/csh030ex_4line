@@ -2794,6 +2794,16 @@ namespace S2System.Vision
                 DateTime dtNow = DateTime.Now;
                 string filename = "C:\\CSHTest\\Result\\log\\Err" + index.ToString() + "_" + dtNow.ToString("ddHHmmss.fff") + ".bmp";
                 mFAL.mSourceImg[iBuf].SaveImage(filename);
+                mC_pX[index] = 0;
+                mC_pY[index] = 0;
+                mC_pZ[index] = 0;
+                mC_pTX[index] = 0;
+                mC_pTY[index] = 0;
+                mC_pTZ[index] = 0;
+
+                mPrism_pTX[index] = 0;
+                mPrism_pTY[index] = 0;
+                mPrism_pTZ[index] = 0;
             }
             if (bPseudoOMM)
             {
