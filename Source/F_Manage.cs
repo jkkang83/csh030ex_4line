@@ -68,7 +68,7 @@ namespace CSH030Ex
 
         //public double[] mTime = new double[10000];
         public double[][] mStroke = new double[6][];
-        public string[] mStrStroke = new string[6] { "X", "Y", "Z", "TX", "TY", "TZ"};
+        public string[] mStrStroke = new string[6] { "X", "Y", "Z", "TX", "TY", "TZ" };
         //public double[] mXstroke = new double[10000];     //  Code Output Time
         //public double[] mYstroke = new double[10000];     //  Code Output Time
         //public double[] mZstroke = new double[10000];     //  Code Output Time
@@ -190,7 +190,7 @@ namespace CSH030Ex
 
         private void Network_LogEvened(object sender, string e)
         {
-            AddViewLog(string.Format("{0}\r\n",e));
+            AddViewLog(string.Format("{0}\r\n", e));
         }
 
         public byte[] sDataBuff = null;
@@ -253,7 +253,7 @@ namespace CSH030Ex
                             //Thread.Sleep(10);
                     m__G.mDoingStatus = "Triggered Measure";
                     lfrmCnt = int.Parse(arry[1]);
-                    if (!m__G.m_bHideAllGraph) 
+                    if (!m__G.m_bHideAllGraph)
                         AddViewLog(string.Format("[{0}] - R_S Recieve, trg :{1}\r\n", RunNum++, lfrmCnt));
 
                     if (InvokeRequired)
@@ -333,10 +333,10 @@ namespace CSH030Ex
                         BeginInvoke((MethodInvoker)delegate
                         {
                             m__G.fVision.FindCarrierToDummyShift();
-                              if (!m__G.m_bHideAllGraph) AddViewLog(string.Format(string.Format("{0:0.000}\t{1:0.000}\t{2:0.000}\t{3:0.000}\t{4:0.000}\t{5:0.000}===,\r\n",
-                                    m__G.fVision.mMarkShift[0].X, m__G.fVision.mMarkShift[0].Y, 
-                                    m__G.fVision.mMarkShift[1].X, m__G.fVision.mMarkShift[1].Y, 
-                                    m__G.fVision.mMarkShift[2].X, m__G.fVision.mMarkShift[2].Y)));
+                            if (!m__G.m_bHideAllGraph) AddViewLog(string.Format(string.Format("{0:0.000}\t{1:0.000}\t{2:0.000}\t{3:0.000}\t{4:0.000}\t{5:0.000}===,\r\n",
+                                  m__G.fVision.mMarkShift[0].X, m__G.fVision.mMarkShift[0].Y,
+                                  m__G.fVision.mMarkShift[1].X, m__G.fVision.mMarkShift[1].Y,
+                                  m__G.fVision.mMarkShift[2].X, m__G.fVision.mMarkShift[2].Y)));
 
                             if (!m__G.m_bHideAllGraph) AddViewLog(string.Format(string.Format("{0:0.000}\t{1:0.000}\t{2:0.000}\t{3:0.000}\t===,\r\n",
                                     m__G.oCam[0].mAzimuthPts[1][8].X,
@@ -747,7 +747,7 @@ namespace CSH030Ex
                         "Ana" +
                         imgIndex.ToString() +
                         ".bmp";
-                    if (barcode!="File")
+                    if (barcode != "File")
                         m__G.oCam[0].SaveGrabbedImage(
                             imgIndex,
                             sweepFileName);
@@ -785,7 +785,7 @@ namespace CSH030Ex
             }
             catch (Exception ex)
             {
-                if(!m__G.m_bHideAllGraph) AddViewLog(
+                if (!m__G.m_bHideAllGraph) AddViewLog(
                     "R_V Image Save Error : " +
                     ex.Message +
                     "\r\n");
@@ -799,7 +799,7 @@ namespace CSH030Ex
             byte[] sRnBuf = null;
             byte[] sendBuf = null;
 
-            if(m__G.fVision.bHaltLive)
+            if (m__G.fVision.bHaltLive)
             {
                 m__G.fVision.StartLive();
             }
@@ -1278,7 +1278,7 @@ namespace CSH030Ex
 
             m__G.mbSuddenStop[0] = false;
 
-            if (frmCnt>0)
+            if (frmCnt > 0)
             {
                 if (InvokeRequired)
                 {
@@ -1339,11 +1339,11 @@ namespace CSH030Ex
             int watchCnt = 0;
             Thread.Sleep(500);
 
-            while(true)
+            while (true)
             {
                 if (S2System.Vision.MILlib.mTriggeredFrameCount > 0)
 
-                Thread.Sleep(500);
+                    Thread.Sleep(500);
                 //AddViewLog(" " + S2System.Vision.MILlib.mTriggeredFrameCount.ToString());
                 if (m__G.oCam[0].mExternalTriggerOrg == false && watchCnt++ > 20)
                     break;
@@ -1355,7 +1355,7 @@ namespace CSH030Ex
         {
             m__G.fVision.CameraReset(2, true);
             int waitTime = 0;
-            while(true)
+            while (true)
             {
                 if (m__G.fVision.mLoaded)
                     break;
@@ -1434,7 +1434,7 @@ namespace CSH030Ex
                 //if (effFrameCount > 24 && oldindex != index)
                 //{
                 updatePlot++;
-                if (updatePlot%3 == 1)
+                if (updatePlot % 3 == 1)
                 {
                     if (index < 1000)
                     {
@@ -1465,8 +1465,8 @@ namespace CSH030Ex
                         Array.Copy(m__G.oCam[0].mC_pTY, 1, mStroke[4], 1000 - (index9999), index9999);
                         Array.Copy(m__G.oCam[0].mC_pTZ, 1, mStroke[5], 1000 - (index9999), index9999);
 
-                        if (mRealTimeUnit== 6.1 / 500.0)
-                            mRealTimeUnit = ((m__G.oCam[0].GrabT1[900] - m__G.oCam[0].GrabT1[200]) / (double)(lTimerFrequency))/700;
+                        if (mRealTimeUnit == 6.1 / 500.0)
+                            mRealTimeUnit = ((m__G.oCam[0].GrabT1[900] - m__G.oCam[0].GrabT1[200]) / (double)(lTimerFrequency)) / 700;
 
 
                         for (int az = 0; az < 12; az++)
@@ -1534,7 +1534,7 @@ namespace CSH030Ex
                     effFrameCount++;
                 else
                     effFrameCount = 1000;
-                
+
             }
             m__G.fVision.CameraReset(2, false);
             m__G.fGraph.Drive_LEDs(0, 0);
@@ -2134,7 +2134,7 @@ namespace CSH030Ex
 
                 if (lgrabbedFrame >= m__G.oCam[0].mTargetTriggerCount)
                     m__G.fVision.ProcessVisionData(m__G.oCam[0].mTargetTriggerCount, lmaxThread);
-                else 
+                else
                     m__G.fVision.ProcessVisionData(lgrabbedFrame, lmaxThread);
 
                 if (!m__G.m_bHideAllGraph) AddViewLog("Vision Process End\r\n");
@@ -2185,7 +2185,7 @@ namespace CSH030Ex
                 double totalTime = (endTime - triggeredTime) / (double)lTimerFrequency;
 
                 int saveFrameCount = m__G.oCam[0].mTargetTriggerCount;
-
+                int receivedTriggerCount = Math.Max(0, Math.Min(triggergrabbedCnt, saveFrameCount));
                 imageSaveTask = Task.Run(() =>
                 {
                     if (m__G.m_bSaveFImage)
@@ -2320,6 +2320,11 @@ namespace CSH030Ex
                                             needToSaveImage = true;
                                             break;
                                         }
+                                        if (saveFrameCount > receivedTriggerCount)
+                                        {
+                                            needToSaveImage = true;
+                                            break;
+                                        }
                                         // 위치: µm / 각도: arcmin으로 환산.
                                         double scale = axis < 3 ? umScale : arcminScale;
                                         current *= scale;
@@ -2347,7 +2352,7 @@ namespace CSH030Ex
                                     // 한 Frame이라도 NG이면 추가 검사 없이 전체 이미지 저장.
                                     if (needToSaveImage) break;
                                 }
-
+                                
                                 if (needToSaveImage)
                                 {
                                     string sDate = DateTime.Now.ToString("yyMMddHHmmssfff");
@@ -2368,7 +2373,7 @@ namespace CSH030Ex
                                             if (!Directory.Exists(fileName)) Directory.CreateDirectory(fileName);
 
                                             // NG 검출 시 전체 Frame 저장.
-                                            for (int imgIndex = 0; imgIndex < saveFrameCount; imgIndex++)
+                                            for (int imgIndex = 0; imgIndex < receivedTriggerCount; imgIndex++)
                                             {
                                                 string savefilename = Path.Combine(fileName, "Ana" + imgIndex.ToString() + ".bmp");
                                                 m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
@@ -2517,7 +2522,7 @@ namespace CSH030Ex
 
         private static bool IsValidNgImageValue(double value)
         {
-            return IsFiniteNgImageValue(value) && value != 88888.0 && value != 99999.0;
+            return IsFiniteNgImageValue(value) && value !=0;
         }
         public void InitializeEulerMatrix()
         {
@@ -2548,11 +2553,11 @@ namespace CSH030Ex
 
             for (int i = 0; i < EffframeCount; i++)
             {
-                if ( m__G.oCam[0].mC_pX[i] < Xmin)
+                if (m__G.oCam[0].mC_pX[i] < Xmin)
                     Xmin = m__G.oCam[0].mC_pX[i];
-                if ( m__G.oCam[0].mC_pY[i] < Ymin)
+                if (m__G.oCam[0].mC_pY[i] < Ymin)
                     Ymin = m__G.oCam[0].mC_pY[i];
-                if ( m__G.oCam[0].mC_pZ[i] < Zmin)
+                if (m__G.oCam[0].mC_pZ[i] < Zmin)
                     Zmin = m__G.oCam[0].mC_pZ[i];
 
                 if (m__G.oCam[0].mC_pX[i] > Xmax)
@@ -2634,7 +2639,7 @@ namespace CSH030Ex
             double slopeW = 0;
             double offset = 0;
 
-            if (principalAxis=="X")
+            if (principalAxis == "X")
             {
                 for (int i = Xstart; i < Xend; i++)
                 {
@@ -2645,7 +2650,7 @@ namespace CSH030Ex
                 }
                 m__G.oCam[0].mFAL.mFZM.mcLMS1stPoly(luv, Xend - Xstart, ref slopeV, ref offset);
                 m__G.oCam[0].mFAL.mFZM.mcLMS1stPoly(luw, Xend - Xstart, ref slopeW, ref offset);
-                
+
                 m__G.fVision.mPhiThetaPsi[0] = 0;
                 m__G.fVision.mPhiThetaPsi[1] = Math.Atan(slopeW);
                 m__G.fVision.mPhiThetaPsi[2] = -Math.Atan(slopeV);
@@ -3240,7 +3245,7 @@ namespace CSH030Ex
                 m__G.oCam[0].mAbort = true;
             }
 
-            while ( mbStartTriggerTest )
+            while (mbStartTriggerTest)
             {
                 Thread.Sleep(1);
             }
@@ -3269,15 +3274,15 @@ namespace CSH030Ex
             long startTime = 0;
             long endTime = 0;
             long lTimerFrequency = 0;
-            
+
             SupremeTimer.QueryPerformanceCounter(ref startTime);
-            
+
             for (int i = 0; i < m__G.oCam[0].mTargetTriggerCount; i++)
                 m__G.oCam[0].GrabB(i);
 
             SupremeTimer.QueryPerformanceCounter(ref endTime);
             SupremeTimer.QueryPerformanceFrequency(ref lTimerFrequency);
-            double ellapse = (endTime - startTime)/(double)lTimerFrequency;
+            double ellapse = (endTime - startTime) / (double)lTimerFrequency;
 
             m__G.fGraph.Drive_LEDs(0, 0);
             //m__G.oCam[0].ResizeImgs(0, m__G.oCam[0].mTargetTriggerCount);
@@ -3293,13 +3298,13 @@ namespace CSH030Ex
             //m__G.oCam[0].mTargetTriggerCount = 0;
             int orgmTargetTriggerCount = m__G.oCam[0].mTargetTriggerCount;
             m__G.oCam[0].SetTriggeredframeCount(frmCnt);
-            
+
             m__G.oCam[0].mFAL.LoadFMICandidate();
             m__G.oCam[0].PrepareFineCOG();
             m__G.oCam[0].mFAL.BackupFMI();
             m__G.oCam[0].mFAL.RecoverFromBackupFMI();
             m__G.oCam[0].ForceTriggerTime();
-            
+
             m__G.fVision.ProcessVisionData(frmCnt, maxThread);
             m__G.mbSuddenStop[0] = false;
             m__G.oCam[0].mTargetTriggerCount = orgmTargetTriggerCount;
@@ -3363,7 +3368,8 @@ namespace CSH030Ex
                     {
                         PlotMeasureData(frmCnt);
                     });
-                }else
+                }
+                else
                 {
                     PlotMeasureData(frmCnt);
                 }
@@ -3428,7 +3434,7 @@ namespace CSH030Ex
                     mInfoBtn[0].Text = "Start Test";
                 });
             }
-          
+
             int ch = port * 2;
             int k = 0;
             //int q = 0;
@@ -3574,7 +3580,7 @@ namespace CSH030Ex
                 string pngname = "SC_" + dtNow.ToString("MM-dd HH/mm/ss");
 
                 if (m__G.m_ChannelOn[0])
-                    pngname += "_" + m__G.sCIndex[0].ToString(); 
+                    pngname += "_" + m__G.sCIndex[0].ToString();
                 if (m__G.m_ChannelOn[1])
                     pngname += "_" + m__G.sCIndex[1].ToString();
 
@@ -3733,9 +3739,9 @@ namespace CSH030Ex
                 mychart[i].BackColor = System.Drawing.SystemColors.ControlLightLight;
                 //mychart[i].BackColor = System.Drawing.SystemColors.ControlDarkDark;
 
-                if (i<2)
+                if (i < 2)
                 {
-                    String tmp =  "Time ";
+                    String tmp = "Time ";
                     mychart[i].ChartAreas[0].AxisY.MinorGrid.Interval = .1;
                     mychart[i].ChartAreas[0].AxisX.MinorGrid.Enabled = false;
                     mychart[i].ChartAreas[0].AxisY.MinorGrid.Enabled = false;
@@ -3778,7 +3784,7 @@ namespace CSH030Ex
             }
             int[] numSeries = new int[8];
             int[] LnumSeries = new int[8];
-            int[] chIndex = new int[4] { 0, 1, 2,3};
+            int[] chIndex = new int[4] { 0, 1, 2, 3 };
             string[] seriesHead = new string[4] { "Time to ", "Time to ", "Any to ", "Any to " };
             string lHead = "";
             i = 0;
@@ -4080,7 +4086,7 @@ namespace CSH030Ex
             catch { }
         }
 
-        public void PlotChartStroke(int ch,int[] yItems, int[] y2Items, int count)
+        public void PlotChartStroke(int ch, int[] yItems, int[] y2Items, int count)
         {
             if (mychart[ch].InvokeRequired)
             {
@@ -4110,7 +4116,7 @@ namespace CSH030Ex
             {
                 mychart[ch].Invoke(new MethodInvoker(delegate ()
                 {
-                    _locusPlotChart(ch, items,  count);
+                    _locusPlotChart(ch, items, count);
                 }));
             }
             else
@@ -4364,7 +4370,7 @@ namespace CSH030Ex
                     mychart[chartID].Titles.Clear();
                     mychart[chartID].Titles.Add(mStrStroke[xItem] + " vs " + mStrStroke[yItem]);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     MessageBox.Show(e.ToString() + "\r\n debugIndex = " + debugIndex.ToString());
                 }
@@ -4387,10 +4393,10 @@ namespace CSH030Ex
             mychart[chartID].ChartAreas[0].AxisX.MajorGrid.Interval = mychart[chartID].ChartAreas[0].AxisX.Interval;
             mychart[chartID].ChartAreas[0].AxisX.MinorGrid.Enabled = false;
 
-            mychart[chartID].ChartAreas[0].AxisY.MajorGrid.Interval = mychart[chartID].ChartAreas[0].AxisY.Interval/5;
-            mychart[chartID].ChartAreas[0].AxisY2.MajorGrid.Interval = mychart[chartID].ChartAreas[0].AxisY2.Interval/5;
+            mychart[chartID].ChartAreas[0].AxisY.MajorGrid.Interval = mychart[chartID].ChartAreas[0].AxisY.Interval / 5;
+            mychart[chartID].ChartAreas[0].AxisY2.MajorGrid.Interval = mychart[chartID].ChartAreas[0].AxisY2.Interval / 5;
 
-            if (chartID<2)
+            if (chartID < 2)
                 mychart[chartID].ChartAreas[0].AxisY2.Enabled = AxisEnabled.True;
             else
                 mychart[chartID].ChartAreas[0].AxisY2.Enabled = AxisEnabled.False;
@@ -4407,11 +4413,11 @@ namespace CSH030Ex
             else if (y1Inverval >= 1)
                 mychart[chartID].ChartAreas[0].AxisY.LabelStyle.Format = "{0:0}";
 
-            if (y2Inverval >= 0.2 && y2Inverval<1)
+            if (y2Inverval >= 0.2 && y2Inverval < 1)
                 mychart[chartID].ChartAreas[0].AxisY2.LabelStyle.Format = "{0:0.0}";
-            else if (y2Inverval < 0.2 )
+            else if (y2Inverval < 0.2)
                 mychart[chartID].ChartAreas[0].AxisY2.LabelStyle.Format = "{0:0.00}";
-            else if (y2Inverval >=1)
+            else if (y2Inverval >= 1)
                 mychart[chartID].ChartAreas[0].AxisY2.LabelStyle.Format = "{0:0}";
 
             m_FlagChart[chartID] = false;
@@ -4466,10 +4472,10 @@ namespace CSH030Ex
 
             int seriesNum = 0;
             int yItems_iltem = 0;
-            for ( int iItem = 0; iItem < yItems.Length; iItem++ )
+            for (int iItem = 0; iItem < yItems.Length; iItem++)
             {
                 yItems_iltem = yItems[iItem];
-                if (mychart[chartID].Series.FindByName(mStrStroke[yItems_iltem]) != null) 
+                if (mychart[chartID].Series.FindByName(mStrStroke[yItems_iltem]) != null)
                     continue;
                 mychart[chartID].Series.Add(mStrStroke[yItems_iltem]);
                 mychart[chartID].Series[seriesNum].ChartType = SeriesChartType.FastLine;
@@ -4479,14 +4485,15 @@ namespace CSH030Ex
                 if (yItems_iltem > 2)
                     curScale = minscale;
 
-                if(mRealTimeUnit==0)
+                if (mRealTimeUnit == 0)
                 {
                     for (int i = 0; i < count; i++)
                         mychart[chartID].Series[seriesNum].Points.AddXY(i / 1000.0, mStroke[yItems_iltem][i] * curScale); //  FWD
-                }else
+                }
+                else
                 {
                     for (int i = 0; i < count; i++)
-                        mychart[chartID].Series[seriesNum].Points.AddXY(i* mRealTimeUnit, mStroke[yItems_iltem][i] * curScale); //  FWD
+                        mychart[chartID].Series[seriesNum].Points.AddXY(i * mRealTimeUnit, mStroke[yItems_iltem][i] * curScale); //  FWD
                 }
 
                 if (yItems.Length >= 0)
@@ -4516,8 +4523,8 @@ namespace CSH030Ex
                     mychart[chartID].Series.Add(mStrStroke[yI2tems_iltem]);
                     mychart[chartID].Series[seriesNum].ChartType = SeriesChartType.FastLine;
                     mychart[chartID].Series[seriesNum].MarkerSize = 0;
-                    mychart[chartID].Series[seriesNum].Color = mLineColor[iItem+6];
-                    if ( mRealTimeUnit == 0)
+                    mychart[chartID].Series[seriesNum].Color = mLineColor[iItem + 6];
+                    if (mRealTimeUnit == 0)
                     {
                         for (int i = 0; i < count; i++)
                             mychart[chartID].Series[seriesNum].Points.AddXY(i / 1000.0, mStroke[yI2tems_iltem][i] * curScale2); //  FWD
@@ -4525,7 +4532,7 @@ namespace CSH030Ex
                     else
                     {
                         for (int i = 0; i < count; i++)
-                            mychart[chartID].Series[seriesNum].Points.AddXY( i * mRealTimeUnit, mStroke[yI2tems_iltem][i] * curScale2); //  FWD
+                            mychart[chartID].Series[seriesNum].Points.AddXY(i * mRealTimeUnit, mStroke[yI2tems_iltem][i] * curScale2); //  FWD
                     }
 
                     mychart[chartID].Series[seriesNum].YAxisType = AxisType.Secondary;
@@ -4558,7 +4565,7 @@ namespace CSH030Ex
                 xInterval = 1.0;
 
             mychart[chartID].ChartAreas[0].AxisX.Minimum = 0;
-            if (mRealTimeUnit==0)
+            if (mRealTimeUnit == 0)
             {
                 mychart[chartID].ChartAreas[0].AxisX.Maximum = (count / 1000.0);
                 mychart[chartID].ChartAreas[0].AxisX.MinorGrid.Enabled = false;
@@ -4623,8 +4630,8 @@ namespace CSH030Ex
 
             mychart[chartID].ChartAreas[0].AxisX.MajorGrid.Interval = mychart[chartID].ChartAreas[0].AxisX.Interval;
 
-            mychart[chartID].ChartAreas[0].AxisY.MajorGrid.Interval = mychart[chartID].ChartAreas[0].AxisY.Interval/5;
-            mychart[chartID].ChartAreas[0].AxisY2.MajorGrid.Interval = mychart[chartID].ChartAreas[0].AxisY2.Interval/5;
+            mychart[chartID].ChartAreas[0].AxisY.MajorGrid.Interval = mychart[chartID].ChartAreas[0].AxisY.Interval / 5;
+            mychart[chartID].ChartAreas[0].AxisY2.MajorGrid.Interval = mychart[chartID].ChartAreas[0].AxisY2.Interval / 5;
 
             if (chartID < 2)
                 mychart[chartID].ChartAreas[0].AxisY2.Enabled = AxisEnabled.True;
@@ -4706,7 +4713,7 @@ namespace CSH030Ex
 
 
 
-            for ( int iItem = 0; iItem< items.Length; iItem ++)
+            for (int iItem = 0; iItem < items.Length; iItem++)
             {
                 int items_iltem = items[iItem];
 
@@ -4737,18 +4744,18 @@ namespace CSH030Ex
             }
             mychart[chartID].Legends[0].Position.X = 75;
             mychart[chartID].Legends[0].Position.Y = 0;
-            mychart[chartID].Legends[0].Position.Height = 6 + (items.Length-1) * 4;
+            mychart[chartID].Legends[0].Position.Height = 6 + (items.Length - 1) * 4;
             mychart[chartID].Legends[0].Position.Width = 18;
             double gMin = 0;
             double gMax = 0;
             double gInterval = 0;
-            string strMsg = chartID.ToString() +"]\t X : ";
+            string strMsg = chartID.ToString() + "]\t X : ";
             double xInvertval = 0;
             double yInvertval = 0;
             if (!cbRealTimeFixedYScale.Checked)
             {
                 AutoChartGrid(xMin, xMax, ref gMin, ref gMax, ref gInterval);
-                if ( gMin >= gMax)
+                if (gMin >= gMax)
                 {
                     gMax = gMin + 100;
                     gInterval = 10;
@@ -4812,7 +4819,7 @@ namespace CSH030Ex
         public void AutoChartGrid(double xMin, double xMax, ref double gMin, ref double gMax, ref double gInterval)
         {
             double xspan = xMax - xMin;
-            if ( xspan == 0)
+            if (xspan == 0)
             {
                 gMin = 0;
                 gMax = 10;
@@ -4838,12 +4845,12 @@ namespace CSH030Ex
             //double xE = (int)xD + 1;
             double xE = (int)xD + 1.5;
             double xF = xE * xZ;
-            double xG = (2*xMin / xZ);
+            double xG = (2 * xMin / xZ);
             if (xG > 0)
                 xG = (int)xG;
             else
                 xG = (int)xG - 1;
-            
+
             xG = xG / 2;
 
             gMin = xG * xZ;
@@ -4853,10 +4860,10 @@ namespace CSH030Ex
             if (gInterval < 0.02)
                 gInterval = 0.02;
 
-            if (gInterval<=0.5)
+            if (gInterval <= 0.5)
             {
-                gMin = gMin - 2*gInterval;
-                gMax = gMax + 2*gInterval;
+                gMin = gMin - 2 * gInterval;
+                gMax = gMax + 2 * gInterval;
             }
         }
 
@@ -4953,7 +4960,7 @@ namespace CSH030Ex
 
             if (IsRealtime)
             {
-                m__G.fGraph.Drive_LEDs(m__G.sRecipe.iLEDcurrentLR , m__G.sRecipe.iLEDcurrentLL );
+                m__G.fGraph.Drive_LEDs(m__G.sRecipe.iLEDcurrentLR, m__G.sRecipe.iLEDcurrentLL);
 
                 m_bChartFront[ch] = true;
                 mChartArea[0].Width = mychart[0].Width;
@@ -4979,13 +4986,13 @@ namespace CSH030Ex
             }
             else
             {
-                mychart[0].Width  = 475;
+                mychart[0].Width = 475;
 
                 mychart[0].SendToBack();
                 mychart[0].Titles[0].Text = mChartTitle[ch];
                 mychart[0].Titles[0].Font = new Font("Malgun Gothic", 9, FontStyle.Bold); ;
                 mychart[0].ChartAreas[0].AxisY.MinorGrid.Enabled = false;
-                        
+
                 mychart[0].ChartAreas[0].AxisX.Interval = mychart[0].ChartAreas[0].AxisX.Interval * 2;
                 mychart[0].ChartAreas[0].AxisX.MajorGrid.Interval = mychart[0].ChartAreas[0].AxisX.Interval;
 
@@ -5021,7 +5028,7 @@ namespace CSH030Ex
                 //mychart[ch].Legends[0].Position = new ElementPosition(80, 0, 20, 12);
                 mychart[ch].BringToFront();
 
-                mychart[ch].ChartAreas[0].AxisX.Interval = mychart[ch].ChartAreas[0].AxisX.Interval/2;
+                mychart[ch].ChartAreas[0].AxisX.Interval = mychart[ch].ChartAreas[0].AxisX.Interval / 2;
                 mychart[ch].ChartAreas[0].AxisX.MajorGrid.Interval = mychart[ch].ChartAreas[0].AxisX.Interval;
                 //mychart[ch].ChartAreas[0].AxisY.Interval = mychart[ch].ChartAreas[0].AxisY.Interval/2;
                 //mychart[ch].ChartAreas[0].AxisY.MajorGrid.Interval = mychart[ch].ChartAreas[0].AxisY.Interval;
@@ -5181,7 +5188,7 @@ namespace CSH030Ex
             {
                 InitializeChart();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Error in InitializeChart() " + e.ToString());
             }
@@ -5234,8 +5241,8 @@ namespace CSH030Ex
             string[] axisItems = new string[6] { "X", "Y", "Z", "TX", "TY", "TZ" };
             string[] axisMarkItems = new string[12] { "N1", "N2", "W1", "W2", "S1", "S2", "E1", "E2", "topN1", "topN2", "topS1", "topS2" };
 
-            for ( int i=0; i< 6; i++)
-                for ( int j=0; j< 6; j++)
+            for (int i = 0; i < 6; i++)
+                for (int j = 0; j < 6; j++)
                 {
                     tListBox[i].Items.Add(axisItems[j]);
                 }
@@ -5257,7 +5264,7 @@ namespace CSH030Ex
 
         private void btnToAdmin_Click(object sender, EventArgs e)
         {
-            
+
             if (!m__G.m_bPasswordOn)
                 MyOwner.ShowAdminMode();
             else
@@ -6948,7 +6955,7 @@ namespace CSH030Ex
             {
                 ModelBtn.Text = "Model " + m__G.sModelName;
                 txtMsaterNuma.Text = m__G.fVision.GetMasterZeroIndex().ToString();
-               //DebugStopBtn.Visible = m__G.m_bDebugMode;
+                //DebugStopBtn.Visible = m__G.m_bDebugMode;
             }
         }
         private void btnMouseEnter(object sender, EventArgs e)
@@ -7087,7 +7094,8 @@ namespace CSH030Ex
                     SaveChartListBoxChange();
                     PlotChartMark(3, selectedIndices, mCommonDataCount);
                 });
-            }else
+            }
+            else
             {
                 selectedIndices = new int[listBox7.SelectedIndices.Count];
                 listBox7.SelectedIndices.CopyTo(selectedIndices, 0);

@@ -2789,12 +2789,12 @@ namespace S2System.Vision
                 mPrism_pTY[index] = 0;
                 mPrism_pTZ[index] = 0;
             }
-            if ((lTranslation.X == 0 && bSaveLostMarkFrame))
-            {
-                DateTime dtNow = DateTime.Now;
-                string filename = "C:\\CSHTest\\Result\\log\\Err" + index.ToString() + "_" + dtNow.ToString("ddHHmmss.fff") + ".bmp";
-                mFAL.mSourceImg[iBuf].SaveImage(filename);
-            }
+            //if ((lTranslation.X == 0 && bSaveLostMarkFrame))
+            //{
+            //    DateTime dtNow = DateTime.Now;
+            //    string filename = "C:\\CSHTest\\Result\\log\\Err" + index.ToString() + "_" + dtNow.ToString("ddHHmmss.fff") + ".bmp";
+            //    mFAL.mSourceImg[iBuf].SaveImage(filename);
+            //}
             foreach (int az in new int[] { 0, 4, 6, 8, 10 })
             {
                 if (pts[az].X == 0 && pts[az].Y == 0)
