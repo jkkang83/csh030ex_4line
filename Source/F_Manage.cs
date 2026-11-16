@@ -992,7 +992,24 @@ namespace CSH030Ex
                     double value1 = rows[neighbor1][axis];
                     double value2 = rows[neighbor2][axis];
 
-                    if (!IsValidNgSimulationValue(current) || !IsValidNgSimulationValue(value1) || !IsValidNgSimulationValue(value2))
+                    // 현재 Frame이 실패·누락값이면 NG로 검출.
+                    if (!IsValidNgSimulationValue(current))
+                    {
+                        frameNg = true;
+                        ngAxisCount++;
+
+                        if (ngAxisCount <= 20)
+                        {
+                            details.AppendFormat(CultureInfo.InvariantCulture,
+                                "Frame {0} / {1}: 마크 검출 실패·누락값 ({2})\r\n",
+                                frame, mGraphSimulationNames[axis], current);
+                        }
+
+                        continue;
+                    }
+
+                    // 이웃 실패값은 기준값 계산에 사용하지 않음.
+                    if (!IsValidNgSimulationValue(value1) || !IsValidNgSimulationValue(value2))
                     {
                         skippedComparisons++;
                         continue;
@@ -1130,12 +1147,15 @@ namespace CSH030Ex
                         double y = rows[frame][axis];
 
                         // 기존 저장 코드의 누락/실패 표시는 실제 측정값으로 그리지 않음.
-                        bool missing = y == 88888.0 || y == 99999.0;
-                        if (xAxis >= 0 && (x == 88888.0 || x == 99999.0)) missing = true;
+                        //bool missing = y == 88888.0 || y == 99999.0;
+                        //if (xAxis >= 0 && (x == 88888.0 || x == 99999.0)) missing = true;
 
-                        DataPoint point = new DataPoint(missing && xAxis >= 0 ? 0.0 : x, missing ? 0.0 : y);
-                        point.IsEmpty = missing;
-                        series.Points.Add(point);
+                        //DataPoint point = new DataPoint(missing && xAxis >= 0 ? 0.0 : x, missing ? 0.0 : y);
+                        //point.IsEmpty = missing;
+                        //series.Points.Add(point);
+
+                        //그릴 경우
+                        series.Points.AddXY(x, y);
                     }
 
                     chart.Series.Add(series);
@@ -2294,16 +2314,21 @@ namespace CSH030Ex
                                         double value1 = axisData[axis][neighbor1];
                                         double value2 = axisData[axis][neighbor2];
 
-                                        // 누락·실패 표시와 비정상 숫자는 비교에서 제외.
-                                        if (!IsValidNgImageValue(current) || !IsValidNgImageValue(value1) || !IsValidNgImageValue(value2)) continue;
-
+                                        // 현재 Frame이 마크 검출 실패·누락이면 즉시 저장 대상.
+                                        if (!IsValidNgImageValue(current))
+                                        {
+                                            needToSaveImage = true;
+                                            break;
+                                        }
                                         // 위치: µm / 각도: arcmin으로 환산.
                                         double scale = axis < 3 ? umScale : arcminScale;
                                         current *= scale;
                                         value1 *= scale;
                                         value2 *= scale;
 
-                                        if (!IsFiniteNgImageValue(current) || !IsFiniteNgImageValue(value1) || !IsFiniteNgImageValue(value2)) continue;
+                                        // 이웃 실패값은 변화량 계산에 사용하지 않음.
+                                        // 이웃 Frame 자체는 설정된 검사 범위에 포함되면 별도로 검출됨.
+                                        if (!IsValidNgImageValue(value1) || !IsValidNgImageValue(value2)) continue;
 
                                         // 중간 Frame은 앞뒤 평균, 양 끝은 인접 두 점으로 예상값 계산.
                                         double reference = frame == 0 || frame == saveFrameCount - 1
