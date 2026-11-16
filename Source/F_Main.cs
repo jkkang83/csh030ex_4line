@@ -6556,8 +6556,8 @@ namespace CSH030Ex
         // Frame Index는 0부터 시작하며 시작·끝 모두 검사 범위에 포함.
         public int m_ngStartFrameIndex = 300;
         public int m_ngEndFrameIndex = 644;
-        public double m_ngMaxUm = 20;
-        public double m_ngMaxArcmin = 20;
+        public double m_ngMaxUm = 100;
+        public double m_ngMaxArcmin = 100;
 
         private void LoadNgImageSettings()
         {
