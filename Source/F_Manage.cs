@@ -2320,11 +2320,7 @@ namespace CSH030Ex
                                             needToSaveImage = true;
                                             break;
                                         }
-                                        if (saveFrameCount > receivedTriggerCount)
-                                        {
-                                            needToSaveImage = true;
-                                            break;
-                                        }
+                                        
                                         // 위치: µm / 각도: arcmin으로 환산.
                                         double scale = axis < 3 ? umScale : arcminScale;
                                         current *= scale;
