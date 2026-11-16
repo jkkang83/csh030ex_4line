@@ -1,26 +1,27 @@
-﻿using System;
-using System.Numerics;
+﻿using Dln;
+using OpenCvSharp;
+using OpenCvSharp.Flann;
+using S2System.Vision;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.IO;
+using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Numerics;
 using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using System.Net;
-using System.Net.Sockets;
-using System.Net.NetworkInformation;
-using System.Diagnostics;
 using static CSH030Ex.F_Main;
-using OpenCvSharp.Flann;
-using S2System.Vision;
-using Dln;
 using static MotorizedStage_SK_PI.F_Motion_SK_PI;
-using OpenCvSharp;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -822,11 +823,406 @@ namespace CSH030Ex
             Network.SendData(sendBuf);
             isReceivedMD = true;
         }
+        // true: CSV 그래프 테스트 / false: 기존 실제 검사
+        private bool m_bGraphSimulationMode = false;
+
+        private readonly string[] mGraphSimulationNames = { "X", "Y", "Z", "TX", "TY", "TZ" };
+
         private void btnRepeatStartTest_Click(object sender, EventArgs e)
         {
+            if (m_bGraphSimulationMode)
+            {
+                LoadRawDataAndDrawGraph();
+                return;
+            }
+
             RepeatStartTest();
         }
 
+        private void LoadRawDataAndDrawGraph()
+        {
+            // 기존 실제 검사 중에는 파일 그래프를 표시하지 않음.
+            if (!btnStartTriggeredGrab.Enabled)
+            {
+                MessageBox.Show("검사 종료 후 실행해 주세요.");
+                return;
+            }
+
+            using (OpenFileDialog dialog = new OpenFileDialog())
+            {
+                dialog.Title = "ActroRawData 파일 선택";
+                dialog.Filter = "CSV Files (*.csv)|*.csv";
+                dialog.Multiselect = false;
+
+                if (dialog.ShowDialog() != DialogResult.OK) return;
+
+                try
+                {
+                    List<double[]> rows = new List<double[]>();
+
+                    using (StreamReader reader = new StreamReader(dialog.FileName))
+                    {
+                        string headerLine = reader.ReadLine();
+                        if (string.IsNullOrWhiteSpace(headerLine)) throw new InvalidDataException("CSV 헤더가 없습니다.");
+
+                        string[] headers = headerLine.Split(',');
+                        int[] columns = new int[6];
+
+                        for (int axis = 0; axis < 6; axis++)
+                        {
+                            columns[axis] = -1;
+
+                            for (int column = 0; column < headers.Length; column++)
+                            {
+                                string name = headers[column].Trim().Trim('\uFEFF');
+
+                                if (string.Equals(name, mGraphSimulationNames[axis], StringComparison.OrdinalIgnoreCase))
+                                {
+                                    if (columns[axis] >= 0) throw new InvalidDataException("중복 헤더: " + name);
+                                    columns[axis] = column;
+                                }
+                            }
+
+                            if (columns[axis] < 0) throw new InvalidDataException("필수 헤더 없음: " + mGraphSimulationNames[axis]);
+                        }
+
+                        string line;
+                        int lineNumber = 1;
+
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            lineNumber++;
+                            if (string.IsNullOrWhiteSpace(line)) continue;
+
+                            string[] cells = line.Split(',');
+                            if (cells.Length != headers.Length) throw new InvalidDataException(lineNumber + "행의 열 개수가 맞지 않습니다.");
+
+                            double[] values = new double[6];
+
+                            for (int axis = 0; axis < 6; axis++)
+                            {
+                                double value;
+
+                                if (!double.TryParse(cells[columns[axis]].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out value) || double.IsNaN(value) || double.IsInfinity(value))
+                                    throw new InvalidDataException(lineNumber + "행의 " + mGraphSimulationNames[axis] + " 값이 올바르지 않습니다.");
+
+                                values[axis] = value;
+                            }
+
+                            rows.Add(values);
+                            if (rows.Count > 10000) throw new InvalidDataException("최대 10000 Frame까지 지원합니다.");
+                        }
+                    }
+
+                    if (rows.Count == 0) throw new InvalidDataException("표시할 데이터가 없습니다.");
+
+                    // 기존 리스트 선택을 사용. 선택이 없으면 기본 축 표시.
+                    DrawRawDataSimulationChart(0, rows, GetSimulationAxes(listBox1, new int[] { 0, 1, 2 }), GetSimulationAxes(listBox2, new int[0]), -1);
+                    DrawRawDataSimulationChart(1, rows, GetSimulationAxes(listBox3, new int[] { 3, 4, 5 }), GetSimulationAxes(listBox4, new int[0]), -1);
+
+                    // 세 번째 차트는 기존과 동일하게 축 대 축 표시.
+                    int xAxis = listBox5.SelectedIndex;
+                    int yAxis = listBox6.SelectedIndex;
+
+                    if (xAxis < 0 || xAxis > 5) xAxis = 0;
+                    if (yAxis < 0 || yAxis > 5) yAxis = 1;
+
+                    DrawRawDataSimulationChart(2, rows, new int[] { yAxis }, new int[0], xAxis);
+
+                    // CSV에는 마크 좌표가 없으므로 이전 검사 그래프 제거.
+                    mychart[3].Series.Clear();
+                    mychart[3].Titles.Clear();
+                    mychart[3].Titles.Add("CSV: Mark data unavailable");
+
+                    AddViewLog("[Simulation] " + Path.GetFileName(dialog.FileName) + ", Frame=" + rows.Count + "\r\n");
+                    // 추가
+                    CheckRawDataNgImageSimulation(rows);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "RawData 그래프 표시 오류", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
+        private void CheckRawDataNgImageSimulation(List<double[]> rows)
+        {
+            if (!m__G.m_bSaveNgImage) return;
+
+            if (rows == null || rows.Count < 500)
+            {
+                MessageBox.Show(this, "500 Frame 미만이므로 NG 이미지 검사를 생략합니다.",
+                    "NG Image Simulation", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // 검사 시작 시 설정값 고정.
+            int startIndex = MyOwner.m_ngStartFrameIndex;
+            int endIndex = Math.Min(MyOwner.m_ngEndFrameIndex, rows.Count - 1);
+            double maxUm = MyOwner.m_ngMaxUm;
+            double maxArcmin = MyOwner.m_ngMaxArcmin;
+
+            if (startIndex > endIndex)
+            {
+                MessageBox.Show(this, "설정한 검사 범위가 파일의 Frame 범위를 벗어났습니다.\r\n\r\n"
+                    + "파일 Frame Index: 0 ~ " + (rows.Count - 1),
+                    "NG Image Simulation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            int ngFrameCount = 0;
+            int ngAxisCount = 0;
+            int skippedComparisons = 0;
+
+            StringBuilder details = new StringBuilder();
+
+            // 실제 저장 시 중복 없이 저장될 이미지 범위 계산용.
+            bool[] saveFrames = new bool[rows.Count];
+
+            for (int frame = startIndex; frame <= endIndex; frame++)
+            {
+                bool frameNg = false;
+
+                for (int axis = 0; axis < 6; axis++)
+                {
+                    // 경계에서는 인접 두 점을 이용해 직선으로 예상.
+                    int neighbor1 = frame == 0 ? 1 : frame - 1;
+                    int neighbor2 = frame == 0 ? 2 : frame == rows.Count - 1 ? frame - 2 : frame + 1;
+
+                    double current = rows[frame][axis];
+                    double value1 = rows[neighbor1][axis];
+                    double value2 = rows[neighbor2][axis];
+
+                    if (!IsValidNgSimulationValue(current) || !IsValidNgSimulationValue(value1) || !IsValidNgSimulationValue(value2))
+                    {
+                        skippedComparisons++;
+                        continue;
+                    }
+
+                    double reference = frame == 0 || frame == rows.Count - 1
+                        ? 2.0 * value1 - value2
+                        : (value1 + value2) / 2.0;
+
+                    double difference = current - reference;
+                    double limit = axis < 3 ? maxUm : maxArcmin;
+
+                    if (Math.Abs(difference) <= limit) continue;
+
+                    frameNg = true;
+                    ngAxisCount++;
+
+                    // 경고창에는 최대 20건만 표시.
+                    if (ngAxisCount <= 20)
+                    {
+                        details.AppendFormat(CultureInfo.InvariantCulture,
+                            "Frame {0} / {1}: Δ={2:+0.000;-0.000;0.000} {3}, Limit=±{4:0.000}\r\n",
+                            frame, mGraphSimulationNames[axis], difference,
+                            axis < 3 ? "µm" : "arcmin", limit);
+                    }
+                }
+
+                if (!frameNg) continue;
+
+                ngFrameCount++;
+
+                // 검출 위치 ±15 Frame. 겹치는 범위는 한 번만 계산.
+                int saveStart = Math.Max(0, frame - 15);
+                int saveEnd = Math.Min(rows.Count - 1, frame + 15);
+
+                for (int i = saveStart; i <= saveEnd; i++) saveFrames[i] = true;
+            }
+
+            int imageCount = 0;
+            for (int i = 0; i < saveFrames.Length; i++)
+            {
+                if (saveFrames[i]) imageCount++;
+            }
+
+            string summary = string.Format(CultureInfo.InvariantCulture,
+                "검사 범위: {0} ~ {1}\r\nMax µm: ±{2:0.000}\r\nMax arcmin: ±{3:0.000}\r\n"
+                + "비교 제외: {4}건 (누락·실패값 포함)\r\n",
+                startIndex, endIndex, maxUm, maxArcmin, skippedComparisons);
+
+            if (ngFrameCount == 0)
+            {
+                MessageBox.Show(this, summary + "\r\n검사 가능한 데이터에서 임계값 초과가 없습니다.\r\n이미지 저장 조건이 발생하지 않았습니다.",
+                    "NG Image Simulation", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (ngAxisCount > 20)
+                details.Append("... 나머지 " + (ngAxisCount - 20) + "건 생략\r\n");
+
+            AddViewLog("[NG Simulation] Frame=" + ngFrameCount + ", Axis=" + ngAxisCount + ", SaveImage=" + imageCount + "\r\n");
+
+            MessageBox.Show(this, summary
+                + "\r\n이미지 저장 조건이 검출되었습니다."
+                + "\r\n검출 Frame: " + ngFrameCount
+                + "\r\n검출 축 건수: " + ngAxisCount
+                + "\r\n저장 예상 이미지: " + imageCount
+                + "\r\n\r\n" + details.ToString()
+                + "\r\n※ 시뮬레이션이므로 이미지는 저장하지 않습니다.",
+                "NG 이미지 저장 대상", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
+        private static bool IsValidNgSimulationValue(double value)
+        {
+            return !double.IsNaN(value) && !double.IsInfinity(value)
+                && value != 88888.0 && value != 99999.0;
+        }
+        private int[] GetSimulationAxes(ListBox listBox, int[] defaultAxes)
+        {
+            List<int> axes = new List<int>();
+
+            foreach (int index in listBox.SelectedIndices)
+            {
+                if (index >= 0 && index < 6) axes.Add(index);
+            }
+
+            return axes.Count > 0 ? axes.ToArray() : defaultAxes;
+        }
+
+        private void DrawRawDataSimulationChart(int chartIndex, List<double[]> rows, int[] primaryAxes, int[] secondaryAxes, int xAxis)
+        {
+            Chart chart = mychart[chartIndex];
+            chart.Series.Clear();
+            chart.Titles.Clear();
+
+            ChartArea area = chart.ChartAreas[0];
+
+            // 이전 그래프의 고정 범위와 확대 상태 초기화.
+            foreach (Axis axis in new Axis[] { area.AxisX, area.AxisY, area.AxisY2 })
+            {
+                axis.ScaleView.ZoomReset(0);
+                axis.Minimum = double.NaN;
+                axis.Maximum = double.NaN;
+                axis.Interval = 0;
+                axis.MajorGrid.Interval = 0;
+                axis.LabelStyle.Format = "0.##";
+            }
+
+            area.AxisX.IsStartedFromZero = false;
+            area.AxisY.IsStartedFromZero = false;
+            area.AxisY2.IsStartedFromZero = false;
+            area.AxisY2.Enabled = AxisEnabled.False;
+            area.AxisY.Title = "";
+            area.AxisY2.Title = "";
+            area.AxisX.Title = xAxis < 0 ? "Frame Index" : GetSimulationAxisLabel(xAxis);
+
+            HashSet<int> addedAxes = new HashSet<int>();
+
+            for (int group = 0; group < 2; group++)
+            {
+                int[] axes = group == 0 ? primaryAxes : secondaryAxes;
+
+                foreach (int axis in axes)
+                {
+                    if (!addedAxes.Add(axis)) continue;
+
+                    Series series = new Series(GetSimulationAxisLabel(axis));
+                    series.ChartArea = area.Name;
+                    series.ChartType = SeriesChartType.FastLine;
+                    series.BorderWidth = 1;
+                    series.YAxisType = group == 0 ? AxisType.Primary : AxisType.Secondary;
+
+                    for (int frame = 0; frame < rows.Count; frame++)
+                    {
+                        double x = xAxis < 0 ? frame : rows[frame][xAxis];
+                        double y = rows[frame][axis];
+
+                        // 기존 저장 코드의 누락/실패 표시는 실제 측정값으로 그리지 않음.
+                        bool missing = y == 88888.0 || y == 99999.0;
+                        if (xAxis >= 0 && (x == 88888.0 || x == 99999.0)) missing = true;
+
+                        DataPoint point = new DataPoint(missing && xAxis >= 0 ? 0.0 : x, missing ? 0.0 : y);
+                        point.IsEmpty = missing;
+                        series.Points.Add(point);
+                    }
+
+                    chart.Series.Add(series);
+                    if (group == 1) area.AxisY2.Enabled = AxisEnabled.True;
+                }
+            }
+
+            chart.Titles.Add(xAxis < 0 ? "CSV Simulation - Frame vs Stroke" : "CSV Simulation - Stroke vs Stroke");
+            chart.ResetAutoValues();
+
+            if (!cbRealTimeFixedYScale.Checked)
+            {
+                ApplySimulationChartGrid(chart, AxisType.Primary);
+                ApplySimulationChartGrid(chart, AxisType.Secondary);
+            }
+            // 주 Grid는 연한 회색으로 표시하고 보조 Grid는 제거.
+            area.AxisX.MajorGrid.Enabled = true;
+            area.AxisX.MajorGrid.LineColor = System.Drawing.Color.LightGray;
+            area.AxisX.MajorGrid.LineWidth = 1;
+            area.AxisX.MajorGrid.Interval = 0; // 축 눈금 간격을 따름
+            area.AxisX.MinorGrid.Enabled = false;
+
+            area.AxisY.MajorGrid.Enabled = true;
+            area.AxisY.MajorGrid.LineColor = System.Drawing.Color.LightGray;
+            area.AxisY.MajorGrid.LineWidth = 1;
+            area.AxisY.MajorGrid.Interval = 0;
+            area.AxisY.MinorGrid.Enabled = false;
+
+            // 오른쪽 축은 눈금만 표시하고 Grid 중첩은 방지.
+            area.AxisY2.MajorGrid.Enabled = false;
+            area.AxisY2.MinorGrid.Enabled = false;
+
+            chart.Invalidate();
+        }
+
+        private string GetSimulationAxisLabel(int axis)
+        {
+            return mGraphSimulationNames[axis] + (axis < 3 ? " (um)" : " (min)");
+        }
+        private void ApplySimulationChartGrid(Chart chart, AxisType axisType)
+        {
+            bool found = false;
+            double min = double.MaxValue;
+            double max = double.MinValue;
+
+            foreach (Series series in chart.Series)
+            {
+                if (series.YAxisType != axisType) continue;
+
+                foreach (DataPoint point in series.Points)
+                {
+                    if (point.IsEmpty) continue;
+
+                    double value = point.YValues[0];
+                    if (double.IsNaN(value) || double.IsInfinity(value)) continue;
+
+                    if (value < min) min = value;
+                    if (value > max) max = value;
+                    found = true;
+                }
+            }
+
+            if (!found) return;
+
+            // 기존 AutoChartGrid는 동일값이면 무조건 0~10을 반환하므로,
+            // 상수 파형도 실제 값 주변에 표시되도록 범위를 확보.
+            if (min == max)
+            {
+                double margin = Math.Max(Math.Abs(min) * 0.01, 0.1);
+                min -= margin;
+                max += margin;
+            }
+
+            double gridMin = 0;
+            double gridMax = 0;
+            double gridInterval = 0;
+
+            AutoChartGrid(min, max, ref gridMin, ref gridMax, ref gridInterval);
+
+            Axis axis = axisType == AxisType.Primary ? chart.ChartAreas[0].AxisY : chart.ChartAreas[0].AxisY2;
+
+            axis.Minimum = gridMin;
+            axis.Maximum = gridMax;
+            axis.Interval = gridInterval;
+            axis.MajorGrid.Interval = 0;
+            axis.LabelStyle.Format = gridInterval >= 1 ? "0" : gridInterval >= 0.2 ? "0.0" : "0.00";
+        }
         public void RepeatStartTest(int frmCnt = 0)
         {
             if (btnStartTriggeredGrab.Enabled == false)
@@ -1846,30 +2242,119 @@ namespace CSH030Ex
 
                     if (m__G.m_bSaveNgImage && saveFrameCount > 0)
                     {
-                        string sDate = DateTime.Now.ToString("yyMMddHHmmssfff");
-                        string fileName = Path.Combine(m__G.m_RootDirectory, "Result", "RawData", "NG", sDate, "Image" + saveFrameCount.ToString());
-
-                        DriveInfo drive = new DriveInfo(Path.GetPathRoot(fileName));
-
-                        if (drive.IsReady)
+                        if (saveFrameCount >= 500)
                         {
-                            if (drive.AvailableFreeSpace <= mlimit)
-                            {
-                                double freeGB = drive.AvailableFreeSpace / (double)GB;
+                            // 검사 시작 시 설정값 고정.
+                            int startIndex = MyOwner.m_ngStartFrameIndex;
+                            int endIndex = Math.Min(MyOwner.m_ngEndFrameIndex, saveFrameCount - 1);
+                            double maxUm = MyOwner.m_ngMaxUm;
+                            double maxArcmin = MyOwner.m_ngMaxArcmin;
 
-                                MessageBox.Show($"남은 용량 : {freeGB:F1} GB\n불필요한 파일을 삭제해 주세요.", "용량 부족", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            double umScale = 5.5 / Global.LensMag;
+                            double arcminScale = 180.0 / Math.PI * 60.0;
+
+                            double[][] axisData =
+                            {
+            m__G.oCam[0].mC_pX,
+            m__G.oCam[0].mC_pY,
+            m__G.oCam[0].mC_pZ,
+            m__G.oCam[0].mC_pTX,
+            m__G.oCam[0].mC_pTY,
+            m__G.oCam[0].mC_pTZ
+        };
+
+                            bool validSettings = startIndex >= 0 && startIndex <= endIndex
+                                && !double.IsNaN(maxUm) && !double.IsInfinity(maxUm) && maxUm > 0
+                                && !double.IsNaN(maxArcmin) && !double.IsInfinity(maxArcmin) && maxArcmin > 0
+                                && !double.IsNaN(umScale) && !double.IsInfinity(umScale) && umScale > 0;
+
+                            bool validArrays = true;
+
+                            for (int axis = 0; axis < axisData.Length; axis++)
+                            {
+                                if (axisData[axis] == null || axisData[axis].Length < saveFrameCount)
+                                {
+                                    validArrays = false;
+                                    break;
+                                }
+                            }
+
+                            if (validSettings && validArrays)
+                            {
+                                bool needToSaveImage = false;
+
+                                for (int frame = startIndex; frame <= endIndex; frame++)
+                                {
+                                    for (int axis = 0; axis < 6; axis++)
+                                    {
+                                        int neighbor1 = frame == 0 ? 1 : frame - 1;
+                                        int neighbor2 = frame == 0 ? 2 : frame == saveFrameCount - 1 ? frame - 2 : frame + 1;
+
+                                        double current = axisData[axis][frame];
+                                        double value1 = axisData[axis][neighbor1];
+                                        double value2 = axisData[axis][neighbor2];
+
+                                        // 누락·실패 표시와 비정상 숫자는 비교에서 제외.
+                                        if (!IsValidNgImageValue(current) || !IsValidNgImageValue(value1) || !IsValidNgImageValue(value2)) continue;
+
+                                        // 위치: µm / 각도: arcmin으로 환산.
+                                        double scale = axis < 3 ? umScale : arcminScale;
+                                        current *= scale;
+                                        value1 *= scale;
+                                        value2 *= scale;
+
+                                        if (!IsFiniteNgImageValue(current) || !IsFiniteNgImageValue(value1) || !IsFiniteNgImageValue(value2)) continue;
+
+                                        // 중간 Frame은 앞뒤 평균, 양 끝은 인접 두 점으로 예상값 계산.
+                                        double reference = frame == 0 || frame == saveFrameCount - 1
+                                            ? 2.0 * value1 - value2
+                                            : (value1 + value2) / 2.0;
+
+                                        double difference = current - reference;
+                                        double limit = axis < 3 ? maxUm : maxArcmin;
+
+                                        if (!IsFiniteNgImageValue(difference) || Math.Abs(difference) <= limit) continue;
+
+                                        needToSaveImage = true;
+                                        break;
+                                    }
+
+                                    // 한 Frame이라도 NG이면 추가 검사 없이 전체 이미지 저장.
+                                    if (needToSaveImage) break;
+                                }
+
+                                if (needToSaveImage)
+                                {
+                                    string sDate = DateTime.Now.ToString("yyMMddHHmmssfff");
+                                    string fileName = Path.Combine(m__G.m_RootDirectory, "Result", "RawData", "NG", sDate, "Image" + saveFrameCount.ToString());
+
+                                    DriveInfo drive = new DriveInfo(Path.GetPathRoot(fileName));
+
+                                    if (drive.IsReady)
+                                    {
+                                        if (drive.AvailableFreeSpace <= mlimit)
+                                        {
+                                            double freeGB = drive.AvailableFreeSpace / (double)GB;
+
+                                            MessageBox.Show($"남은 용량 : {freeGB:F1} GB\n불필요한 파일을 삭제해 주세요.", "용량 부족", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                        }
+                                        else
+                                        {
+                                            if (!Directory.Exists(fileName)) Directory.CreateDirectory(fileName);
+
+                                            // NG 검출 시 전체 Frame 저장.
+                                            for (int imgIndex = 0; imgIndex < saveFrameCount; imgIndex++)
+                                            {
+                                                string savefilename = Path.Combine(fileName, "Ana" + imgIndex.ToString() + ".bmp");
+                                                m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
-                                if (!Directory.Exists(fileName)) Directory.CreateDirectory(fileName);
-
-                                for (int imgIndex = 0; imgIndex < saveFrameCount; imgIndex++)
-                                {
-                                    if (imgIndex >= 3 && imgIndex < saveFrameCount - 3) continue;
-
-                                    string savefilename = Path.Combine(fileName, "Ana" + imgIndex.ToString() + ".bmp");
-                                    m__G.oCam[0].SaveGrabbedImage(imgIndex, savefilename);
-                                }
+                                AddViewLog("[NG Image] 검사 범위, 임계값, 배율 또는 배열 길이 오류로 저장 검사를 생략했습니다.\r\n");
                             }
                         }
                     }
@@ -2000,7 +2485,15 @@ namespace CSH030Ex
             m__G.fGraph.Drive_LEDs(0, 0);
             mbStartTriggerTest = false;
         }
+        private static bool IsFiniteNgImageValue(double value)
+        {
+            return !double.IsNaN(value) && !double.IsInfinity(value);
+        }
 
+        private static bool IsValidNgImageValue(double value)
+        {
+            return IsFiniteNgImageValue(value) && value != 88888.0 && value != 99999.0;
+        }
         public void InitializeEulerMatrix()
         {
             mbEulerSimpleApply = false;

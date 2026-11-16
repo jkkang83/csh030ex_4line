@@ -702,7 +702,7 @@ namespace CSH030Ex
                 //ReadLastSampleNumber();
 
                 ReadModel();
-
+                LoadNgImageSettings();
 
                 sForm.BringToFront();
 
@@ -6543,6 +6543,238 @@ namespace CSH030Ex
                 m__G.m_bSaveNgImage = false;
 
         }
+        // Save NG Image Settings
+        private void cbSaveNGImage_Click(object sender, EventArgs e)
+        {
+            CheckBox ch = sender as CheckBox;
+            if (ch == null || !ch.Checked) return;
+
+            ShowNgImageSettings();
+        }
+        private const string NgImageSettingsPath = @"C:\CSHTest\DoNotTouch\NGImageSettings.txt";
+
+        // Frame Index는 0부터 시작하며 시작·끝 모두 검사 범위에 포함.
+        public int m_ngStartFrameIndex = 300;
+        public int m_ngEndFrameIndex = 644;
+        public double m_ngMaxUm = 20;
+        public double m_ngMaxArcmin = 20;
+
+        private void LoadNgImageSettings()
+        {
+            // 파일이 없으면 기본값 사용. 최초 OK 시 파일 생성.
+            if (!File.Exists(NgImageSettingsPath)) return;
+
+            try
+            {
+                Dictionary<string, string> values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (string rawLine in File.ReadAllLines(NgImageSettingsPath, Encoding.UTF8))
+                {
+                    string line = rawLine.Trim();
+                    if (line.Length == 0 || line.StartsWith("#")) continue;
+
+                    int separator = line.IndexOf('=');
+                    if (separator <= 0) throw new InvalidDataException("설정 파일 형식이 올바르지 않습니다.");
+
+                    string key = line.Substring(0, separator).Trim();
+                    string value = line.Substring(separator + 1).Trim();
+
+                    if (key != "StartFrameIndex" && key != "EndFrameIndex" && key != "MaxUm" && key != "MaxArcmin")
+                        throw new InvalidDataException("알 수 없는 설정 항목: " + key);
+
+                    if (values.ContainsKey(key)) throw new InvalidDataException("중복된 설정 항목: " + key);
+                    values.Add(key, value);
+                }
+
+                int startIndex;
+                int endIndex;
+                double maxUm;
+                double maxArcmin;
+
+                if (!values.ContainsKey("StartFrameIndex") || !values.ContainsKey("EndFrameIndex") || !values.ContainsKey("MaxUm") || !values.ContainsKey("MaxArcmin"))
+                    throw new InvalidDataException("필수 설정 항목이 누락되었습니다.");
+
+                if (!int.TryParse(values["StartFrameIndex"], NumberStyles.Integer, CultureInfo.InvariantCulture, out startIndex))
+                    throw new InvalidDataException("StartFrameIndex 값이 올바르지 않습니다.");
+
+                if (!int.TryParse(values["EndFrameIndex"], NumberStyles.Integer, CultureInfo.InvariantCulture, out endIndex))
+                    throw new InvalidDataException("EndFrameIndex 값이 올바르지 않습니다.");
+
+                if (!double.TryParse(values["MaxUm"], NumberStyles.Float, CultureInfo.InvariantCulture, out maxUm))
+                    throw new InvalidDataException("MaxUm 값이 올바르지 않습니다.");
+
+                if (!double.TryParse(values["MaxArcmin"], NumberStyles.Float, CultureInfo.InvariantCulture, out maxArcmin))
+                    throw new InvalidDataException("MaxArcmin 값이 올바르지 않습니다.");
+
+                ValidateNgImageSettings(startIndex, endIndex, maxUm, maxArcmin);
+
+                // 전체 검증이 끝난 후 한 번에 반영.
+                m_ngStartFrameIndex = startIndex;
+                m_ngEndFrameIndex = endIndex;
+                m_ngMaxUm = maxUm;
+                m_ngMaxArcmin = maxArcmin;
+            }
+            catch (Exception ex)
+            {
+                // 잘못된 파일은 덮어쓰지 않고 기존 메모리 값 유지.
+                MessageBox.Show("NG 이미지 설정을 불러오지 못했습니다.\r\n기존 설정값을 유지합니다.\r\n\r\n" + ex.Message,
+                    "NG Image Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private static void ValidateNgImageSettings(int startIndex, int endIndex, double maxUm, double maxArcmin)
+        {
+            if (startIndex < 0 || endIndex > 9999 || startIndex > endIndex)
+                throw new InvalidDataException("Frame Index는 0~9999 범위이며 시작값이 끝값보다 클 수 없습니다.");
+
+            if (double.IsNaN(maxUm) || double.IsInfinity(maxUm) || maxUm < 0.001 || maxUm > 100000)
+                throw new InvalidDataException("Max µm은 0.001~100000 범위로 입력해 주세요.");
+
+            if (double.IsNaN(maxArcmin) || double.IsInfinity(maxArcmin) || maxArcmin < 0.001 || maxArcmin > 100000)
+                throw new InvalidDataException("Max arcmin은 0.001~100000 범위로 입력해 주세요.");
+        }
+
+        private void SaveNgImageSettings(int startIndex, int endIndex, double maxUm, double maxArcmin)
+        {
+            ValidateNgImageSettings(startIndex, endIndex, maxUm, maxArcmin);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(NgImageSettingsPath));
+
+            string[] lines =
+            {
+        "# Frame indices are zero-based and inclusive.",
+        "StartFrameIndex=" + startIndex.ToString(CultureInfo.InvariantCulture),
+        "EndFrameIndex=" + endIndex.ToString(CultureInfo.InvariantCulture),
+        "MaxUm=" + maxUm.ToString("R", CultureInfo.InvariantCulture),
+        "MaxArcmin=" + maxArcmin.ToString("R", CultureInfo.InvariantCulture)
+    };
+
+            // 임시 파일 쓰기 성공 후 교체하여 기존 파일 보호.
+            string tempPath = NgImageSettingsPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+
+            try
+            {
+                File.WriteAllLines(tempPath, lines, new UTF8Encoding(false));
+
+                if (File.Exists(NgImageSettingsPath))
+                    File.Replace(tempPath, NgImageSettingsPath, null);
+                else
+                    File.Move(tempPath, NgImageSettingsPath);
+            }
+            finally
+            {
+                try { if (File.Exists(tempPath)) File.Delete(tempPath); }
+                catch { }
+            }
+        }
+
+        private void ShowNgImageSettings()
+        {
+            using (NgImageSettingsDialog dialog = new NgImageSettingsDialog(m_ngStartFrameIndex, m_ngEndFrameIndex, m_ngMaxUm, m_ngMaxArcmin))
+            {
+                // 저장 실패 시 입력값을 유지한 채 다시 편집 가능.
+                while (dialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    try
+                    {
+                        SaveNgImageSettings(dialog.StartFrameIndex, dialog.EndFrameIndex, dialog.MaxUm, dialog.MaxArcmin);
+
+                        m_ngStartFrameIndex = dialog.StartFrameIndex;
+                        m_ngEndFrameIndex = dialog.EndFrameIndex;
+                        m_ngMaxUm = dialog.MaxUm;
+                        m_ngMaxArcmin = dialog.MaxArcmin;
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("설정을 저장하지 못했습니다.\r\n\r\n" + ex.Message,
+                            "NG Image Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+            }
+        }
+
+        private sealed class NgImageSettingsDialog : Form
+        {
+            private readonly NumericUpDown numStartIndex;
+            private readonly NumericUpDown numEndIndex;
+            private readonly NumericUpDown numMaxUm;
+            private readonly NumericUpDown numMaxArcmin;
+
+            public int StartFrameIndex { get { return (int)numStartIndex.Value; } }
+            public int EndFrameIndex { get { return (int)numEndIndex.Value; } }
+            public double MaxUm { get { return (double)numMaxUm.Value; } }
+            public double MaxArcmin { get { return (double)numMaxArcmin.Value; } }
+
+            public NgImageSettingsDialog(int startIndex, int endIndex, double maxUm, double maxArcmin)
+            {
+                Text = "Save NG Image Settings";
+                ClientSize = new System.Drawing.Size(440, 340);
+                StartPosition = FormStartPosition.CenterParent;
+                FormBorderStyle = FormBorderStyle.FixedDialog;
+                MaximizeBox = false;
+                MinimizeBox = false;
+                ShowInTaskbar = false;
+                Font = new System.Drawing.Font("Segoe UI", 10F);
+
+                numStartIndex = AddInput("Start Frame Index", 25, 0, 9999, 0, 1, startIndex);
+                numEndIndex = AddInput("End Frame Index", 75, 0, 9999, 0, 1, endIndex);
+                numMaxUm = AddInput("Max µm (X / Y / Z)", 125, 0.001M, 100000, 3, 0.1M, (decimal)maxUm);
+                numMaxArcmin = AddInput("Max arcmin (TX / TY / TZ)", 175, 0.001M, 100000, 3, 0.1M, (decimal)maxArcmin);
+
+                Label description = new Label();
+                description.Text = "Frame indices start at 0. Both ends are included.\r\nLimits apply to positive and negative deviations.";
+                description.SetBounds(25, 225, 395, 45);
+                description.Font = new System.Drawing.Font("Segoe UI", 9F);
+                Controls.Add(description);
+
+                Button btnOk = new Button();
+                btnOk.Text = "OK";
+                btnOk.SetBounds(230, 290, 85, 30);
+                btnOk.Click += delegate
+                {
+                    if (StartFrameIndex > EndFrameIndex)
+                    {
+                        MessageBox.Show(this, "시작 Frame Index는 끝 Frame Index보다 클 수 없습니다.");
+                        return;
+                    }
+
+                    DialogResult = DialogResult.OK;
+                };
+                Controls.Add(btnOk);
+
+                Button btnCancel = new Button();
+                btnCancel.Text = "Cancel";
+                btnCancel.SetBounds(325, 290, 85, 30);
+                btnCancel.DialogResult = DialogResult.Cancel;
+                Controls.Add(btnCancel);
+
+                AcceptButton = btnOk;
+                CancelButton = btnCancel;
+            }
+
+            private NumericUpDown AddInput(string title, int top, decimal minimum, decimal maximum, int decimals, decimal increment, decimal value)
+            {
+                Label label = new Label();
+                label.Text = title;
+                label.SetBounds(25, top + 3, 200, 25);
+                Controls.Add(label);
+
+                NumericUpDown input = new NumericUpDown();
+                input.SetBounds(235, top, 175, 28);
+                input.Minimum = minimum;
+                input.Maximum = maximum;
+                input.DecimalPlaces = decimals;
+                input.Increment = increment;
+                input.Value = value;
+                input.TextAlign = HorizontalAlignment.Right;
+                Controls.Add(input);
+
+                return input;
+            }
+        }
+        //============================================================================
+
 
         private void cbTestStage_CheckedChanged(object sender, EventArgs e)
         {
