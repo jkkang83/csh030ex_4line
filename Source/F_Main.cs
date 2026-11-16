@@ -29,7 +29,7 @@ using S2System.Vision;
 namespace CSH030Ex
 {
     public enum MachineType
-    { Normal, Master, Slave, Handler}
+    { Normal, Master, Slave, Handler }
 
     public partial class F_Main : Form
     {
@@ -451,7 +451,7 @@ namespace CSH030Ex
 
                 for (int i = 0; i < (int)Page.NUM_OF_PAGE; i++)
                 {
-                    if (m_form[i]!= null)
+                    if (m_form[i] != null)
                         m_form[i].Close();
                 }
 
@@ -599,7 +599,7 @@ namespace CSH030Ex
                 Splasher.Status = "Load CameraID.txt";
                 //bool IsSwap = true;// CheckCameraSwap();
                 Splasher.Status = "Initializing Vision";
-                if ( !m__G.Initial_Vision(mImageGrabberType))
+                if (!m__G.Initial_Vision(mImageGrabberType))
                     Splasher.Status = m__G.oCam[0].mMatroxMsg;
 
                 // Form 배열에 담기 For Loop 돌리기 위해
@@ -712,7 +712,8 @@ namespace CSH030Ex
                 {
                     mbDlnAvailable = false;
                     Splasher.Status = "Fail to Initialize I2C & GPIO.";
-                }else
+                }
+                else
                     Splasher.Status = "Success.";
 
 
@@ -724,7 +725,7 @@ namespace CSH030Ex
                     ReadPrevCBstates();
                 }
                 catch (IndexOutOfRangeException)
-                {                    
+                {
                     WriteCurrentCBstates();
                 }
                 ShowOperatorMode();
@@ -815,7 +816,7 @@ namespace CSH030Ex
             string strMOTID = "";
             int numMOT = m__G.fGraph.mDriverIC.MOTID / 32;
             int numWndMask = m__G.fGraph.mDriverIC.MOTID % 32;
-            switch(numMOT)
+            switch (numMOT)
             {
                 case 0:
                     strMOTID = "A";
@@ -871,7 +872,7 @@ namespace CSH030Ex
 
             string IsChecked = rows[i++];
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
-                cb_ScreenCapture.Checked = true;
+                cb_ScreenCapture.Checked = false;
             else
                 cb_ScreenCapture.Checked = false;
 
@@ -901,8 +902,8 @@ namespace CSH030Ex
 
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbYTiltReverse.Checked = true;
-                m__G.m_bYTiltReverse = true;
+                cbYTiltReverse.Checked = false;
+                m__G.m_bYTiltReverse = false;
             }
             else
             {
@@ -914,8 +915,8 @@ namespace CSH030Ex
 
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbCalibrationModel.Checked = true;
-                m__G.m_bCalibrationModel = true;
+                cbCalibrationModel.Checked = false;
+                m__G.m_bCalibrationModel = false;
             }
             else
             {
@@ -934,80 +935,94 @@ namespace CSH030Ex
                 cbHideAllGraph.Checked = false;
                 m__G.m_bHideAllGraph = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbXTiltReverse.Checked = true;
-                m__G.m_bXTiltReverse = true;
+                cbXTiltReverse.Checked = false;
+                m__G.m_bXTiltReverse = false;
             }
             else
             {
                 cbXTiltReverse.Checked = false;
                 m__G.m_bXTiltReverse = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbReverseTX.Checked = true;
-                m__G.m_bTXDirReverse = true;
+                cbReverseTX.Checked = false;
+                m__G.m_bTXDirReverse = false;
             }
             else
             {
                 cbReverseTX.Checked = false;
                 m__G.m_bTXDirReverse = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbReverseTY.Checked = true;
-                m__G.m_bTYDirReverse = true;
+                cbReverseTY.Checked = false;
+                m__G.m_bTYDirReverse = false;
             }
             else
             {
                 cbReverseTY.Checked = false;
                 m__G.m_bTYDirReverse = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbReverseX.Checked = true;
-                m__G.m_bXDirReverse = true;
+                cbReverseX.Checked = false;
+                m__G.m_bXDirReverse = false;
             }
             else
             {
                 cbReverseX.Checked = false;
                 m__G.m_bXDirReverse = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbReverseY.Checked = true;
-                m__G.m_bYDirReverse = true;
+                cbReverseY.Checked = false;
+                m__G.m_bYDirReverse = false;
             }
             else
             {
                 cbReverseY.Checked = false;
                 m__G.m_bYDirReverse = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbEulerRotation.Checked = true;
-                m__G.m_bEulerRotation = true;
+                cbEulerRotation.Checked = false;
+                m__G.m_bEulerRotation = false;
             }
             else
             {
                 cbEulerRotation.Checked = false;
                 m__G.m_bEulerRotation = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
                 cbPrismCoordinateSystem.Checked = true;
@@ -1018,20 +1033,24 @@ namespace CSH030Ex
                 cbPrismCoordinateSystem.Checked = false;
                 m__G.m_bPrismCS = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbAutoLastFrame.Checked = true;
-                m__G.m_bAutoLastFrame = true;
+                cbAutoLastFrame.Checked = false;
+                m__G.m_bAutoLastFrame = false;
             }
             else
             {
                 cbAutoLastFrame.Checked = false;
                 m__G.m_bAutoLastFrame = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
                 cbSaveLostTestSet.Checked = true;
@@ -1042,44 +1061,52 @@ namespace CSH030Ex
                 cbSaveLostTestSet.Checked = false;
                 m__G.m_bSaveLostTestSet = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbNoHost.Checked = true;
-                m__G.m_bNoHostPC = true;
+                cbNoHost.Checked = false;
+                m__G.m_bNoHostPC = false;
             }
             else
             {
                 cbNoHost.Checked = false;
                 m__G.m_bNoHostPC = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbDebugMode.Checked = true;
-                m__G.m_bDebugMode = true;
+                cbDebugMode.Checked = false;
+                m__G.m_bDebugMode = false;
             }
             else
             {
                 cbDebugMode.Checked = false;
                 m__G.m_bDebugMode = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbTestStage.Checked = true;
-                m__G.m_bTestStage = true;
+                cbTestStage.Checked = false;
+                m__G.m_bTestStage = false;
             }
             else
             {
                 cbTestStage.Checked = false;
                 m__G.m_bTestStage = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
                 cbSaveNGImage.Checked = true;
@@ -1090,8 +1117,10 @@ namespace CSH030Ex
                 cbSaveNGImage.Checked = false;
                 m__G.m_bSaveNgImage = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
                 chOISOption.Checked = true;
@@ -1102,8 +1131,10 @@ namespace CSH030Ex
                 chOISOption.Checked = false;
                 m__G.m_bOISOption = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
                 chSaveUserImage.Checked = true;
@@ -1114,8 +1145,10 @@ namespace CSH030Ex
                 chSaveUserImage.Checked = false;
                 m__G.m_bSaveFImage = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
                 cbPseudoOMM.Checked = true;
@@ -1126,8 +1159,10 @@ namespace CSH030Ex
                 cbPseudoOMM.Checked = false;
                 m__G.m_bPseudoOMM = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
                 chSaveVideo.Checked = true;
@@ -1138,8 +1173,10 @@ namespace CSH030Ex
                 chSaveVideo.Checked = false;
                 m__G.m_bSaveVideo = false;
             }
+
             if (i == rows.Length) return true;
             IsChecked = rows[i++];
+
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
                 chReverseCamera.Checked = true;
@@ -1165,24 +1202,24 @@ namespace CSH030Ex
             StreamWriter sr = new StreamWriter(strFileName);
 
             //   다음은 항상 순서를 지켜야 한다.
-            sr.WriteLine(cb_ScreenCapture.Checked.ToString());
+            sr.WriteLine("false"); //sr.WriteLine(cb_ScreenCapture.Checked.ToString());
             sr.WriteLine(cbSaveRawData.Checked.ToString());
             sr.WriteLine(cbPassword.Checked.ToString());
-            sr.WriteLine(cbYTiltReverse.Checked.ToString());
-            sr.WriteLine(cbCalibrationModel.Checked.ToString());
+            sr.WriteLine("false"); //sr.WriteLine(cbYTiltReverse.Checked.ToString());
+            sr.WriteLine("false"); //sr.WriteLine(cbCalibrationModel.Checked.ToString());
             sr.WriteLine(cbHideAllGraph.Checked.ToString());
-            sr.WriteLine(cbXTiltReverse.Checked.ToString());
-            sr.WriteLine(cbReverseTX.Checked.ToString());
-            sr.WriteLine(cbReverseTY.Checked.ToString());
-            sr.WriteLine(cbReverseX.Checked.ToString());
-            sr.WriteLine(cbReverseY.Checked.ToString());
-            sr.WriteLine(cbEulerRotation.Checked.ToString());
+            sr.WriteLine("false"); //sr.WriteLine(cbXTiltReverse.Checked.ToString());
+            sr.WriteLine("false"); //sr.WriteLine(cbReverseTX.Checked.ToString());
+            sr.WriteLine("false"); //sr.WriteLine(cbReverseTY.Checked.ToString());
+            sr.WriteLine("false"); //sr.WriteLine(cbReverseX.Checked.ToString());
+            sr.WriteLine("false"); //sr.WriteLine(cbReverseY.Checked.ToString());
+            sr.WriteLine("false"); //sr.WriteLine(cbEulerRotation.Checked.ToString());
             sr.WriteLine(cbPrismCoordinateSystem.Checked.ToString());
-            sr.WriteLine(cbAutoLastFrame.Checked.ToString());//cbSaveLostTestSet
+            sr.WriteLine("false"); //sr.WriteLine(cbAutoLastFrame.Checked.ToString());//cbSaveLostTestSet
             sr.WriteLine(cbSaveLostTestSet.Checked.ToString());
-            sr.WriteLine(cbNoHost.Checked.ToString());
-            sr.WriteLine(cbDebugMode.Checked.ToString());
-            sr.WriteLine(cbTestStage.Checked.ToString());
+            sr.WriteLine("false"); //sr.WriteLine(cbNoHost.Checked.ToString());
+            sr.WriteLine("false"); //sr.WriteLine(cbDebugMode.Checked.ToString());
+            sr.WriteLine("false"); //sr.WriteLine(cbTestStage.Checked.ToString());
             sr.WriteLine(cbSaveNGImage.Checked.ToString());
             sr.WriteLine(chOISOption.Checked.ToString());
             sr.WriteLine(chSaveUserImage.Checked.ToString());
@@ -1210,11 +1247,12 @@ namespace CSH030Ex
             for (int i = 0; i < (int)Page.NUM_OF_PAGE; i++)
                 if (m_form[i] != null) m_form[i].Hide();
 
-            if (formNo!= (int)Page.MANAGE)
+            if (formNo != (int)Page.MANAGE)
             {
                 label2.Hide();
                 labelMOTID.Hide();
-            }else
+            }
+            else
             {
                 label2.Show();
                 labelMOTID.Show();
@@ -1496,15 +1534,15 @@ namespace CSH030Ex
             [MarshalAs(UnmanagedType.R8)]
             public double testTime;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10000)]
-            public double[] X ;                           
+            public double[] X;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10000)]
-            public double[] Y ;                           
+            public double[] Y;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10000)]
-            public double[] Z ;                           
+            public double[] Z;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10000)]
-            public double[] TX;                           
+            public double[] TX;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10000)]
-            public double[] TY;                           
+            public double[] TY;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10000)]
             public double[] TZ;
         }
@@ -1627,7 +1665,7 @@ namespace CSH030Ex
         [Serializable]
         public class sSaveResultBin
         {
-            public Int64 sTime;             
+            public Int64 sTime;
             public int frameCount;
             public double fps;
             public double ledLeft;
@@ -1664,16 +1702,16 @@ namespace CSH030Ex
             public double ledLeft;
             public double ledRight;
             public double testTime;
-            public double[] X1 = new double [5000];
-            public double[] Y1 = new double [5000];
-            public double[] X2 = new double [5000];
-            public double[] Y2 = new double [5000];
-            public double[] X3 = new double [5000];
-            public double[] Y3 = new double [5000];
-            public double[] X4 = new double [5000];
-            public double[] Y4 = new double [5000];
-            public double[] X5 = new double [5000];
-            public double[] Y5 = new double [5000];
+            public double[] X1 = new double[5000];
+            public double[] Y1 = new double[5000];
+            public double[] X2 = new double[5000];
+            public double[] Y2 = new double[5000];
+            public double[] X3 = new double[5000];
+            public double[] Y3 = new double[5000];
+            public double[] X4 = new double[5000];
+            public double[] Y4 = new double[5000];
+            public double[] X5 = new double[5000];
+            public double[] Y5 = new double[5000];
         }
         public string WriteResultPos(int modelIndex = 0)
         {
@@ -1753,12 +1791,12 @@ namespace CSH030Ex
             string filename = framCnt.ToString() + "_" + modelIndex.ToString() + "_" + dtNow.ToString("yyMMddHHmmss.fff") + ".dat";
             string sFilePath = sLotDir + filename;
 
-            double umscale = 5.5/ Global.LensMag;                           //  rad to min
+            double umscale = 5.5 / Global.LensMag;                           //  rad to min
             double minscale = 180 / Math.PI * 60;                           //  rad to min
             double preZ = 0;
             int i = 0;
 
-            if (framCnt >5000)
+            if (framCnt > 5000)
             {
                 sSaveResult sResult = new sSaveResult();
 
@@ -1785,7 +1823,7 @@ namespace CSH030Ex
                 ////double ty0 = m__G.oCam[0].mC_pTY[0];
                 ////double tz0 = m__G.oCam[0].mC_pTZ[0];
 
-              
+
                 for (i = 0; i < 5; i++)
                 {
                     sResult.X[0] += m__G.oCam[0].mC_pX[i] * umscale / 5;  //  um
@@ -1797,7 +1835,7 @@ namespace CSH030Ex
                     sResult.TY[0] += m__G.oCam[0].mC_pTY[i] * minscale / 5; //  min
                     sResult.TZ[0] += m__G.oCam[0].mC_pTZ[i] * minscale / 5; //  min
                 }
-                
+
                 for (i = 1; i < framCnt; i++)
                 {
                     sResult.X[i] = m__G.oCam[0].mC_pX[i] * umscale;  //  um
@@ -1837,7 +1875,7 @@ namespace CSH030Ex
 
                 Marshal.FreeHGlobal(wPtr);
             }
-            else if ( framCnt > 3000)
+            else if (framCnt > 3000)
             {
                 sSaveResult5 sResult = new sSaveResult5();
 
@@ -1933,7 +1971,7 @@ namespace CSH030Ex
                 sResult.ledRight = m__G.fVision.mLEDcurrent[1];
                 sResult.testTime = m__G.fVision.GetHowLongItTook();
 
-                if (framCnt>1000)
+                if (framCnt > 1000)
                 {
                     for (i = 0; i < 5; i++)
                     {
@@ -2395,7 +2433,7 @@ namespace CSH030Ex
                 }
                 for (i = 0; i < framCnt; i++)
                 {
-                    double ommZToSend = i >= validFrameCount? MissingFrameValue : -sResult.pOmmZ[i];
+                    double ommZToSend = i >= validFrameCount ? MissingFrameValue : -sResult.pOmmZ[i];
                     data = BitConverter.GetBytes(ommZToSend);
                     //data = BitConverter.GetBytes(-sResult.pOmmZ[i]);
                     Array.Copy(data, 0, dataBuf, curCount, data.Length);
@@ -2766,7 +2804,7 @@ namespace CSH030Ex
             Stream rs = new FileStream(FileName, FileMode.Open);
             BinaryFormatter bf = new BinaryFormatter();
 
-            object sRes = bf.Deserialize(rs); 
+            object sRes = bf.Deserialize(rs);
             rs.Close();
 
             return sRes;
@@ -2784,7 +2822,7 @@ namespace CSH030Ex
             int len = result.frameCount;
             DateTimeOffset ltime = DateTimeOffset.FromUnixTimeSeconds(result.sTime);
             DateTime TimeTested = ltime.DateTime;
-            if ( sFileName.Contains("_0_"))
+            if (sFileName.Contains("_0_"))
                 lstr = TimeTested.ToLocalTime().ToString() + "\t" + "X1 smt" + "\t" + "Y1 smt" + "\t" + "X2 smt" + "\t" + "Y2 smt" + "\t" + "X3 smt" + "\t" + "Y3 smt" + "\t" + "X4 smt" + "\t" + "Y4 smt" + "\t" + "X5 smt" + "\t" + "Y5 smt" + "\r\n";
             else
                 lstr = TimeTested.ToLocalTime().ToString() + "\t" + "X1 std" + "\t" + "Y1 std" + "\t" + "X2 std" + "\t" + "Y2 std" + "\t" + "X3 std" + "\t" + "Y3 std" + "\t" + "X4 std" + "\t" + "Y4 std" + "\t" + "X5 std" + "\t" + "Y5 std" + "\r\n";
@@ -2822,7 +2860,7 @@ namespace CSH030Ex
                 DateTimeOffset ltime = DateTimeOffset.FromUnixTimeSeconds(result.sTime);
                 DateTime TimeTested = ltime.DateTime;
                 lstr = TimeTested.ToLocalTime().ToString() + strHead + "\r\n";
-                for ( int i=0; i<len;i++)
+                for (int i = 0; i < len; i++)
                 {
                     lstr += i.ToString() + "\t" + result.X[i].ToString("F2") + "\t" + result.Y[i].ToString("F2") + "\t" + result.Z[i].ToString("F2") + "\t" + result.TX[i].ToString("F2") + "\t" + result.TY[i].ToString("F2") + "\t" + result.TZ[i].ToString("F2") + "\r\n";
                 }
@@ -3346,8 +3384,8 @@ namespace CSH030Ex
             //m__G.fVision.mLEDcurrent[3] = m__G.sRecipe.iLEDcurrentRR;
 
             m__G.fGraph.mDriverIC.SetSlaveAddr(m__G.sRecipe.iI2CslaveAddr);
-            m__G.oCam[0].mWaitLimitForNextTrigger   = m__G.sRecipe.iMaxWaitAfterLastTrigger;
-            m__G.oCam[0].mTargetTriggerCount        = m__G.sRecipe.iTriggeredGrabImageCount;
+            m__G.oCam[0].mWaitLimitForNextTrigger = m__G.sRecipe.iMaxWaitAfterLastTrigger;
+            m__G.oCam[0].mTargetTriggerCount = m__G.sRecipe.iTriggeredGrabImageCount;
         }
         //------------------------------------------------------------------------------------------------------------------------------------------------
         private void DataUpdateToGUI()
@@ -3525,13 +3563,13 @@ namespace CSH030Ex
                     }
                     m__G.sRecipe.iI2CslaveAddr = result;
                     if (i == rows.Length) return true;
-                    StrArr = rows[i++].Split('\t'); 
+                    StrArr = rows[i++].Split('\t');
                     m__G.sRecipe.iGrabTimeLimit = Convert.ToInt32(StrArr[1]);
                     if (i == rows.Length) return true;
-                    StrArr = rows[i++].Split('\t'); 
+                    StrArr = rows[i++].Split('\t');
                     m__G.sRecipe.iMaxWaitAfterLastTrigger = Convert.ToInt32(StrArr[1]);
                     if (i == rows.Length) return true;
-                    StrArr = rows[i++].Split('\t'); 
+                    StrArr = rows[i++].Split('\t');
                     m__G.sRecipe.iTriggeredGrabImageCount = Convert.ToInt32(StrArr[1]);
 
                     if (i == rows.Length) return true;
@@ -3556,8 +3594,8 @@ namespace CSH030Ex
 
                     m__G.fGraph.mDriverIC.SetSlaveAddr(m__G.sRecipe.iI2CslaveAddr);
 
-                    m__G.oCam[0].mWaitLimitForNextTrigger   = m__G.sRecipe.iMaxWaitAfterLastTrigger;
-                    m__G.oCam[0].mTargetTriggerCount        = m__G.sRecipe.iTriggeredGrabImageCount;
+                    m__G.oCam[0].mWaitLimitForNextTrigger = m__G.sRecipe.iMaxWaitAfterLastTrigger;
+                    m__G.oCam[0].mTargetTriggerCount = m__G.sRecipe.iTriggeredGrabImageCount;
                 }
                 WritePrevRecipe(sFileName);
                 setJobFile(sFileName);
@@ -4360,7 +4398,7 @@ namespace CSH030Ex
         //------------------------------------------------------------------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------------------------------------------------------------------
-  
+
         private void dataGridView2_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
 
@@ -4744,7 +4782,7 @@ namespace CSH030Ex
         public void ShowOperatorMode()
         {
             m_bAdmin = false;
-            
+
             btnOperation.Text = "Supervisor";
             //btnInitAFDrvIC.Hide();
             btn_Vision.Hide();
@@ -4760,12 +4798,12 @@ namespace CSH030Ex
             lbxBarcodeMaker.Hide();
             lbxProductModel.Hide();
 
-            btn_Vision         .Hide();
-            btnOperation       .Hide();
-            btnAutoLearn       .Hide();
-            btnSaveScreenAdmin .Hide();
-            cbPassword         .Hide();
-            cb_ScreenCapture   .Hide();
+            btn_Vision.Hide();
+            btnOperation.Hide();
+            btnAutoLearn.Hide();
+            btnSaveScreenAdmin.Hide();
+            cbPassword.Hide();
+            cb_ScreenCapture.Hide();
             cbSaveRawData.Hide();
             cbDebugMode.Hide();
             cbSaveImage.Hide();
@@ -4802,13 +4840,13 @@ namespace CSH030Ex
             btn_Down.Show();
             groupBox1.Show();
 
-            btn_Vision         .Show();
-            btnOperation       .Show();
-            btnAutoLearn       .Show();
-            btnSaveScreenAdmin .Show();
-            cbPassword         .Show();
-            cb_ScreenCapture   .Show();
-            cbSaveRawData      .Show();
+            btn_Vision.Show();
+            btnOperation.Show();
+            btnAutoLearn.Show();
+            btnSaveScreenAdmin.Show();
+            cbPassword.Show();
+            cb_ScreenCapture.Show();
+            cbSaveRawData.Show();
             cbDebugMode.Show();
             cbSaveImage.Show();
             lblSaveImage.Show();
@@ -4964,7 +5002,7 @@ namespace CSH030Ex
 
         }
 
-      
+
 
         private void SetPrevFWupdateFile(int type = 0)
         {
@@ -4976,7 +5014,7 @@ namespace CSH030Ex
             sr.WriteLine(mBU252Calfile); //  Cal File Name
             sr.Close();
         }
-       
+
 
         private void P_Sub_Paint(object sender, PaintEventArgs e)
         {
@@ -5015,19 +5053,19 @@ namespace CSH030Ex
 
         private void cb_ScreenCapture_CheckedChanged(object sender, EventArgs e)
         {
-            if (cb_ScreenCapture.Checked) m__G.m_bScreenCapture = true;
-            else m__G.m_bScreenCapture = false;
-            if (MachineType == (int)CSH030Ex.MachineType.Master)
-                btnApplyTesterNo.Enabled = true;
+            cb_ScreenCapture.Checked = false;
+            m__G.m_bScreenCapture = false;
+            //if (MachineType == (int)CSH030Ex.MachineType.Master)
+            //    btnApplyTesterNo.Enabled = true;
         }
 
         private void cbSaveRawData_CheckedChanged(object sender, EventArgs e)
         {
-            if (cbSaveRawData.Checked) 
+            if (cbSaveRawData.Checked)
                 m__G.m_bSaveRawData = true;
-            else 
+            else
                 m__G.m_bSaveRawData = false;
-            
+
             if (MachineType == (int)CSH030Ex.MachineType.Master)
                 btnApplyTesterNo.Enabled = true;
         }
@@ -5056,8 +5094,8 @@ namespace CSH030Ex
             //SaveProductMaker();
             SaveModel();
             WriteCurrentCBstates();
-            if (m__G.oCam[0].mFAL!=null)
-                if (m__G.oCam[0].mFAL.mFZM!= null)
+            if (m__G.oCam[0].mFAL != null)
+                if (m__G.oCam[0].mFAL.mFZM != null)
                 {
                     m__G.m_bXTiltReverse = cbXTiltReverse.Checked;
                     m__G.m_bYTiltReverse = cbYTiltReverse.Checked;
@@ -5074,7 +5112,7 @@ namespace CSH030Ex
             {
                 m__G.mMonitoringTestSet = int.Parse(tbMonitoringTestSetCount.Text);
             }
-            catch(Exception exs)
+            catch (Exception exs)
             {
                 m__G.mMonitoringTestSet = 129;
                 tbMonitoringTestSetCount.Text = "129";
@@ -5284,7 +5322,7 @@ namespace CSH030Ex
             {
                 StreamReader rr = new StreamReader(strFileName);
                 List<string> line = new List<string>();
-                while(true)
+                while (true)
                 {
                     string rd = rr.ReadLine();
                     if (rd == null) break;
@@ -5410,10 +5448,11 @@ namespace CSH030Ex
 
         private void cbPitchDirReverse_CheckedChanged(object sender, EventArgs e)
         {
+            cbYTiltReverse.Checked = false;
             if (m__G == null) return;
-            // m__G.m_bYTiltReverse = cbYTiltReverse.Checked;
-            if (MachineType == (int)CSH030Ex.MachineType.Master)
-                btnApplyTesterNo.Enabled = true;
+            m__G.m_bYTiltReverse = false;
+            //if (MachineType == (int)CSH030Ex.MachineType.Master)
+            //    btnApplyTesterNo.Enabled = true;
         }
 
         private void cbBarcodeOverwriteDisable_CheckedChanged(object sender, EventArgs e)
@@ -5426,10 +5465,11 @@ namespace CSH030Ex
 
         private void cbSkipVisionCheck_CheckedChanged(object sender, EventArgs e)
         {
+            cbCalibrationModel.Checked = false;
             if (m__G == null) return;
-            m__G.m_bCalibrationModel = cbCalibrationModel.Checked;
-            if (MachineType == (int)CSH030Ex.MachineType.Master)
-                btnApplyTesterNo.Enabled = true;
+            m__G.m_bCalibrationModel = false;
+            //if (MachineType == (int)CSH030Ex.MachineType.Master)
+            //    btnApplyTesterNo.Enabled = true;
         }
 
         private void btnSaveScreenAdmin_Click(object sender, EventArgs e)
@@ -5501,17 +5541,18 @@ namespace CSH030Ex
         }
         public void SetTCPReceived(string text)
         {
-          //  tbTCPReceived.Text = text;
+            //  tbTCPReceived.Text = text;
         }
 
         #endregion
 
         private void cbYawDirReverse_CheckedChanged(object sender, EventArgs e)
         {
+            cbXTiltReverse.Checked = false;
             if (m__G == null) return;
-            // m__G.m_bXTiltReverse = cbXTiltReverse.Checked;
-            if (MachineType == (int)CSH030Ex.MachineType.Master)
-                btnApplyTesterNo.Enabled = true;
+            m__G.m_bXTiltReverse = false;
+            //if (MachineType == (int)CSH030Ex.MachineType.Master)
+            //    btnApplyTesterNo.Enabled = true;
         }
 
         private void lbxProductModel_SelectedIndexChanged(object sender, EventArgs e)
@@ -5769,13 +5810,14 @@ namespace CSH030Ex
             Thread.Sleep(150); // 150 이상 100%
         }
 
-        
+
         private void cbReverseAF_CheckedChanged(object sender, EventArgs e)
         {
+            cbReverseTX.Checked = false;
             if (m__G == null) return;
-            m__G.m_bTXDirReverse = cbReverseTX.Checked;
-            if (MachineType == (int)CSH030Ex.MachineType.Master)
-                btnApplyTesterNo.Enabled = true;
+            m__G.m_bTXDirReverse = false;
+            //if (MachineType == (int)CSH030Ex.MachineType.Master)
+            //    btnApplyTesterNo.Enabled = true;
         }
 
 
@@ -5886,7 +5928,7 @@ namespace CSH030Ex
         private void btnMouseEnter(object sender, EventArgs e)
         {
             Button lbtn = (Button)sender;
-            if ( lbtn.Text.Contains("Open") || lbtn.Text.Contains("Save") || lbtn.Text.Contains("Apply"))
+            if (lbtn.Text.Contains("Open") || lbtn.Text.Contains("Save") || lbtn.Text.Contains("Apply"))
                 lbtn.BackgroundImage = Properties.Resources.BtnDBP;
             else
                 lbtn.BackgroundImage = Properties.Resources.BtnKP;
@@ -6014,7 +6056,7 @@ namespace CSH030Ex
 
         private void lbxModelFiles_KeyDown(object sender, KeyEventArgs e)
         {
-            if ( e.KeyCode == Keys.Delete )
+            if (e.KeyCode == Keys.Delete)
             {
                 //  해당항목 삭제
                 int selectedIndex = lbxModelFiles.SelectedIndex;
@@ -6022,7 +6064,7 @@ namespace CSH030Ex
                 if (selectedIndex > 0)
                     lbxModelFiles.SelectedIndex = selectedIndex - 1;
                 else if (lbxModelFiles.Items.Count > 0)
-                    lbxModelFiles.SelectedIndex = lbxModelFiles.Items.Count-1;
+                    lbxModelFiles.SelectedIndex = lbxModelFiles.Items.Count - 1;
 
                 //  리스트파일 업데이트
                 StreamWriter wr = new StreamWriter(m__G.m_RootDirectory + "\\DoNotTouch\\" + mFile4ModelFileList);
@@ -6060,10 +6102,10 @@ namespace CSH030Ex
             string sengMsg = "[" + m__G.mTesterID + "]";
 
             sengMsg += "#" + m__G.oCam[0].mFAL.mLastFMIfile;
-            sengMsg += "#" + m__G.m_RootDirectory + "\\DoNotTouch\\" +  mFile4ModelFileList;
-            sengMsg += "#" + m__G.m_RootDirectory + "\\DoNotTouch\\" +  "OpticsConfig.txt";
-            sengMsg += "#" + m__G.m_RootDirectory + "\\DoNotTouch\\" +  "LastDesignInfo.png";
-            sengMsg += "#" + m__G.m_RootDirectory + "\\DoNotTouch\\" +  "LastFMIfile.txt";
+            sengMsg += "#" + m__G.m_RootDirectory + "\\DoNotTouch\\" + mFile4ModelFileList;
+            sengMsg += "#" + m__G.m_RootDirectory + "\\DoNotTouch\\" + "OpticsConfig.txt";
+            sengMsg += "#" + m__G.m_RootDirectory + "\\DoNotTouch\\" + "LastDesignInfo.png";
+            sengMsg += "#" + m__G.m_RootDirectory + "\\DoNotTouch\\" + "LastFMIfile.txt";
             sengMsg += "#" + m__G.oCam[0].mFAL.mLastSchematicFile;
             SendCopyDataMessage(sengMsg);
 
@@ -6093,7 +6135,7 @@ namespace CSH030Ex
         //  WM_COPYDATA 메세지 받기
         protected override void WndProc(ref Message m)
         {
-                //  Socket 프로그램이 WM_COPYDATA 메세지를 보내면 아래와 같이 처리해줘야 한다.
+            //  Socket 프로그램이 WM_COPYDATA 메세지를 보내면 아래와 같이 처리해줘야 한다.
             switch (m.Msg)
             {
                 //
@@ -6118,7 +6160,7 @@ namespace CSH030Ex
         public bool DecodeCopyDataMsg(string cpMsg)
         {
             string tmpFileName = "";
-            cpMsg = cpMsg.Substring(0,cpMsg.LastIndexOf("\0"));
+            cpMsg = cpMsg.Substring(0, cpMsg.LastIndexOf("\0"));
             if (cpMsg.Contains("$") || !cpMsg.Contains("!"))
             {
                 ////////////////////////////////////////////////////////////////////////////////
@@ -6240,10 +6282,10 @@ namespace CSH030Ex
                                 cbPrismCoordinateSystem.Checked = false;
                                 break;
                             case "Fast":
-                                cbEulerRotation.Checked = true;
+                                cbEulerRotation.Checked = false;
                                 break;
                             case "SuperFast":
-                                cbEulerRotation.Checked = true;
+                                cbEulerRotation.Checked = false;
                                 cbPrismCoordinateSystem.Checked = true;
                                 break;
                             default:
@@ -6354,32 +6396,35 @@ namespace CSH030Ex
 
         private void cbEulerRotation_CheckedChanged(object sender, EventArgs e)
         {
-            if (cbEulerRotation.Checked)
-            {
-                m__G.m_bEulerRotation = true;
-                //  저장되어있는 Euler Angle 을 읽어들여서 EulerMatrix 를 설정하고, Validate 한다.
-                //  저장되어있는 Euler Angle 이 없으면 Validate 만 한다.
-                //  EulerMatrix 는 사용자에 의해 변경될 수 있고 변경될 때 저장된다.
-                string eulerFile = m__G.m_RootDirectory + "\\DoNotTouch\\EulerAngle" + m__G.fVision.camID0 + ".txt";
-                if (File.Exists(eulerFile))
-                {
-                    StreamReader rd = new StreamReader(eulerFile);
-                    string fullstr = rd.ReadToEnd();
-                    rd.Close();
-                    string[] eachLine = fullstr.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                    m__G.fVision.mPhiThetaPsi[0] = double.Parse(eachLine[0]);
-                    m__G.fVision.mPhiThetaPsi[1] = double.Parse(eachLine[1]);
-                    m__G.fVision.mPhiThetaPsi[2] = double.Parse(eachLine[2]);
-                    m__G.oCam[0].mFAL.SetEulerAngle(m__G.fVision.mPhiThetaPsi);
-                }
-                m__G.oCam[0].mFAL.ValidateEulerRotation(true);
-                m__G.fVision.UpdateEulerAngle();
-            }
-            else
-            {
-                m__G.m_bEulerRotation = false;
-                m__G.oCam[0].mFAL.ValidateEulerRotation(false);
-            }
+            //if (cbEulerRotation.Checked)
+            //{
+            //    m__G.m_bEulerRotation = true;
+            //    //  저장되어있는 Euler Angle 을 읽어들여서 EulerMatrix 를 설정하고, Validate 한다.
+            //    //  저장되어있는 Euler Angle 이 없으면 Validate 만 한다.
+            //    //  EulerMatrix 는 사용자에 의해 변경될 수 있고 변경될 때 저장된다.
+            //    string eulerFile = m__G.m_RootDirectory + "\\DoNotTouch\\EulerAngle" + m__G.fVision.camID0 + ".txt";
+            //    if (File.Exists(eulerFile))
+            //    {
+            //        StreamReader rd = new StreamReader(eulerFile);
+            //        string fullstr = rd.ReadToEnd();
+            //        rd.Close();
+            //        string[] eachLine = fullstr.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            //        m__G.fVision.mPhiThetaPsi[0] = double.Parse(eachLine[0]);
+            //        m__G.fVision.mPhiThetaPsi[1] = double.Parse(eachLine[1]);
+            //        m__G.fVision.mPhiThetaPsi[2] = double.Parse(eachLine[2]);
+            //        m__G.oCam[0].mFAL.SetEulerAngle(m__G.fVision.mPhiThetaPsi);
+            //    }
+            //    m__G.oCam[0].mFAL.ValidateEulerRotation(true);
+            //    m__G.fVision.UpdateEulerAngle();
+            //}
+            //else
+            //{
+            //    m__G.m_bEulerRotation = false;
+            //    m__G.oCam[0].mFAL.ValidateEulerRotation(false);
+            //}
+            cbEulerRotation.Checked = false;
+            m__G.m_bEulerRotation = false;
+            m__G.oCam[0].mFAL.ValidateEulerRotation(false);
         }
 
         private void cbSuperFastMode_CheckedChanged(object sender, EventArgs e)
@@ -6392,10 +6437,8 @@ namespace CSH030Ex
 
         private void cbAutoLastFrame_CheckedChanged(object sender, EventArgs e)
         {
-            if (cbAutoLastFrame.Checked)
-                m__G.m_bAutoLastFrame = true;
-            else
-                m__G.m_bAutoLastFrame = false;
+            cbAutoLastFrame.Checked = false;
+            m__G.m_bAutoLastFrame = false;
         }
 
         private void cbSaveLostTestSet_CheckedChanged(object sender, EventArgs e)
@@ -6408,44 +6451,44 @@ namespace CSH030Ex
 
         private void cbNoHost_CheckedChanged(object sender, EventArgs e)
         {
-            if (cbNoHost.Checked)
-                m__G.m_bNoHostPC = true;
-            else
-                m__G.m_bNoHostPC = false;
+            cbNoHost.Checked = false;
+            m__G.m_bNoHostPC = false;
 
             m__G.oCam[0].bNoHostPC = m__G.m_bNoHostPC;
         }
 
         private void cbReverseX_CheckedChanged(object sender, EventArgs e)
         {
+            cbReverseX.Checked = false;
             if (m__G == null) return;
-            m__G.m_bXDirReverse = cbReverseX.Checked;
-            if (MachineType == (int)CSH030Ex.MachineType.Master)
-                btnApplyTesterNo.Enabled = true;
+            m__G.m_bXDirReverse = false;
+            //if (MachineType == (int)CSH030Ex.MachineType.Master)
+            //    btnApplyTesterNo.Enabled = true;
         }
 
         private void cbReverseY_CheckedChanged(object sender, EventArgs e)
         {
+            cbReverseY.Checked = false;
             if (m__G == null) return;
-            m__G.m_bYDirReverse = cbReverseY.Checked;
-            if (MachineType == (int)CSH030Ex.MachineType.Master)
-                btnApplyTesterNo.Enabled = true;
+            m__G.m_bYDirReverse = false;
+            //if (MachineType == (int)CSH030Ex.MachineType.Master)
+            //    btnApplyTesterNo.Enabled = true;
         }
 
         private void cbReverseTY_CheckedChanged(object sender, EventArgs e)
         {
+            cbReverseTY.Checked = false;
             if (m__G == null) return;
-            m__G.m_bTYDirReverse = cbReverseTY.Checked;
-            if (MachineType == (int)CSH030Ex.MachineType.Master)
-                btnApplyTesterNo.Enabled = true;
+            m__G.m_bTYDirReverse = false;
+
+            //if (MachineType == (int)CSH030Ex.MachineType.Master)
+            //btnApplyTesterNo.Enabled = true;
         }
 
         private void cbDebugMode_CheckedChanged(object sender, EventArgs e)
         {
-            if (cbDebugMode.Checked)
-                m__G.m_bDebugMode = true;
-            else
-                m__G.m_bDebugMode = false;
+            cbDebugMode.Checked = false;
+            m__G.m_bDebugMode = false;
 
         }
 
@@ -6504,11 +6547,8 @@ namespace CSH030Ex
         private void cbTestStage_CheckedChanged(object sender, EventArgs e)
         {
             CheckBox ch = (sender as CheckBox);
-            if (ch.Checked)
-                m__G.m_bTestStage = true;
-            else
-                m__G.m_bTestStage = false;
-
+            ch.Checked = false;
+            m__G.m_bTestStage = false;
         }
 
         private void chOISOption_CheckedChanged(object sender, EventArgs e)
