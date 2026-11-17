@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  CSH030Ex_Offline : 카메라/MIL 보드/DLN 이 없는 개발 PC 에서 BMP 로드 후 마크 검출 확인용.
+  ..\Source 의 파일을 복사하지 않고 링크로 그대로 컴파일하며, OFFLINE 심볼로 장비 초기화만 건너뛴다.
+  ※ Source\CSH030Ex.csproj 에 파일을 추가/삭제하면 이 파일에도 동일하게 반영할 것.
+-->
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8D3F1C2A-5B47-4E6A-9C1D-0F2E3A4B5C6D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>CSH030Ex</RootNamespace>
+    <AssemblyName>CSH030Ex_Offline</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <ErrorReport>prompt</ErrorReport>
+    <ApplicationIcon>..\Source\CSH_PIE.ico</ApplicationIcon>
+    <ApplicationManifest>..\Source\Properties\app.manifest</ApplicationManifest>
+    <AppConfig>..\Source\App.config</AppConfig>
+    <GenerateManifests>false</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;OFFLINE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;OFFLINE</DefineConstants>
+    <WarningLevel>2</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Basler.Pylon, Version=1.2.0.0, Culture=neutral, PublicKeyToken=e389355f398382ab, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Basler\pylon 8\Development\Assemblies\Basler.Pylon\x64\Basler.Pylon.dll</HintPath>
+    </Reference>
+    <Reference Include="dln.net, Version=2.2.0.1, Culture=neutral, PublicKeyToken=1d7ca6ad526a5ce7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Diolan\DLN\binaries\dln.net.dll</HintPath>
+    </Reference>
+    <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net48\MathNet.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="Matrox.MatroxImagingLibrary">
+      <HintPath>C:\Program Files\Matrox Imaging\MIL\MIL.NET\Matrox.MatroxImagingLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp4.4.5.5.20211231\lib\net48\OpenCvSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp4.Extensions.4.5.5.20211231\lib\net48\OpenCvSharp.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.5.0.3\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Management" />
+    <Reference Include="System.Management.Instrumentation" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Offline 전용 -->
+    <Compile Include="OfflineMode.cs" />
+    <!-- 이하 ..\Source\CSH030Ex.csproj 와 동일 (링크) -->
+    <Compile Include="..\Source\F_VisionPassForm.cs"><Link>F_VisionPassForm.cs</Link><SubType>Form</SubType></Compile>
+    <Compile Include="..\Source\F_VisionPassForm.Designer.cs"><Link>F_VisionPassForm.Designer.cs</Link><DependentUpon>F_VisionPassForm.cs</DependentUpon></Compile>
+    <Compile Include="..\Source\Form1.cs"><Link>Form1.cs</Link><SubType>Form</SubType></Compile>
+    <Compile Include="..\Source\Form1.Designer.cs"><Link>Form1.Designer.cs</Link><DependentUpon>Form1.cs</DependentUpon></Compile>
+    <Compile Include="..\Source\Form2.cs"><Link>Form2.cs</Link><SubType>Form</SubType></Compile>
+    <Compile Include="..\Source\Form2.Designer.cs"><Link>Form2.Designer.cs</Link><DependentUpon>Form2.cs</DependentUpon></Compile>
+    <Compile Include="..\Source\Form3.cs"><Link>Form3.cs</Link><SubType>Form</SubType></Compile>
+    <Compile Include="..\Source\Form3.Designer.cs"><Link>Form3.Designer.cs</Link><DependentUpon>Form3.cs</DependentUpon></Compile>
+    <Compile Include="..\Source\F_Main.cs"><Link>F_Main.cs</Link><SubType>Form</SubType></Compile>
+    <Compile Include="..\Source\F_Main.Designer.cs"><Link>F_Main.Designer.cs</Link><DependentUpon>F_Main.cs</DependentUpon></Compile>
+    <Compile Include="..\Source\F_Manage.cs"><Link>F_Manage.cs</Link><SubType>Form</SubType></Compile>
+    <Compile Include="..\Source\F_Manage.Designer.cs"><Link>F_Manage.Designer.cs</Link><DependentUpon>F_Manage.cs</DependentUpon></Compile>
+    <Compile Include="..\Source\F_Graph.cs"><Link>F_Graph.cs</Link></Compile>
+    <Compile Include="..\Source\F_Vision.cs"><Link>F_Vision.cs</Link><SubType>Form</SubType></Compile>
+    <Compile Include="..\Source\F_Vision.Designer.cs"><Link>F_Vision.Designer.cs</Link><DependentUpon>F_Vision.cs</DependentUpon></Compile>
+    <Compile Include="..\Source\F_SubMarkView.cs"><Link>F_SubMarkView.cs</Link><SubType>Form</SubType></Compile>
+    <Compile Include="..\Source\Motion\AxisStatus.cs"><Link>Motion\AxisStatus.cs</Link></Compile>
+    <Compile Include="..\Source\Motion\F_Motion_SK_PI.cs"><Link>Motion\F_Motion_SK_PI.cs</Link><SubType>Form</SubType></Compile>
+    <Compile Include="..\Source\Motion\F_Motion_SK_PI.Designer.cs"><Link>Motion\F_Motion_SK_PI.Designer.cs</Link><DependentUpon>F_Motion_SK_PI.cs</DependentUpon></Compile>
+    <Compile Include="..\Source\Motion\PI_GCS2.cs"><Link>Motion\PI_GCS2.cs</Link></Compile>
+    <Compile Include="..\Source\Motion\PI_Motion.cs"><Link>Motion\PI_Motion.cs</Link></Compile>
+    <Compile Include="..\Source\Motion\SK_Motion.cs"><Link>Motion\SK_Motion.cs</Link></Compile>
+    <Compile Include="..\Source\MyDbgHelper.cs"><Link>MyDbgHelper.cs</Link></Compile>
+    <Compile Include="..\Source\MyMatrox.cs"><Link>MyMatrox.cs</Link></Compile>
+    <Compile Include="..\Source\MyMicroLibrary.cs"><Link>MyMicroLibrary.cs</Link></Compile>
+    <Compile Include="..\Source\MySingleton.cs"><Link>MySingleton.cs</Link></Compile>
+    <Compile Include="..\Source\NETWORK.cs"><Link>NETWORK.cs</Link></Compile>
+    <Compile Include="..\Source\Program.cs"><Link>Program.cs</Link></Compile>
+    <Compile Include="..\Source\Properties\AssemblyInfo.cs"><Link>Properties\AssemblyInfo.cs</Link></Compile>
+    <Compile Include="..\Source\SocketInterface.cs"><Link>SocketInterface.cs</Link></Compile>
+    <Compile Include="..\Source\Splasher.cs"><Link>Splasher.cs</Link></Compile>
+    <Compile Include="..\Source\TestItemOnOff.cs"><Link>TestItemOnOff.cs</Link><SubType>Form</SubType></Compile>
+    <Compile Include="..\Source\TestItemOnOff.Designer.cs"><Link>TestItemOnOff.Designer.cs</Link><DependentUpon>TestItemOnOff.cs</DependentUpon></Compile>
+    <Compile Include="..\Source\Properties\Resources.Designer.cs"><Link>Properties\Resources.Designer.cs</Link><AutoGen>True</AutoGen><DependentUpon>Resources.resx</DependentUpon><DesignTime>True</DesignTime></Compile>
+    <Compile Include="..\Source\Properties\Settings.Designer.cs"><Link>Properties\Settings.Designer.cs</Link><AutoGen>True</AutoGen><DependentUpon>Settings.settings</DependentUpon><DesignTimeSharedInput>True</DesignTimeSharedInput></Compile>
+    <EmbeddedResource Include="..\Source\F_VisionPassForm.resx"><Link>F_VisionPassForm.resx</Link><DependentUpon>F_VisionPassForm.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="..\Source\Form1.resx"><Link>Form1.resx</Link><DependentUpon>Form1.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="..\Source\Form2.resx"><Link>Form2.resx</Link><DependentUpon>Form2.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="..\Source\Form3.resx"><Link>Form3.resx</Link><DependentUpon>Form3.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="..\Source\F_Main.resx"><Link>F_Main.resx</Link><DependentUpon>F_Main.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="..\Source\F_Manage.resx"><Link>F_Manage.resx</Link><DependentUpon>F_Manage.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="..\Source\F_Vision.resx"><Link>F_Vision.resx</Link><DependentUpon>F_Vision.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="..\Source\Motion\F_Motion_SK_PI.resx"><Link>Motion\F_Motion_SK_PI.resx</Link><DependentUpon>F_Motion_SK_PI.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="..\Source\Properties\Resources.resx"><Link>Properties\Resources.resx</Link></EmbeddedResource>
+    <EmbeddedResource Include="..\Source\TestItemOnOff.resx"><Link>TestItemOnOff.resx</Link><DependentUpon>TestItemOnOff.cs</DependentUpon></EmbeddedResource>
+    <None Include="..\Source\App.config"><Link>App.config</Link></None>
+    <None Include="..\Source\Resources\Alert.wav"><Link>Resources\Alert.wav</Link><CopyToOutputDirectory>Always</CopyToOutputDirectory></None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FAutoLearn\FAutoLearn.csproj">
+      <Project>{39752b05-88c4-4608-a3dc-695d165b7a94}</Project>
+      <Name>FAutoLearn</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MOTSimulator\MOTSimulator.csproj">
+      <Project>{ffb2e2ca-02d4-43f1-87df-9a8169531781}</Project>
+      <Name>MOTSimulator</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="CopyDlls" AfterTargets="Build">
+    <Copy SourceFiles="$(SolutionDir)PIDll\PI_GCS2_DLL_x64.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="false" />
+  </Target>
+</Project>

@@ -666,7 +666,11 @@ namespace CSH030Ex
             radioButton10Step.Checked = true;
             cbLiveWithMarks.Checked = false;
             rb1step.Checked = true;
+#if OFFLINE
+            this.BackColor = OfflineMode.BackColor;
+#else
             this.BackColor = Color.FromArgb(96, 96, 100);
+#endif
             //MessageBox.Show("aaa");
             //if (m__G!=null)
             SetEdgeBand(m__G.sRecipe.iEdgeBand);
@@ -716,7 +720,9 @@ namespace CSH030Ex
             InitializeHexpodPivot();
             if (m__G.m_bCalibrationModel)
             {
+#if !OFFLINE
                 m__G.mGageCounter?.OpenAllport();
+#endif
                 MAX_TRGGRAB_COUNT = 3000;
             }
             else
@@ -731,6 +737,17 @@ namespace CSH030Ex
             //    grbVolumetric.Visible = false;
             //}
             VisibleAdmin(false);
+#if OFFLINE
+            //  OFFLINE : 카메라 / LED / 모션 / 소켓 / Calibration 관련 버튼 비활성화
+            OfflineMode.Disable(
+                btnLive2, btnHalt2, button11, btnRepeatTriggerGrab, btnFindMarks, button7,
+                btnOISXReplay, btnOISXStepReplay, button1, button8, btnUptoNthMeasure, button4, button3, btnSetMasterTilt,
+                btnLEDUP, btnLEDDOWN, btnAllLEDOn,
+                btnFOVRight, btnFOVUp, btnFOVLeft, btnFOVDown, btnFitFOV, btnCheckFovBalance, button10, button12,
+                btnGobackOrg, btnSaveOrgPosition, btnMoveTo, button14, button15, button16, MotionStageBtn, cbMotorized,
+                BaseUpBtn, BaseDownBtn, SidePushloadBtn, SidePushUnloadBtn, PogoPinloadBtn, PogoPinUnloadBtn, cbBench,
+                btnPivotTest, btnTest, btn45Test, btnRangeTest, btnFindCSHorg, btnRepeatTest, btnScan, btnAutoCal, btnEastScale, btnAutoCrop);
+#endif
         }
 
         public string camID0 = "";
@@ -766,6 +783,20 @@ namespace CSH030Ex
                     MessageBox.Show("Camera ID not exists.");
                     return;
                 }
+#if OFFLINE
+                //  OFFLINE : 카메라를 열지 않고 CameraID.txt 첫 줄 ID 사용 (ID 별 보정파일 로드용)
+                string[] offlineIDs = File.ReadAllText(m__G.m_RootDirectory + "\\DoNotTouch\\CameraID.txt").Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                if (offlineIDs.Length == 0)
+                {
+                    MessageBox.Show("Camera ID is empty. Check CameraID.txt.");
+                    return;
+                }
+                camID0 = offlineIDs[0];
+                m__G.SetTesterID(camID0);
+                ReadOrgROI(camCount);
+                m__G.mCamCount = 1;
+                m_FocusedLED = 0;
+#else
                 StreamReader sr = new StreamReader(m__G.m_RootDirectory + "\\DoNotTouch\\CameraID.txt");
                 string fullText = sr.ReadToEnd();
                 sr.Close();
@@ -876,6 +907,7 @@ namespace CSH030Ex
                 
                 BaslerCam[0].Parameters[PLCamera.GainRaw].SetValue(v_OrgGain[0]);
                 BaslerCam[0].Parameters[PLCamera.GammaEnable].SetValue(true);
+#endif
 
                 m__G.oCam[0].SetBlobAreaMinMax(m_BlobAreaMin, m_BlobAreaMax);
                 string strScaleRotation = m__G.m_RootDirectory + "\\DoNotTouch\\ScaleNOpticalR.txt";
@@ -1003,6 +1035,7 @@ namespace CSH030Ex
 
 
                                     );
+#if !OFFLINE
             if (m__G.m_bCalibrationModel)
             {
                 if (m__G.fMotion.ConnectSKPI())
@@ -1021,6 +1054,7 @@ namespace CSH030Ex
                 //else
                 //mHybridStageAvailable = false;
             }
+#endif
             // JH 스테이지
             //RegisterMotorDelegates(m__G.fManage.M_C,
             //            m__G.fManage.M_H,

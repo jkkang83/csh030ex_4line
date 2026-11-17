@@ -708,6 +708,11 @@ namespace CSH030Ex
 
 
                 Splasher.Status = "Initializing I2C & GPIO ";
+#if OFFLINE
+                //  OFFLINE : DLN 어댑터 없음
+                mbDlnAvailable = false;
+                Splasher.Status = "OFFLINE : Skip I2C & GPIO.";
+#else
                 if (!m__G.fGraph.mDriverIC.InitI2CnGPIO(m__G.sRecipe.iI2Cclock, 2, m__G.mChannelCount))
                 {
                     mbDlnAvailable = false;
@@ -715,6 +720,7 @@ namespace CSH030Ex
                 }
                 else
                     Splasher.Status = "Success.";
+#endif
 
 
                 ChkCLAF();
@@ -738,7 +744,12 @@ namespace CSH030Ex
 
                 m__G.fManage.CalcShowYield();
 
+#if OFFLINE
+                //  OFFLINE : DIO/LED 감시 스레드 실행 안함
+                m__G.fGraph.mDriverIC.MyOwner = m__G.fGraph;
+#else
                 m__G.fGraph.StartMonitor();
+#endif
 
                 try
                 {
@@ -844,6 +855,11 @@ namespace CSH030Ex
 
             Splasher.Close();
             sForm.Close();
+#if OFFLINE
+            this.Text = OfflineMode.TitleTag + this.Text;
+            this.BackColor = OfflineMode.BackColor;
+            OfflineMode.Disable(button2, btnSendTCP, btnSaveNStartLan);     //  Distribute / TCP 송신 비활성화
+#endif
             this.Show();
             lblDefaultModel.Text = m__G.mFAL.GetLastFMI();
 

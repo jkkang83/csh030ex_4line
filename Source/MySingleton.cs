@@ -1189,6 +1189,10 @@ namespace CSH030Ex
                 lSystemName = "M_SYSTEM_RADIENTEVCL";
             
             bool res = true;
+#if OFFLINE
+            //  OFFLINE : MIL 보드/라이선스가 없으므로 MIL 할당 없이 초기화
+            res = oCam[0].InitOffline(mVROI[0], mHROI, mVROIstep, 0);
+#else
             if (!IsSwap)
             {
                 res = oCam[0].Init(mVROI[0], mHROI, mVROIstep, 0, lSystemName, 0, 0, mDcfFilePathT);
@@ -1197,6 +1201,7 @@ namespace CSH030Ex
             {
                 res = oCam[0].Init(mVROI[0], mHROI, mVROIstep, 0, lSystemName, 1, 0, mDcfFilePathT);
             }
+#endif
             mFAL = oCam[0].mFAL;
             return res;
         }

@@ -5221,6 +5221,9 @@ namespace CSH030Ex
             //m__G.fGraph.Drive_LEDs(m__G.sRecipe.iLEDcurrentLR - 0.01, m__G.sRecipe.iLEDcurrentLL - 0.01);
             m__G.oCam[0].RegisterDelegatesStandbyTrigger(SendAStoHost);
             m__G.oCam[0].RegisterDelegatesTriggerLoss(TriggerLossDetected);
+#if OFFLINE
+            OfflineMode.Disable(btnInfo1, btnStartTriggeredGrab, btnSuddenStop);    //  검사 시작/정지 비활성화
+#endif
         }
 
         public void TriggerLossDetected()
@@ -5454,7 +5457,11 @@ namespace CSH030Ex
         private void FManage_Paint(object sender, PaintEventArgs e)
         {
             UpdateCheckStates();
+#if OFFLINE
+            this.BackColor = OfflineMode.BackColor;
+#else
             this.BackColor = Color.FromArgb(96, 96, 100);
+#endif
         }
 
         private void tbRepeatLULdone_TextChanged(object sender, EventArgs e)

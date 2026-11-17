@@ -657,6 +657,38 @@ namespace S2System.Vision
             return true;
         }
 
+#if OFFLINE
+        //  OFFLINE : Init() 중 MIL 할당을 제외한 나머지 초기화만 동일 순서로 수행 (bInit 은 false 유지)
+        public bool InitOffline(int lVROI, int lHROI, int lVROIstep, int nCamIndex, bool FlipX = false, bool FlipY = false)
+        {
+            m_nCam = nCamIndex;
+            nSizeX = lHROI;
+            nSizeY = lVROI;
+            nSizeYstep = lVROI - 100;
+            bFlipX = FlipX;
+            bFlipY = FlipY;
+
+            p_Temp = new byte[nSizeX * nSizeY];
+            for (int i = 0; i < MAX_THREAD_NUM; i++)
+                p_Value[i] = new byte[M_HROI * nSizeY];
+
+            SupremeTimer.QueryPerformanceFrequency(ref mTimerFrequency);
+            ClearPoints();
+
+            if (!mFAL.LoadLastFMI())
+            {
+                mMatroxMsg = "Fail to Load LastFMIfile.txt";
+                return false;
+            }
+
+            mBackgroundNoise = new int[nSizeX];
+            mBackgroundNoiseY = new int[nSizeY];
+
+            PrepareFineCOG();
+            return true;
+        }
+#endif
+
         public void ResetModelScale(double scale)
         {
             if (mModelScale == scale)
@@ -773,6 +805,9 @@ namespace S2System.Vision
         //------------------------------------------------------------------------------------------------------------------------------------------------
         public void SelectWindow(IntPtr wndHandle)
         {
+#if OFFLINE
+            if (!bInit) return;     //  OFFLINE : MIL 미초기화 상태에서 MIL 호출 방지
+#endif
             MIL.MdispSelectWindow(milDisplay, milImageDisp, wndHandle);
 
             MIL.MdispControl(milDisplay, MIL.M_OVERLAY, MIL.M_ENABLE);
@@ -788,6 +823,9 @@ namespace S2System.Vision
         //------------------------------------------------------------------------------------------------------------------------------------------------
         public void DisplayZoom(double dZoomX, double dZoomY)
         {
+#if OFFLINE
+            if (!bInit) return;     //  OFFLINE : MIL 미초기화 상태에서 MIL 호출 방지
+#endif
             if (dZoomX == 0 || dZoomY == 0)
                 MIL.MdispControl(milDisplay, MIL.M_SCALE_DISPLAY, MIL.M_ENABLE);
             else
@@ -809,6 +847,9 @@ namespace S2System.Vision
         //------------------------------------------------------------------------------------------------------------------------------------------------
         public void DrawClear()
         {
+#if OFFLINE
+            if (!bInit) return;     //  OFFLINE : MIL 미초기화 상태에서 MIL 호출 방지
+#endif
             MIL.MbufClear(milOverlayImage, keyColor);
         }
         //------------------------------------------------------------------------------------------------------------------------------------------------
@@ -825,6 +866,9 @@ namespace S2System.Vision
         //------------------------------------------------------------------------------------------------------------------------------------------------
         public void DrawSetDCalloc()
         {
+#if OFFLINE
+            if (!bInit) return;     //  OFFLINE : MIL 미초기화 상태에서 MIL 호출 방지 (gr == null 이면 Draw 생략됨)
+#endif
             MIL.MbufControl(milOverlayImage, MIL.M_DC_ALLOC, MIL.M_DEFAULT);
             IntPtr hCustomDC = (IntPtr)MIL.MbufInquire(milOverlayImage, MIL.M_DC_HANDLE, MIL.M_NULL);
             //MessageBox.Show(m_nCam.ToString() + " hCustomDC" + hCustomDC.ToString());
@@ -838,6 +882,9 @@ namespace S2System.Vision
         //------------------------------------------------------------------------------------------------------------------------------------------------
         public void DrawSetDCfree()
         {
+#if OFFLINE
+            if (!bInit) return;     //  OFFLINE : MIL 미초기화 상태에서 MIL 호출 방지
+#endif
             if (gr != null)
                 gr.Dispose();
             MIL.MbufControl(milOverlayImage, MIL.M_DC_FREE, MIL.M_DEFAULT);
