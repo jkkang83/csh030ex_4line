@@ -3857,6 +3857,11 @@ namespace CSH030Ex
                                 + lCalibrationData[4].ToString("F3") + "\t"
                                 + lCalibrationData[5].ToString("F3") + "\t";
 
+                strtmp[ci] += "\tT-B = " + m__G.oCam[0].mTgradientRatio[0].ToString("F2") + " - " + m__G.oCam[0].mBgradientRatio[0].ToString("F2");
+                strtmp[ci] += "( > 20 )\tMean = " + m__G.oCam[0].mCurMeanBin.ToString("F2");
+                strtmp[ci] += "\t";
+
+
                 double[] xavg = new double[12];
                 double[] yavg = new double[12];
                 for (int findex = 1; findex < mavNum + 1; findex++)
@@ -4625,7 +4630,9 @@ namespace CSH030Ex
                     for (int i = 0; i < 5; i++)
                         strtmp += m__G.oCam[0].mFAL.mEffectiveContrast[i].ToString() + "\t";
 
-                    tbVsnLog.Text += strtmp + "( > 20 )\r\n";
+                    strtmp += "( > 20 )\tT-B = " + m__G.oCam[0].mTgradientRatio[0].ToString("F2") + " - " + m__G.oCam[0].mBgradientRatio[0].ToString("F2");
+
+                    tbVsnLog.Text += strtmp + "\r\n";
                 }
                 // ScaleNOpticalRotation();
             }
@@ -8886,7 +8893,8 @@ namespace CSH030Ex
                     strtmp += constrast.ToString() + "\t";
 
                 }
-                strtmp += "( > 20 )";
+                strtmp += "( > 20 )\tMean = " + m__G.oCam[0].mCurMeanBin.ToString("F2");
+                strtmp += "\t";
                 //strtmp += "\tSharpness\t" + m__G.oCam[0].m_sMR[0].mMTF.ToString("F0") + " " + m__G.oCam[0].m_sMR[1].mMTF.ToString("F0") + " " + m__G.oCam[0].m_sMR[2].mMTF.ToString("F0") + " "
                 //            + m__G.oCam[0].m_sMR[3].mMTF.ToString("F0") + " " + m__G.oCam[0].m_sMR[4].mMTF.ToString("F0");
 
@@ -8902,6 +8910,7 @@ namespace CSH030Ex
                     strtmp += "\tP45\t" + lPrismTXTYTZ[0].ToString("F5") + "\t" + lPrismTXTYTZ[1].ToString("F5") + "\t" + lPrismTXTYTZ[2].ToString("F5");
                 }
             }
+            strtmp += "\tT-B = " + m__G.oCam[0].mTgradientRatio[0].ToString("F2") + " - " + m__G.oCam[0].mBgradientRatio[0].ToString("F2");
             m__G.oCam[0].SaveGrabbedImage(0, fileName);
 
             DrawMarkDetected(); //DrawMarkDetected(true);

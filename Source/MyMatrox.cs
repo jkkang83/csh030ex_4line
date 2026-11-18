@@ -97,6 +97,10 @@ namespace S2System.Vision
         public double[] mPOMM_rTX = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
         public double[] mPOMM_rTY = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
         public double[] mPOMM_rTZ = new double[10000];  //  Left 0,1 ;; Right 2,3 in a camera view
+        public double mCurMeanBin = 0;
+
+        public double[] mTgradientRatio = new double[10000];
+        public double[] mBgradientRatio = new double[10000];
         public bool bPseudoOMM = false;
         
         
@@ -2667,7 +2671,10 @@ namespace S2System.Vision
             SupremeTimer.QueryPerformanceCounter(ref starttime);
 
 
+            mCurMeanBin = Cv2.Mean(mFAL.mSourceImg[iBuf]).Val0;
             mDetectedMarkPos[iBuf] = mFAL.FineCOG(IsFirst, index, ref sMR, ref sMR_T, ref sMR_B, ref Nfound, false, iBuf);
+            mTgradientRatio[index] = mFAL.mTopGradientRatio[index];
+            mBgradientRatio[index] = mFAL.mBtmGradientRatio[index];
             mDetectedMarkPts[index] = mDetectedMarkPos[iBuf];
 
             mOldSMR = sMR;

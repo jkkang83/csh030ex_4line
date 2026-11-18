@@ -6437,6 +6437,7 @@ namespace FAutoLearn
             //  계산된 경계좌표를 중심으로 BOX 영역의 위치를 재설정하고 재설정된 BOX 영역에서 다시 경계좌표를 계산하기를 반복한다.
             //  반복하여, 직전 반복결과와 비교하여 결과의 변화가 0.001 이하이면 반복 종료, 최대반복은 5회까지 허용
             double res1st = 0;
+            double[] resGradient = new double[8];
 
             int xi0 = (int)xia;
             double xi0_r = xia - xi0;
@@ -6750,7 +6751,10 @@ namespace FAutoLearn
                             }
 
                             if (newi == 0)
+                            {
+                                resGradient[edgeFound] = pY;
                                 pY = 1.15 * pY;      //  1보다 0.9 가 나빠짐, 1.1 해볼 필요 있음
+                            }
 
                             else if (newi == -1 || newi == 1)
                                 pY = 1.1 * pY;      //  1보다 0.9 가 나빠짐, 1.1 해볼 필요 있음
@@ -6823,7 +6827,13 @@ namespace FAutoLearn
                 //MessageBox.Show("ConvergePeakX() 2>>\r\n" + e.ToString());
                 //return simpleRes;
             }
-            resEdge[8] = (maxSlope[7] - maxSlope[0]);
+            if (si == 2)
+                //resEdge[8] = resGradient[0] / resGradient[7];   //  Focusing 상대에서는 si == 2 일 때 외측 Gradient[7] 가 내측 Gradient[0] 보다 작다.
+                resEdge[8] = resGradient[7] / 100;   //  Focusing 상대에서는 si == 2 일 때 외측 Gradient[7] 가 내측 Gradient[0] 보다 작다.
+            else if (si == 0)
+                //resEdge[8] = resGradient[7] / resGradient[0];   //  Focusing 상대에서는 si == 0 일 때 외측 Gradient[0] 가 내측 Gradient[7] 보다 작다.
+                resEdge[8] = resGradient[0] / 100;   //  Focusing 상대에서는 si == 0 일 때 외측 Gradient[0] 가 내측 Gradient[7] 보다 작다.
+
             return resEdge;
         }
 

@@ -8776,6 +8776,9 @@ namespace FAutoLearn
         }
 
         public double mSideToEastX = 0;
+        public double[] mTopGradientRatio = new double[10000];
+        public double[] mBtmGradientRatio = new double[10000];
+
         public OpenCvSharp.Point[] FineCOG(bool IsFirst, int iIndex, ref sMarkResult[] smr, ref sMarkResult[] smr_T, ref sMarkResult[] smr_B, ref long Nfound, bool IsDebug = false, int iBuf = 0, int whichModel = -1)
         {
             //  q_Value[iBuf] 에서 Object 를 찾은 뒤ㄹ
@@ -9430,33 +9433,12 @@ namespace FAutoLearn
                             if (ItrCountHeadExtension < 4)
                                 goto HeadExtension;
                         }
-                        ///////////////////////////////////////////////////////////////////////////////////////
-                        ///     2 Line or 3 Line 선택 필요
-                        //if (si < 2)
-                        //if (si == 2)
-                        //    smr[si].pos.Y = (yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 6;    //  3 Line  ConvergePeakX3( )
-                        //else
+
                         smr[si].pos.Y = (yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8;    //  3 Line  ConvergePeakX3( )
 
-                        //else if (si<2)
-                        //    smr[si].pos.Y = (yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8;    //  3 Line  ConvergePeakX3( )
-                        //else
-                        //    smr[si].pos.Y = (yT[0] + yT[1] + 2*(yT[2] + yT[3] + yT[4] + yT[5]) + yT[6] + yT[7]) / 12;    //  3 Line  ConvergePeakX3( )
-                        //string[] str8y = new string[1];
-                        //str8y[0] = yT[0].ToString("F5") + "," + yT[1].ToString("F5") + "," + yT[2].ToString("F5") + "," + yT[3].ToString("F5") + "," + yT[4].ToString("F5") + "," + yT[5].ToString("F5") + "," + yT[6].ToString("F5") + "," + yT[7].ToString("F5");
-                        //if ( si == 0)
-                        //{
-                        //    File.AppendAllLines("D:\\Linearity\\Pos8Y0.csv", str8y);
-                        //}else if ( si == 1)
-                        //{
-                        //    File.AppendAllLines("D:\\Linearity\\Pos8Y1.csv", str8y);
-                        //}else if ( si== 2)
-                        //{
-                        //    File.AppendAllLines("D:\\Linearity\\Pos8Y2.csv", str8y);
-                        //}
+                        if (si == 2)
+                            mBtmGradientRatio[iIndex] = yT[8];
 
-                        //smr_T[si].pos.Y = yT[0] + subTop;// + compT;
-                        //smr_B[si].pos.Y = yT[7] + subTop;// + compB;
                     }
                     else if (lfMark.yPosType == 3)     //  Shape
                     {
@@ -9902,6 +9884,9 @@ namespace FAutoLearn
                             }
                             ///////////////////////////////////////////////////////////////////////////////////////
                             smr_T[si].pos.Y = (yT[0] + yT[1] + yT[2] + yT[3] + yT[4] + yT[5] + yT[6] + yT[7]) / 8;    //  3 Line  ConvergePeakX3( )
+
+                            if (si == 0)
+                                mTopGradientRatio[iIndex] = yT[8];
 
                         }
                         else if (lfMark.yPosType == 3)     //  Shape
@@ -11218,6 +11203,11 @@ namespace FAutoLearn
                                         && (Math.Abs(2 * gap34 - (gap12 + gap23)) < Math.Abs(2 * gap01 - (gap12 + gap23))))
                                     {
                                         resVline[si] = new int[3] { xPos, peakIndex[1] + j0, peakIndex[4] + j0 };
+                                        if (Math.Abs(gap01 - gap34)<2)
+                                        {
+                                            if (peakEach[3]> peakEach[4] && peakEach[0] > peakEach[4])
+                                                resVline[si] = new int[3] { xPos, peakIndex[0] + j0, peakIndex[3] + j0 };
+                                        }
                                         foundMark = true;
                                         break;
                                     }else
