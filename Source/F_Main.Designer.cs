@@ -421,6 +421,7 @@
             this.groupBox1.Controls.Add(this.button2);
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.lbxModelFiles);
+            this.groupBox1.Controls.Add(this.cbEulerRotation);
             this.groupBox1.Controls.Add(this.btnApplyTesterNo);
             this.groupBox1.Controls.Add(this.tbBarcodeRevNo);
             this.groupBox1.Controls.Add(this.groupBox2);
@@ -457,8 +458,7 @@
             this.panel2.Controls.Add(this.label3);
             this.panel2.Controls.Add(this.cbYTiltReverse);
             this.panel2.Controls.Add(this.cbXTiltReverse);
-            this.panel2.Controls.Add(this.cbEulerRotation);
-            this.panel2.Location = new System.Drawing.Point(565, 584);
+            this.panel2.Location = new System.Drawing.Point(565, 571);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(10, 10);
             this.panel2.TabIndex = 206;
@@ -682,13 +682,12 @@
             this.cbEulerRotation.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbEulerRotation.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold);
             this.cbEulerRotation.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.cbEulerRotation.Location = new System.Drawing.Point(311, 29);
+            this.cbEulerRotation.Location = new System.Drawing.Point(346, 91);
             this.cbEulerRotation.Name = "cbEulerRotation";
             this.cbEulerRotation.Size = new System.Drawing.Size(185, 25);
             this.cbEulerRotation.TabIndex = 183;
             this.cbEulerRotation.Text = "Euler Angle Rotation";
             this.cbEulerRotation.UseVisualStyleBackColor = false;
-            this.cbEulerRotation.Visible = false;
             this.cbEulerRotation.CheckedChanged += new System.EventHandler(this.cbEulerRotation_CheckedChanged);
             // 
             // chReverseCamera
@@ -698,7 +697,7 @@
             this.chReverseCamera.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chReverseCamera.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.chReverseCamera.ForeColor = System.Drawing.Color.Black;
-            this.chReverseCamera.Location = new System.Drawing.Point(346, 264);
+            this.chReverseCamera.Location = new System.Drawing.Point(346, 287);
             this.chReverseCamera.Name = "chReverseCamera";
             this.chReverseCamera.Size = new System.Drawing.Size(149, 25);
             this.chReverseCamera.TabIndex = 205;
@@ -713,7 +712,7 @@
             this.chSaveVideo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chSaveVideo.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.chSaveVideo.ForeColor = System.Drawing.Color.Black;
-            this.chSaveVideo.Location = new System.Drawing.Point(346, 205);
+            this.chSaveVideo.Location = new System.Drawing.Point(346, 231);
             this.chSaveVideo.Name = "chSaveVideo";
             this.chSaveVideo.Size = new System.Drawing.Size(112, 25);
             this.chSaveVideo.TabIndex = 204;
@@ -728,7 +727,7 @@
             this.cbPseudoOMM.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbPseudoOMM.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbPseudoOMM.ForeColor = System.Drawing.Color.Aqua;
-            this.cbPseudoOMM.Location = new System.Drawing.Point(346, 236);
+            this.cbPseudoOMM.Location = new System.Drawing.Point(346, 259);
             this.cbPseudoOMM.Name = "cbPseudoOMM";
             this.cbPseudoOMM.Size = new System.Drawing.Size(124, 25);
             this.cbPseudoOMM.TabIndex = 203;
@@ -743,7 +742,7 @@
             this.chSaveUserImage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chSaveUserImage.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.chSaveUserImage.ForeColor = System.Drawing.Color.Black;
-            this.chSaveUserImage.Location = new System.Drawing.Point(346, 174);
+            this.chSaveUserImage.Location = new System.Drawing.Point(346, 203);
             this.chSaveUserImage.Name = "chSaveUserImage";
             this.chSaveUserImage.Size = new System.Drawing.Size(156, 25);
             this.chSaveUserImage.TabIndex = 202;
@@ -758,7 +757,7 @@
             this.chOISOption.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chOISOption.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.chOISOption.ForeColor = System.Drawing.Color.Black;
-            this.chOISOption.Location = new System.Drawing.Point(346, 146);
+            this.chOISOption.Location = new System.Drawing.Point(346, 175);
             this.chOISOption.Name = "chOISOption";
             this.chOISOption.Size = new System.Drawing.Size(110, 25);
             this.chOISOption.TabIndex = 201;
@@ -773,7 +772,7 @@
             this.cbSaveNGImage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbSaveNGImage.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbSaveNGImage.ForeColor = System.Drawing.Color.Black;
-            this.cbSaveNGImage.Location = new System.Drawing.Point(346, 118);
+            this.cbSaveNGImage.Location = new System.Drawing.Point(346, 147);
             this.cbSaveNGImage.Name = "cbSaveNGImage";
             this.cbSaveNGImage.Size = new System.Drawing.Size(147, 25);
             this.cbSaveNGImage.TabIndex = 200;
@@ -814,7 +813,7 @@
             this.cbPrismCoordinateSystem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbPrismCoordinateSystem.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.cbPrismCoordinateSystem.ForeColor = System.Drawing.Color.Lime;
-            this.cbPrismCoordinateSystem.Location = new System.Drawing.Point(346, 89);
+            this.cbPrismCoordinateSystem.Location = new System.Drawing.Point(346, 119);
             this.cbPrismCoordinateSystem.Name = "cbPrismCoordinateSystem";
             this.cbPrismCoordinateSystem.Size = new System.Drawing.Size(219, 25);
             this.cbPrismCoordinateSystem.TabIndex = 184;
@@ -1311,7 +1310,7 @@
             // 
             this.cbSaveRawData.AutoSize = true;
             this.cbSaveRawData.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
-            this.cbSaveRawData.Location = new System.Drawing.Point(1780, 1);
+            this.cbSaveRawData.Location = new System.Drawing.Point(1767, 1);
             this.cbSaveRawData.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
             this.cbSaveRawData.Name = "cbSaveRawData";
             this.cbSaveRawData.Size = new System.Drawing.Size(114, 21);
@@ -1324,7 +1323,7 @@
             // 
             this.cbPassword.AutoSize = true;
             this.cbPassword.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
-            this.cbPassword.Location = new System.Drawing.Point(1665, 1);
+            this.cbPassword.Location = new System.Drawing.Point(1659, 1);
             this.cbPassword.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
             this.cbPassword.Name = "cbPassword";
             this.cbPassword.Size = new System.Drawing.Size(84, 21);
@@ -1515,7 +1514,7 @@
             // 
             this.cbSaveImage.AutoSize = true;
             this.cbSaveImage.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Bold);
-            this.cbSaveImage.Location = new System.Drawing.Point(1541, 2);
+            this.cbSaveImage.Location = new System.Drawing.Point(1541, 1);
             this.cbSaveImage.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
             this.cbSaveImage.Name = "cbSaveImage";
             this.cbSaveImage.Size = new System.Drawing.Size(94, 21);
@@ -1528,7 +1527,7 @@
             // 
             this.txtSaveImage.BackColor = System.Drawing.Color.SandyBrown;
             this.txtSaveImage.Font = new System.Drawing.Font("맑은 고딕", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.txtSaveImage.Location = new System.Drawing.Point(1601, 21);
+            this.txtSaveImage.Location = new System.Drawing.Point(1605, 22);
             this.txtSaveImage.Name = "txtSaveImage";
             this.txtSaveImage.Size = new System.Drawing.Size(39, 22);
             this.txtSaveImage.TabIndex = 195;
@@ -1541,7 +1540,7 @@
             this.lblSaveImage.AutoSize = true;
             this.lblSaveImage.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.lblSaveImage.ForeColor = System.Drawing.Color.Peru;
-            this.lblSaveImage.Location = new System.Drawing.Point(1555, 23);
+            this.lblSaveImage.Location = new System.Drawing.Point(1555, 24);
             this.lblSaveImage.Name = "lblSaveImage";
             this.lblSaveImage.Size = new System.Drawing.Size(43, 17);
             this.lblSaveImage.TabIndex = 194;

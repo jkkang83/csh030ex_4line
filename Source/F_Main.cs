@@ -1027,8 +1027,8 @@ namespace CSH030Ex
 
             if (IsChecked.Contains("t") || IsChecked.Contains("T"))
             {
-                cbEulerRotation.Checked = false;
-                m__G.m_bEulerRotation = false;
+                cbEulerRotation.Checked = true;
+                m__G.m_bEulerRotation = true;
             }
             else
             {
@@ -1229,7 +1229,7 @@ namespace CSH030Ex
             sr.WriteLine("false"); //sr.WriteLine(cbReverseTY.Checked.ToString());
             sr.WriteLine("false"); //sr.WriteLine(cbReverseX.Checked.ToString());
             sr.WriteLine("false"); //sr.WriteLine(cbReverseY.Checked.ToString());
-            sr.WriteLine("false"); //sr.WriteLine(cbEulerRotation.Checked.ToString());
+            sr.WriteLine(cbEulerRotation.Checked.ToString());
             sr.WriteLine(cbPrismCoordinateSystem.Checked.ToString());
             sr.WriteLine("false"); //sr.WriteLine(cbAutoLastFrame.Checked.ToString());//cbSaveLostTestSet
             sr.WriteLine(cbSaveLostTestSet.Checked.ToString());
@@ -2748,6 +2748,7 @@ namespace CSH030Ex
             //AddValue("Y_Tilt_Reversal", m__G.m_bYDirReverse ? 1 : 0);
             AddValue("Prism_Coordinate_System", m__G.m_bPrismCS ? 1 : 0);
             AddValue("Reverse_Camera", m__G.m_bReverseCamera ? 1 : 0);
+            AddValue("Euler_Rotation", m__G.m_bEulerRotation ? 1 : 0);
 
             return Encoding.ASCII.GetBytes(sb.ToString());
         }
@@ -6298,10 +6299,10 @@ namespace CSH030Ex
                                 cbPrismCoordinateSystem.Checked = false;
                                 break;
                             case "Fast":
-                                cbEulerRotation.Checked = false;
+                                cbEulerRotation.Checked = true;
                                 break;
                             case "SuperFast":
-                                cbEulerRotation.Checked = false;
+                                cbEulerRotation.Checked = true;
                                 cbPrismCoordinateSystem.Checked = true;
                                 break;
                             default:
@@ -6412,35 +6413,32 @@ namespace CSH030Ex
 
         private void cbEulerRotation_CheckedChanged(object sender, EventArgs e)
         {
-            //if (cbEulerRotation.Checked)
-            //{
-            //    m__G.m_bEulerRotation = true;
-            //    //  저장되어있는 Euler Angle 을 읽어들여서 EulerMatrix 를 설정하고, Validate 한다.
-            //    //  저장되어있는 Euler Angle 이 없으면 Validate 만 한다.
-            //    //  EulerMatrix 는 사용자에 의해 변경될 수 있고 변경될 때 저장된다.
-            //    string eulerFile = m__G.m_RootDirectory + "\\DoNotTouch\\EulerAngle" + m__G.fVision.camID0 + ".txt";
-            //    if (File.Exists(eulerFile))
-            //    {
-            //        StreamReader rd = new StreamReader(eulerFile);
-            //        string fullstr = rd.ReadToEnd();
-            //        rd.Close();
-            //        string[] eachLine = fullstr.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            //        m__G.fVision.mPhiThetaPsi[0] = double.Parse(eachLine[0]);
-            //        m__G.fVision.mPhiThetaPsi[1] = double.Parse(eachLine[1]);
-            //        m__G.fVision.mPhiThetaPsi[2] = double.Parse(eachLine[2]);
-            //        m__G.oCam[0].mFAL.SetEulerAngle(m__G.fVision.mPhiThetaPsi);
-            //    }
-            //    m__G.oCam[0].mFAL.ValidateEulerRotation(true);
-            //    m__G.fVision.UpdateEulerAngle();
-            //}
-            //else
-            //{
-            //    m__G.m_bEulerRotation = false;
-            //    m__G.oCam[0].mFAL.ValidateEulerRotation(false);
-            //}
-            cbEulerRotation.Checked = false;
-            m__G.m_bEulerRotation = false;
-            m__G.oCam[0].mFAL.ValidateEulerRotation(false);
+            if (cbEulerRotation.Checked)
+            {
+                m__G.m_bEulerRotation = true;
+                //  저장되어있는 Euler Angle 을 읽어들여서 EulerMatrix 를 설정하고, Validate 한다.
+                //  저장되어있는 Euler Angle 이 없으면 Validate 만 한다.
+                //  EulerMatrix 는 사용자에 의해 변경될 수 있고 변경될 때 저장된다.
+                string eulerFile = m__G.m_RootDirectory + "\\DoNotTouch\\EulerAngle" + m__G.fVision.camID0 + ".txt";
+                if (File.Exists(eulerFile))
+                {
+                    StreamReader rd = new StreamReader(eulerFile);
+                    string fullstr = rd.ReadToEnd();
+                    rd.Close();
+                    string[] eachLine = fullstr.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    m__G.fVision.mPhiThetaPsi[0] = double.Parse(eachLine[0]);
+                    m__G.fVision.mPhiThetaPsi[1] = double.Parse(eachLine[1]);
+                    m__G.fVision.mPhiThetaPsi[2] = double.Parse(eachLine[2]);
+                    m__G.oCam[0].mFAL.SetEulerAngle(m__G.fVision.mPhiThetaPsi);
+                }
+                m__G.oCam[0].mFAL.ValidateEulerRotation(true);
+                m__G.fVision.UpdateEulerAngle();
+            }
+            else
+            {
+                m__G.m_bEulerRotation = false;
+                m__G.oCam[0].mFAL.ValidateEulerRotation(false);
+            }
         }
 
         private void cbSuperFastMode_CheckedChanged(object sender, EventArgs e)
