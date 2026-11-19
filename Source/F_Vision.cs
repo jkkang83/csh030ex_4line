@@ -33,7 +33,7 @@ using static CSH030Ex.FVision;
 using static FAutoLearn.FAutoLearn;
 using static FAutoLearn.FZMath;
 using static MotorizedStage_SK_PI.F_Motion_SK_PI;
-using static S2System.Vision.MILlib;
+using static S2System.Vision.VisionCamera;
 using Axis = MotorizedStage_SK_PI.Axis;
 using Microsoft.Win32;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
@@ -2220,7 +2220,7 @@ namespace CSH030Ex
 
         //    m__G.oCam[0].mTargetTriggerCount = 3000;
         //    m__G.oCam[0].dAFZM_FrameCount = 9;
-        //    m__G.oCam[0].mTrgBufLength = MILlib.MAX_TRGGRAB_COUNT;
+        //    m__G.oCam[0].mTrgBufLength = VisionCamera.MAX_TRGGRAB_COUNT;
         //    double[] gageData = null;
 
         //    for (int mi = 0; mi < 5; mi++)
@@ -2446,7 +2446,7 @@ namespace CSH030Ex
 
             m__G.oCam[0].mTargetTriggerCount = 3000;
             m__G.oCam[0].dAFZM_FrameCount = 9;
-            m__G.oCam[0].mTrgBufLength = MILlib.MAX_TRGGRAB_COUNT;
+            m__G.oCam[0].mTrgBufLength = VisionCamera.MAX_TRGGRAB_COUNT;
             double[] gageData = null;
             //double[] gageData2 = null;
 
@@ -2904,7 +2904,7 @@ namespace CSH030Ex
 
             m__G.oCam[0].mTargetTriggerCount = 3000;
             m__G.oCam[0].dAFZM_FrameCount = 9;
-            m__G.oCam[0].mTrgBufLength = MILlib.MAX_TRGGRAB_COUNT;
+            m__G.oCam[0].mTrgBufLength = VisionCamera.MAX_TRGGRAB_COUNT;
             double[] gageData = new double[7];
             //double[] gageData2 = null;
 
@@ -3167,7 +3167,7 @@ namespace CSH030Ex
 
             m__G.oCam[0].mTargetTriggerCount = 3000;
             m__G.oCam[0].dAFZM_FrameCount = 9;
-            m__G.oCam[0].mTrgBufLength = MILlib.MAX_TRGGRAB_COUNT;
+            m__G.oCam[0].mTrgBufLength = VisionCamera.MAX_TRGGRAB_COUNT;
             double[] gageData = null;
             double[] gageData2 = null;
 
@@ -3542,7 +3542,7 @@ namespace CSH030Ex
 
             m__G.oCam[0].mTargetTriggerCount = 3000;
             m__G.oCam[0].dAFZM_FrameCount = 9;
-            m__G.oCam[0].mTrgBufLength = MILlib.MAX_TRGGRAB_COUNT;
+            m__G.oCam[0].mTrgBufLength = VisionCamera.MAX_TRGGRAB_COUNT;
             double[] gageData = null;
 
             for (int mi = 0; mi < 5; mi++)
@@ -3724,7 +3724,7 @@ namespace CSH030Ex
 
             m__G.oCam[0].mTargetTriggerCount = 3000;
             m__G.oCam[0].dAFZM_FrameCount = 9;
-            m__G.oCam[0].mTrgBufLength = MILlib.MAX_TRGGRAB_COUNT;
+            m__G.oCam[0].mTrgBufLength = VisionCamera.MAX_TRGGRAB_COUNT;
             double[] gageData = null;
 
             for (int mi = 0; mi < 5; mi++)
@@ -6616,7 +6616,7 @@ namespace CSH030Ex
             //if (m__G.oCam[0].IsInit == true)
             //    m__G.oCam[0].Free();
 
-            //m__G.oCam[0] = new MILlib(1.0);
+            //m__G.oCam[0] = new VisionCamera(1.0);
 
             //Thread.Sleep(100);
 
@@ -11461,7 +11461,7 @@ namespace CSH030Ex
 
         private void btnCheckFovBalance_Click(object sender, EventArgs e)
         {
-            m__G.oCam[0].mTrgBufLength = MILlib.MAX_TRGGRAB_COUNT;
+            m__G.oCam[0].mTrgBufLength = VisionCamera.MAX_TRGGRAB_COUNT;
             m__G.oCam[0].mTargetTriggerCount = 3000;
             m__G.oCam[0].GrabB(0, true);
             m__G.oCam[0].ShowBalancingImage();

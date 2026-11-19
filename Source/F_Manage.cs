@@ -1296,7 +1296,7 @@ namespace CSH030Ex
             {
                 m_LastSampleNumber = int.Parse(tbConsecutiveTest.Text);
                 tbResidualTestNumber.Text = m_LastSampleNumber.ToString();
-                frmCnt = MILlib.MAX_TRGGRAB_COUNT;
+                frmCnt = VisionCamera.MAX_TRGGRAB_COUNT;
                 if (InvokeRequired)
                 {
                     BeginInvoke((MethodInvoker)delegate
@@ -1341,10 +1341,10 @@ namespace CSH030Ex
 
             while (true)
             {
-                if (S2System.Vision.MILlib.mTriggeredFrameCount > 0)
+                if (S2System.Vision.VisionCamera.mTriggeredFrameCount > 0)
 
                     Thread.Sleep(500);
-                //AddViewLog(" " + S2System.Vision.MILlib.mTriggeredFrameCount.ToString());
+                //AddViewLog(" " + S2System.Vision.VisionCamera.mTriggeredFrameCount.ToString());
                 if (m__G.oCam[0].mExternalTriggerOrg == false && watchCnt++ > 20)
                     break;
             }
@@ -1413,7 +1413,7 @@ namespace CSH030Ex
             SupremeTimer.QueryPerformanceFrequency(ref lTimerFrequency);
 
             mRealTimeUnit = 8.0 / 500.0;    //  Default Value
-            m__G.oCam[0].mTrgBufLength = MILlib.MAX_TRGGRAB_COUNT;
+            m__G.oCam[0].mTrgBufLength = VisionCamera.MAX_TRGGRAB_COUNT;
             while (!m__G.mbSuddenStop[0])   //  여기는 Stop 시 즉각 탈출한다.
             {
                 int indexNow = index % 12;
@@ -1424,7 +1424,7 @@ namespace CSH030Ex
                 if (m__G.mbSuddenStop[0])   //  여기는 Stop 시 즉각 탈출한다.
                     break;
 
-                m__G.oCam[0].mTrgBufLength = MILlib.MAX_TRGGRAB_COUNT;
+                m__G.oCam[0].mTrgBufLength = VisionCamera.MAX_TRGGRAB_COUNT;
                 m__G.oCam[0].FineCOG(false, index9999, 0);
                 //res[indexThread] = false;
                 //res[indexThread] = m__G.oCam[0].FineCOG(false, index9999, indexThread);
@@ -1672,7 +1672,7 @@ namespace CSH030Ex
 
         //            taskExtTrigger.Start();
 
-        //            m__G.fVision.SetTriggerGrabbedFrame(S2System.Vision.MILlib.mTriggeredFrameCount);
+        //            m__G.fVision.SetTriggerGrabbedFrame(S2System.Vision.VisionCamera.mTriggeredFrameCount);
         //            //m__G.fVision.SetTriggerGrabbedFPS(frameRate);
 
         //            if (m__G.mbSuddenStop[0])
@@ -2879,7 +2879,7 @@ namespace CSH030Ex
                 //AddViewLog("MSG\t" + frmCnt.ToString() + "\t>>\t" + m__G.oCam[0].mMatroxMsg);
                 //if (endTriggerTime != 0)
                 //{
-                //    timeinterval = (S2System.Vision.MILlib.mGrabTiming[0] - endTriggerTime) / (double)(lTimerFrequency);
+                //    timeinterval = (S2System.Vision.VisionCamera.mGrabTiming[0] - endTriggerTime) / (double)(lTimerFrequency);
                 //    AddViewLog("\t\tTime Interval\t " + timeinterval.ToString("F3") + "\tsec\r\n");
                 //}
 
@@ -3255,7 +3255,7 @@ namespace CSH030Ex
             m__G.fGraph.Drive_LEDs(m__G.sRecipe.iLEDcurrentLR, m__G.sRecipe.iLEDcurrentLL);
             m__G.fVision.CameraReset(2, true);
             m__G.oCam[0].mTargetTriggerCount = frmCnt;
-            m__G.oCam[0].mTrgBufLength = MILlib.MAX_TRGGRAB_COUNT;
+            m__G.oCam[0].mTrgBufLength = VisionCamera.MAX_TRGGRAB_COUNT;
 
             m__G.fVision.SetDefaultMarkConfig(false);
             m__G.oCam[0].PrepareFineCOG();

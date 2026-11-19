@@ -390,7 +390,7 @@ namespace CSH030Ex
         //public F_SetupRegister fSetupReg = new F_SetupRegister();
 
         // Objects
-        public MILlib[] oCam = new MILlib[2];
+        public VisionCamera[] oCam = new VisionCamera[2];
 
         // User Global 변수 선언
         public Parameter sRecipe;
@@ -1169,10 +1169,10 @@ namespace CSH030Ex
         public string mDcfFilePathT = "";
         public bool Initial_Vision(int grabberType, bool IsSwap = false)
         {
-            oCam[0] = new MILlib(1.0);
+            oCam[0] = new VisionCamera(1.0);
 
             if (mCamCount > 1)
-                oCam[1] = new MILlib(1.0);
+                oCam[1] = new VisionCamera(1.0);
 
             strPath = m_RootDirectory + "\\RunData\\";
             //String[] strFileName = new string[2] { "", "" };

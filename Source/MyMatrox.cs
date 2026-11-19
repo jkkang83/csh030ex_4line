@@ -46,7 +46,7 @@ namespace S2System.Vision
         public static extern int QueryPerformanceFrequency(ref Int64 frequency);
     }
 
-    public class MILlib
+    public class VisionCamera
     {
         public MicroLibrary.MicroTimer uTimer = null;
         public FAutoLearn.FAutoLearn mFAL = null;
@@ -388,7 +388,7 @@ namespace S2System.Vision
         }
 
         //------------------------------------------------------------------------------------------------------------------------------------------------
-        public MILlib(double ZoomFactor)
+        public VisionCamera(double ZoomFactor)
         {
             dZoomFactorX = ZoomFactor;
             dZoomFactorY = ZoomFactor;
@@ -415,7 +415,7 @@ namespace S2System.Vision
         }
 
         //------------------------------------------------------------------------------------------------------------------------------------------------
-        ~MILlib()
+        ~VisionCamera()
         {
             if (bInit == true)
                 Free();
